@@ -1,19 +1,20 @@
 package com.algaecare.controller;
 
-import com.algaecare.model.Model;
+import com.algaecare.model.GameState;
 
 public class MainController {
-    private Model model;
+    private final GameState gameState;
 
     public MainController() {
-        this.model = new Model();
+        this.gameState = new GameState();
     }
 
-    public String getMessage() {
-        return model.getMessage();
+    public void startGame() {
+        gameState.setGameRunning(true);
+        // Add game initialization logic here
     }
 
-    public void updateMessage(String newMessage) {
-        model.setMessage(newMessage);
+    public boolean isGameRunning() {
+        return gameState.isGameRunning();
     }
 }
