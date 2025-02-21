@@ -1,3 +1,12 @@
+# MacOS
+.DS_Store
+
+# Windows
+Thumbs.db
+
+# Linux
+*~
+
 # Compiled class files
 *.class
 

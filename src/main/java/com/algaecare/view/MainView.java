@@ -1,6 +1,11 @@
 package com.algaecare.view;
 
 import com.algaecare.controller.MainController;
+import com.algaecare.input.GameInput;
+import com.algaecare.input.KeyboardInput;
+import com.algaecare.input.Pi4JInput;
+
+import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.image.Image;
@@ -12,11 +17,40 @@ import java.util.Objects;
 public class MainView extends VBox {
     private final MainController controller;
     private ImageView startScreen;
+    private GameInput gameInput;
 
     public MainView() {
         controller = new MainController();
         initializeUI();
         showStartScreen();
+    }
+
+    public void initializeInput(Scene scene) {
+        try {
+            gameInput = new Pi4JInput();
+            gameInput.initialize();
+        } catch (Exception e) {
+            System.out.println("Pi4J not available, falling back to keyboard input");
+            gameInput = new KeyboardInput(scene);
+            try {
+                gameInput.initialize();
+            } catch (Exception keyboardError) {
+                System.err.println("Failed to initialize keyboard input: " + keyboardError.getMessage());
+                return;
+            }
+        }
+        gameInput.setInputCallback(this::handleGameInput);
+    }
+
+    private void handleGameInput() {
+        if (!controller.isGameRunning()) {
+            controller.startGame();
+            showGameScreen();
+        }
+    }
+
+    public void cleanup() {
+        gameInput.cleanup();
     }
 
     private void initializeUI() {
