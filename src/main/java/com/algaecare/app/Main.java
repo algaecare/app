@@ -18,8 +18,7 @@ public class Main extends Application {
             MainView mainView = new MainView();
             Scene scene = new Scene(mainView);
             mainView.initializeInput(scene);
-            primaryStage.setWidth(1920);
-            primaryStage.setHeight(1080);
+            resize(primaryStage);
             // primaryStage.setFullScreen(true);
             primaryStage.setTitle("Algae Care");
             primaryStage.setScene(scene);
@@ -33,5 +32,11 @@ public class Main extends Application {
         System.setProperty("prism.verbose", "false"); // Reduce JavaFX logging
         System.setProperty("javafx.verbose", "false"); // Reduce JavaFX logging
         launch(args);
+    }
+
+    public static void resize(Stage primaryStage) {
+        primaryStage.setWidth(1920);
+        primaryStage.setHeight(1080);
+        primaryStage.setResizable(false);
     }
 }

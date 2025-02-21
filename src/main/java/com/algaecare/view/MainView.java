@@ -4,24 +4,20 @@ import com.algaecare.controller.MainController;
 import com.algaecare.input.GameInput;
 import com.algaecare.input.KeyboardInput;
 import com.algaecare.input.Pi4JInput;
+import com.algaecare.view.screen.GameScreen;
+import com.algaecare.view.screen.GameplayScreen;
+import com.algaecare.view.screen.StartScreen;
 
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.image.Image;
-import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
-
-import java.util.Objects;
 
 public class MainView extends VBox {
     private final MainController controller;
-    private ImageView startScreen;
     private GameInput gameInput;
+    private GameScreen currentScreen;
 
     public MainView() {
         controller = new MainController();
-        initializeUI();
         showStartScreen();
     }
 
@@ -40,6 +36,12 @@ public class MainView extends VBox {
             }
         }
         gameInput.setInputCallback(this::handleGameInput);
+        scene.widthProperty().addListener((obs, oldVal, newVal) -> {
+            System.out.println("Window width: " + newVal);
+        });
+        scene.heightProperty().addListener((obs, oldVal, newVal) -> {
+            System.out.println("Window height: " + newVal);
+        });
     }
 
     private void handleGameInput() {
@@ -53,40 +55,17 @@ public class MainView extends VBox {
         gameInput.cleanup();
     }
 
-    private void initializeUI() {
-        initializeStartScreen();
-    }
-
     private void showStartScreen() {
-        getChildren().clear();
-        getChildren().add(startScreen);
-
-        Button startButton = new Button("Start Game");
-        startButton.setOnAction(e -> {
-            controller.startGame();
-            showGameScreen(); // New method to show game UI
-        });
-
-        getChildren().add(startButton);
+        if (currentScreen != null) {
+            getChildren().clear();
+        }
+        currentScreen = new StartScreen(controller, this::showGameScreen);
+        getChildren().add(currentScreen);
     }
 
     private void showGameScreen() {
         getChildren().clear();
-        Label gameLabel = new Label("Game is running...");
-        getChildren().add(gameLabel);
+        currentScreen = new GameplayScreen(controller);
+        getChildren().add(currentScreen);
     }
-
-    private void initializeStartScreen() {
-        try {
-            Image startImage = new Image(
-                    Objects.requireNonNull(getClass().getResourceAsStream("/images/screen_start.png")));
-            startScreen = new ImageView(startImage);
-            startScreen.fitWidthProperty().bind(this.widthProperty());
-            startScreen.fitHeightProperty().bind(this.heightProperty());
-            startScreen.setPreserveRatio(true);
-        } catch (Exception e) {
-            System.err.println("Could not load start screen image: " + e.getMessage());
-            startScreen = new ImageView();
-        }
-    };
 }
