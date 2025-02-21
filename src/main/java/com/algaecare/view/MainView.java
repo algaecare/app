@@ -36,12 +36,6 @@ public class MainView extends VBox {
             }
         }
         gameInput.setInputCallback(this::handleGameInput);
-        scene.widthProperty().addListener((obs, oldVal, newVal) -> {
-            System.out.println("Window width: " + newVal);
-        });
-        scene.heightProperty().addListener((obs, oldVal, newVal) -> {
-            System.out.println("Window height: " + newVal);
-        });
     }
 
     private void handleGameInput() {

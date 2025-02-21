@@ -5,7 +5,6 @@ import javafx.scene.input.KeyCode;
 
 public class KeyboardInput implements GameInput {
     private Scene scene;
-    private Runnable callback;
 
     public KeyboardInput(Scene scene) {
         this.scene = scene;
@@ -18,7 +17,6 @@ public class KeyboardInput implements GameInput {
 
     @Override
     public void setInputCallback(Runnable callback) {
-        this.callback = callback;
         scene.setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.SPACE) {
                 callback.run();

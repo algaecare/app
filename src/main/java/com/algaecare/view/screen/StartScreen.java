@@ -1,18 +1,15 @@
 package com.algaecare.view.screen;
 
 import com.algaecare.controller.MainController;
-import javafx.scene.control.Button;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import java.util.Objects;
 
 public class StartScreen extends GameScreen {
     private ImageView backgroundImage;
-    private final Runnable onStartGame;
 
     public StartScreen(MainController controller, Runnable onStartGame) {
         super(controller);
-        this.onStartGame = onStartGame;
     }
 
     @Override
