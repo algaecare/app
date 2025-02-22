@@ -1,42 +1,45 @@
 package com.algaecare.app;
 
-import com.algaecare.view.MainView;
 import javafx.application.Application;
 import javafx.application.Platform;
-import javafx.scene.Scene;
 import javafx.stage.Stage;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+import com.algaecare.controller.MainController;
 
+// Main class for the Algae Care application
+// This class initializes the JavaFX application and sets up the main controller.
 public class Main extends Application {
-    @Override
-    public void start(Stage primaryStage) {
-        // Set Mac-specific properties
-        System.setProperty("apple.awt.application.appearance", "system");
-        System.setProperty("apple.awt.application.name", "Algae Care");
-
-        // Initialize view in Platform.runLater to avoid Mac activation timeout
-        Platform.runLater(() -> {
-            MainView mainView = new MainView();
-            Scene scene = new Scene(mainView);
-            mainView.initializeInput(scene);
-            resize(primaryStage);
-            // primaryStage.setFullScreen(true);
-            primaryStage.setTitle("Algae Care");
-            primaryStage.setScene(scene);
-            primaryStage.show();
-        });
-    }
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     public static void main(String[] args) {
-        // Set properties before launching
-        System.setProperty("javafx.macosx.enableRetinaScale", "true");
-        System.setProperty("prism.verbose", "false"); // Reduce JavaFX logging
-        System.setProperty("javafx.verbose", "false"); // Reduce JavaFX logging
+        configureSystemProperties();
         launch(args);
     }
 
-    public static void resize(Stage primaryStage) {
-        primaryStage.setWidth(1920);
-        primaryStage.setHeight(1080);
-        primaryStage.setResizable(false);
+    @Override
+    public void start(Stage primaryStage) {
+        try {
+            configureMacOSProperties();
+            MainController gameController = new MainController();
+            gameController.initializeApplication(primaryStage);
+            LOGGER.info("Application started successfully");
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Failed to initialize application", e);
+            Platform.exit();
+        }
+    }
+
+    private static void configureSystemProperties() {
+        System.setProperty("javafx.macosx.enableRetinaScale", "true");
+        System.setProperty("prism.verbose", "false");
+        System.setProperty("javafx.verbose", "false");
+        System.setProperty("java.util.logging.SimpleFormatter.format",
+                "[%1$tF %1$tT] [%4$-7s] %5$s %n");
+    }
+
+    private void configureMacOSProperties() {
+        System.setProperty("apple.awt.application.appearance", "system");
+        System.setProperty("apple.awt.application.name", "Algae Care");
     }
 }

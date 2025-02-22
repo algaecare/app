@@ -1,34 +1,33 @@
 package com.algaecare.input;
 
+import com.algaecare.view.Window;
+
 import javafx.scene.Scene;
 import javafx.scene.input.KeyCode;
 
-public class KeyboardInput implements GameInput {
-    private Scene scene;
+public class KeyboardInput extends GameInput {
+    Window window;
 
-    public KeyboardInput(Scene scene) {
-        this.scene = scene;
+    public KeyboardInput(Window window) {
+        super(window);
     }
 
-    @Override
     public void initialize() {
         // No initialization needed for keyboard input
     }
 
-    @Override
     public void setInputCallback(Runnable callback) {
-        scene.setOnKeyPressed(event -> {
+        window.getMyScene().setOnKeyPressed(event -> {
             if (event.getCode() == KeyCode.SPACE) {
                 callback.run();
             }
         });
     }
 
-    @Override
     public void cleanup() {
         // Remove event handler
-        if (scene != null) {
-            scene.setOnKeyPressed(null);
+        if (window.getMyScene() != null) {
+            window.getMyScene().setOnKeyPressed(null);
         }
     }
 }
