@@ -1,56 +1,35 @@
 package com.algaecare.controller;
 
-import java.util.ArrayList;
-import java.util.List;
-import javafx.util.Duration;
-
 import com.algaecare.model.GameState;
 import com.algaecare.view.View;
 import com.algaecare.view.Screen;
 import com.algaecare.view.Transition;
-
+import javafx.util.Duration;
 import java.util.logging.Logger;
 
 public class ScreenController {
     private static final Logger LOGGER = Logger.getLogger(ScreenController.class.getName());
     private final MainController gameController;
-    private GameState currentState = GameState.START;
-    private final List<Runnable> screenChangeListeners = new ArrayList<>();
 
-    public ScreenController(MainController gameController) {
-        this.gameController = gameController;
+    public ScreenController(MainController controller) {
+        this.gameController = controller;
     }
 
-    public void showInitialScreen() {
-        gameController.getMainView().mountView(getScreenForState());
+    public void updateScreen() {
+        View newView = getScreenForState(gameController.getGameState());
+        gameController.getWindow().mountView(newView);
     }
 
-    public View getScreenForState() {
-        return switch (currentState) {
+    private View getScreenForState(GameState state) {
+        return switch (state) {
             case START -> new Screen(
-                    "/images/screen/start.png",
-                    () -> handleStateChange(GameState.TRANSITION));
+                    "/images/screen/start.png");
             case TRANSITION -> new Transition(
-                    "/images/transitions/start_to_main.png",
+                    "/images/transition/start_to_main.png",
                     Duration.seconds(2),
-                    () -> handleStateChange(GameState.MAIN));
+                    gameController::handleTransitionComplete);
             case MAIN -> new Screen(
-                    "/images/screen/main.png",
-                    this::handleMainScreenInput);
+                    "/images/screen/main.png");
         };
-    }
-
-    private void handleStateChange(GameState newState) {
-        LOGGER.info("Changing state from " + currentState + " to " + newState);
-        currentState = newState;
-        notifyScreenChange();
-    }
-
-    private void handleMainScreenInput() {
-        LOGGER.info("Main screen input received");
-    }
-
-    private void notifyScreenChange() {
-        screenChangeListeners.forEach(Runnable::run);
     }
 }

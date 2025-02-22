@@ -14,6 +14,9 @@ public class RFIDController implements InputController {
     private static final Logger LOGGER = Logger.getLogger(RFIDController.class.getName());
     private static final String SERIAL_PORT = "/dev/ttyAMA0";
     private static final int BAUD_RATE = 9600;
+    private static final String CHARSET = "UTF-8";
+    private static final char END_MARKER = '\n';
+    private static final int MAX_TAG_LENGTH = 12; // Standard RFID tag length
 
     private Context pi4j;
     private Serial serial;
@@ -36,7 +39,7 @@ public class RFIDController implements InputController {
     }
 
     private void initializeSerialPort() {
-        serial = pi4j.create(Serial.newConfigBuilder(pi4j)
+        SerialConfig config = Serial.newConfigBuilder(pi4j)
                 .id("rfidReader")
                 .name("RFID Reader")
                 .device(SERIAL_PORT)
@@ -45,27 +48,62 @@ public class RFIDController implements InputController {
                 .parity(Parity.NONE)
                 .stopBits_1()
                 .flowControl(FlowControl.NONE)
-                .build());
+                .build();
 
-        serial.addListener(event -> {
-            try {
-                String data = new String(event.getBytes());
-                processRFIDData(data);
-            } catch (Exception e) {
-                LOGGER.log(Level.WARNING, "Error processing RFID data", e);
-            }
-        });
+        serial = pi4j.create(config);
+
+        /*
+         * // Correct listener implementation for Pi4J v2
+         * serial.addListener(new SerialListener() {
+         * 
+         * @Override
+         * public void onSerialData(SerialData event) {
+         * try {
+         * String data = new String(event.getData(), CHARSET);
+         * processRFIDData(data);
+         * } catch (Exception e) {
+         * LOGGER.log(Level.WARNING, "Error processing RFID data: " + e.getMessage(),
+         * e);
+         * tagBuffer.setLength(0); // Reset buffer on error
+         * }
+         * }
+         * });
+         */
+
+        serial.open();
     }
 
     private void processRFIDData(String data) {
-        tagBuffer.append(data);
-        if (data.contains("\n")) {
-            String tag = tagBuffer.toString().trim();
+        try {
+            for (char c : data.toCharArray()) {
+                if (c == END_MARKER) {
+                    processCompleteTag();
+                } else if (Character.isLetterOrDigit(c)) {
+                    // Only append valid characters
+                    if (tagBuffer.length() < MAX_TAG_LENGTH) {
+                        tagBuffer.append(c);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Error in RFID data processing", e);
             tagBuffer.setLength(0);
+        }
+    }
 
+    private void processCompleteTag() {
+        String tag = tagBuffer.toString().trim();
+        tagBuffer.setLength(0);
+
+        if (tag.length() > 0) {
+            LOGGER.info("Read RFID tag: " + tag);
             InputAction action = InputAction.fromRfidTag(tag);
-            if (action != null && callback != null) {
-                handleInput(action);
+            if (action != null) {
+                if (callback != null) {
+                    handleInput(action);
+                } else {
+                    LOGGER.warning("No callback registered for RFID input");
+                }
             } else {
                 LOGGER.warning("Unknown RFID tag received: " + tag);
             }

@@ -3,10 +3,10 @@ package com.algaecare.model;
 import javafx.scene.input.KeyCode;
 
 public enum InputAction {
+    AXOLOTL("Axolotl", "START-RFID", KeyCode.SPACE),
     ALGAE_1("Algae Type 1", "A1-RFID-TAG", KeyCode.DIGIT1),
     ALGAE_2("Algae Type 2", "A2-RFID-TAG", KeyCode.DIGIT2),
     ALGAE_3("Algae Type 3", "A3-RFID-TAG", KeyCode.DIGIT3),
-    CONFIRM("Confirm Selection", "CONFIRM-RFID", KeyCode.SPACE),
     CANCEL("Cancel Action", "CANCEL-RFID", KeyCode.ESCAPE);
 
     private final String description;

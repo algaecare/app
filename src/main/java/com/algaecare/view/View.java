@@ -4,6 +4,8 @@ import javafx.geometry.Pos;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.VBox;
+import javafx.stage.Stage;
+
 import java.util.Objects;
 import java.util.logging.Logger;
 
