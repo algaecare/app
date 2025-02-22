@@ -24,7 +24,7 @@ public class MainController {
     // region Constructor
     public MainController() {
         this.screenController = new ScreenController(this);
-        setGameState(GameState.START);
+        setGameState(GameState.NO_GAME);
     }
     // endregion
 
@@ -55,26 +55,27 @@ public class MainController {
         LOGGER.info("Input received: " + action);
 
         switch (gameState) {
-            case START -> {
+            case NO_GAME -> {
                 if (action == InputAction.AXOLOTL) {
-                    LOGGER.info("AXOLOTL detected, starting transition");
-                    setGameState(GameState.TRANSITION);
+                    setGameState(GameState.START_TRANSITION);
                     screenController.updateScreen();
                 }
             }
-            case TRANSITION -> {
-                // no Input on Transition possible
+            case INTRO -> {
+                if (action == InputAction.ALGAE_1 || action == InputAction.ALGAE_2 || action == InputAction.ALGAE_3) {
+                    setGameState(GameState.INTRO_TRANSITION);
+                    screenController.updateScreen();
+                }
             }
-            case MAIN -> {
-                // handleMainGameInput(action);
-            }
+            default -> throw new IllegalArgumentException("Unexpected value: " + this.gameState);
         }
     }
 
     public void handleTransitionComplete() {
         LOGGER.info("Transition complete");
         switch (this.gameState) {
-            case TRANSITION -> setGameState(GameState.MAIN);
+            case START_TRANSITION -> setGameState(GameState.INTRO);
+            case INTRO_TRANSITION -> setGameState(GameState.MAIN);
             default -> throw new IllegalArgumentException("Unexpected value: " + this.gameState);
         }
         screenController.updateScreen();

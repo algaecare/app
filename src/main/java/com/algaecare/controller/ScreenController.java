@@ -5,10 +5,8 @@ import com.algaecare.view.View;
 import com.algaecare.view.Screen;
 import com.algaecare.view.Transition;
 import javafx.util.Duration;
-import java.util.logging.Logger;
 
 public class ScreenController {
-    private static final Logger LOGGER = Logger.getLogger(ScreenController.class.getName());
     private final MainController gameController;
 
     public ScreenController(MainController controller) {
@@ -22,14 +20,20 @@ public class ScreenController {
 
     private View getScreenForState(GameState state) {
         return switch (state) {
-            case START -> new Screen(
-                    "/images/screen/start.png");
-            case TRANSITION -> new Transition(
-                    "/images/transition/start_to_main.png",
+            case NO_GAME -> new Screen(
+                    "/images/screen/NO_GAME.png");
+            case START_TRANSITION -> new Transition(
+                    "/images/transition/NO_GAME_TRANSITION.png",
+                    Duration.seconds(2),
+                    gameController::handleTransitionComplete);
+            case INTRO -> new Screen(
+                    "/images/screen/INTRO.png");
+            case INTRO_TRANSITION -> new Transition(
+                    "/images/transition/INTRO_TRANSITION.png",
                     Duration.seconds(2),
                     gameController::handleTransitionComplete);
             case MAIN -> new Screen(
-                    "/images/screen/main.png");
+                    "/images/screen/MAIN.png");
         };
     }
 }
