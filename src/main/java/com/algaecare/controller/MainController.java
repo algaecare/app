@@ -1,115 +1,61 @@
 package com.algaecare.controller;
 
-import javafx.scene.Scene;
+import javafx.scene.input.KeyCode;
 import javafx.stage.Stage;
-import com.algaecare.view.Window;
-import com.algaecare.controller.input.InputController;
-import com.algaecare.controller.input.KeyboardController;
-import com.algaecare.controller.input.RFIDController;
-import com.algaecare.model.GameState;
-import com.algaecare.model.InputAction;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.logging.Logger;
 
-// MainController class for the Algae Care application
-// This class manages the main view and input handling for the application.
+import com.algaecare.model.GameState;
+
 public class MainController {
-    private static final Logger LOGGER = Logger.getLogger(MainController.class.getName());
-    private Window window;
     private final ScreenController screenController;
+    private final KeyboardInputController keyboardInputController;
     private GameState gameState;
+    private final List<GameStateChangeListener> listeners = new ArrayList<>();
 
-    // region Constructor
-    public MainController() {
-        this.screenController = new ScreenController(this);
-        setGameState(GameState.NO_GAME);
+    public MainController(Stage stage) {
+        // Initialize the game state
+        this.gameState = GameState.TITLE;
+
+        // Initialize the ScreenController
+        this.screenController = new ScreenController(this, stage);
+        addGameStateChangeListener(this.screenController);
+
+        // Initialize the keyboard input controller
+        this.keyboardInputController = new KeyboardInputController(stage);
+        initializeKeyboardBindings();
     }
-    // endregion
 
-    // region Getters and Setters
     public GameState getGameState() {
         return gameState;
     }
 
-    public Window getWindow() {
-        return window;
-    }
-
     public void setGameState(GameState newState) {
-        LOGGER.info("State changing from " + gameState + " to " + newState);
+        GameState oldState = this.gameState;
         this.gameState = newState;
-    }
-    // endregion
-
-    // region Public Methods
-    public void initializeApplication(Stage primaryStage) {
-        this.window = new Window(primaryStage);
-        initializeInput(primaryStage.getScene());
-        screenController.updateScreen();
-        primaryStage.show();
+        notifyGameStateChanged(oldState, newState);
     }
 
-    public void handleInput(InputAction action) {
-        LOGGER.info("Input received: " + action);
+    public void addGameStateChangeListener(GameStateChangeListener listener) {
+        listeners.add(listener);
+    }
 
-        switch (gameState) {
-            case NO_GAME -> {
-                if (action == InputAction.AXOLOTL) {
-                    setGameState(GameState.START_TRANSITION);
-                    screenController.updateScreen();
-                }
+    public void removeGameStateChangeListener(GameStateChangeListener listener) {
+        listeners.remove(listener);
+    }
+
+    private void notifyGameStateChanged(GameState oldState, GameState newState) {
+        listeners.forEach(listener -> listener.onGameStateChanged(oldState, newState));
+    }
+
+    private void initializeKeyboardBindings() {
+        keyboardInputController.bindKey(KeyCode.SPACE, event -> {
+            if (gameState == GameState.TITLE) {
+                setGameState(GameState.OPENING);
+            } else if (gameState == GameState.OPENING) {
+                setGameState(GameState.GAMEPLAY);
             }
-            case INTRO -> {
-                if (action == InputAction.ALGAE_1 || action == InputAction.ALGAE_2 || action == InputAction.ALGAE_3) {
-                    setGameState(GameState.INTRO_TRANSITION);
-                    screenController.updateScreen();
-                }
-            }
-            default -> throw new IllegalArgumentException("Unexpected value: " + this.gameState);
-        }
-    }
-
-    public void handleTransitionComplete() {
-        LOGGER.info("Transition complete");
-        switch (this.gameState) {
-            case START_TRANSITION -> setGameState(GameState.INTRO);
-            case INTRO_TRANSITION -> setGameState(GameState.MAIN);
-            default -> throw new IllegalArgumentException("Unexpected value: " + this.gameState);
-        }
-        screenController.updateScreen();
-    }
-    // endregion
-
-    // region Private Methods
-    private void initializeInput(Scene scene) {
-        List<InputController> inputControllers = new ArrayList<>();
-
-        // Always add keyboard controller for testing
-        inputControllers.add(new KeyboardController(scene));
-
-        // Add RFID controller if on Raspberry Pi
-        if (isRaspberryPi()) {
-            try {
-                inputControllers.add(new RFIDController());
-            } catch (Exception e) {
-                LOGGER.warning("Failed to initialize RFID controller");
-            }
-        }
-
-        // Initialize all controllers
-        inputControllers.forEach(controller -> {
-            controller.initialize();
-            controller.setInputCallback(this::handleInput);
         });
-
-        LOGGER.info("Input controllers initialized");
     }
-
-    private boolean isRaspberryPi() {
-        return System.getProperty("os.name").toLowerCase().contains("linux")
-                && System.getProperty("os.arch").toLowerCase().contains("arm");
-    }
-    // endregion
 }

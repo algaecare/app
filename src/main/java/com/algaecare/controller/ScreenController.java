@@ -1,39 +1,76 @@
 package com.algaecare.controller;
 
+import java.util.List;
+import java.util.logging.Logger;
+import java.util.logging.Level;
+
 import com.algaecare.model.GameState;
-import com.algaecare.view.View;
+import com.algaecare.view.AnimationScreen;
+import com.algaecare.view.IdleScreen;
 import com.algaecare.view.Screen;
-import com.algaecare.view.Transition;
-import javafx.util.Duration;
+import com.algaecare.view.Window;
 
-public class ScreenController {
-    private final MainController gameController;
+import javafx.stage.Stage;
 
-    public ScreenController(MainController controller) {
-        this.gameController = controller;
+public class ScreenController implements GameStateChangeListener {
+    private static final Logger LOGGER = Logger.getLogger(ScreenController.class.getName());
+    private final Window window;
+    private final MainController mainController;
+    List<Screen> screens;
+
+    public ScreenController(MainController controller, Stage stage) {
+        this.window = new Window(stage);
+        this.mainController = controller;
+        initializeScreens();
+        setScreen(screens.get(0));
+        window.setVisible(true);
+        window.setDisable(false);
     }
 
-    public void updateScreen() {
-        View newView = getScreenForState(gameController.getGameState());
-        gameController.getWindow().mountView(newView);
+    private void initializeScreens() {
+        // Title Screen
+        String titleScreenPath = "/animations/Title.mp4";
+        IdleScreen titleScreen = new IdleScreen(titleScreenPath);
+
+        // Opening Screen
+        String openingScreenPath = "/animations/Opening.mp4";
+        AnimationScreen openingScreen = new AnimationScreen(
+                openingScreenPath,
+                unused -> {
+                    LOGGER.info("Opening animation completed, transitioning to PLAYING state");
+                    mainController.setGameState(GameState.GAMEPLAY);
+                });
+
+        screens = List.of(titleScreen, openingScreen);
     }
 
-    private View getScreenForState(GameState state) {
-        return switch (state) {
-            case NO_GAME -> new Screen(
-                    "/images/screen/NO_GAME.png");
-            case START_TRANSITION -> new Transition(
-                    "/images/transition/NO_GAME_TRANSITION.png",
-                    Duration.seconds(2),
-                    gameController::handleTransitionComplete);
-            case INTRO -> new Screen(
-                    "/images/screen/INTRO.png");
-            case INTRO_TRANSITION -> new Transition(
-                    "/images/transition/INTRO_TRANSITION.png",
-                    Duration.seconds(2),
-                    gameController::handleTransitionComplete);
-            case MAIN -> new Screen(
-                    "/images/screen/MAIN.png");
-        };
+    @Override
+    public void onGameStateChanged(GameState oldState, GameState newState) {
+        try {
+            updateScreen(newState);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Error changing game state from " + oldState + " to " + newState, e);
+        }
+    }
+
+    private void setScreen(Screen screen) {
+        window.getChildren().clear();
+        window.getChildren().add(screen);
+        window.setVisible(true);
+        window.setDisable(false);
+    }
+
+    private void updateScreen(GameState newState) {
+        LOGGER.info("Updating screen to state: " + newState);
+        switch (newState) {
+            case TITLE:
+                setScreen(screens.get(0));
+                break;
+            case OPENING:
+                setScreen(screens.get(1));
+                break;
+            default:
+                break;
+        }
     }
 }

@@ -6,7 +6,7 @@
 
     <groupId>com.algaecare</groupId>
     <artifactId>algaecare</artifactId>
-    <name>AlgaeCare</name>
+    <name>algaecare</name>
     <packaging>jar</packaging>
     <version>0.0.1</version>
 
@@ -15,7 +15,7 @@
         <!-- The class that will be started, choose one and only one -->
         <launcher.class>com.algaecare.app.Main</launcher.class>
 
-        <jar.name>AlgaeCare</jar.name>
+        <jar.name>algaecare</jar.name>
 
         <!-- Setup for the RaspPi -->
         <pi.hostname>algaecare</pi.hostname>
@@ -289,22 +289,27 @@
             <build>
                 <plugins>
                     <plugin>
-                        <groupId>org.codehaus.mojo</groupId>
-                        <artifactId>exec-maven-plugin</artifactId>
+                        <groupId>org.openjfx</groupId>
+                        <artifactId>javafx-maven-plugin</artifactId>
+                        <version>0.0.8</version>
+                        <configuration>
+                            <mainClass>${launcher.class}</mainClass>
+                            <options>
+                                <option>--add-exports</option>
+                                <option>javafx.base/com.sun.javafx=ALL-UNNAMED</option>
+                                <option>--add-exports</option>
+                                <option>javafx.graphics/com.sun.javafx.tk=ALL-UNNAMED</option>
+                            </options>
+                        </configuration>
                         <executions>
                             <execution>
+                                <id>run</id>
                                 <phase>verify</phase>
                                 <goals>
-                                    <goal>exec</goal>
+                                    <goal>run</goal>
                                 </goals>
                             </execution>
                         </executions>
-                        <configuration>
-                            <executable>java</executable>
-                            <commandlineArgs>--module-path "${project.build.directory}/libs"
-                                --add-modules javafx.controls -jar
-                                "${project.build.directory}/${jar.name}.jar"</commandlineArgs>
-                        </configuration>
                     </plugin>
                 </plugins>
             </build>
