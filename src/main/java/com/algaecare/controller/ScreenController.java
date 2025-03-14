@@ -41,6 +41,8 @@ public class ScreenController implements GameStateChangeListener {
                 });
 
         // Gameplay Screen
+        String gameplayScreenPath = "/animations/Gameplay.mp4";
+        IdleScreen gameplayScreen = new IdleScreen(gameplayScreenPath);
 
         // Ending Screen
         String endingScreenPath = "/animations/Ending.mp4";
@@ -54,6 +56,7 @@ public class ScreenController implements GameStateChangeListener {
         screens = Map.of(
                 GameState.TITLE, titleScreen,
                 GameState.OPENING, openingScreen,
+                GameState.GAMEPLAY, gameplayScreen,
                 GameState.ENDING, endingScreen);
     }
 
