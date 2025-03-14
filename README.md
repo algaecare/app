@@ -2,7 +2,13 @@
 
 ## Running the application
 
-- Locally: 
+- Locally without Testing:
+```bash
+mvn clean package -P release -DskipTests
+mvn verify -P run-local -DskipTests
+```
+
+- Locally with Testing: 
 ```bash
 mvn clean package -P release
 mvn verify -P run-local
