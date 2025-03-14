@@ -43,7 +43,7 @@ public class Main extends Application {
                 "[%1$tF %1$tT] [%4$-7s] %5$s %n");
     }
 
-    private void configureMacOSProperties() {
+    void configureMacOSProperties() {
         System.setProperty("apple.awt.application.appearance", "system");
         System.setProperty("apple.awt.application.name", "Algae Care");
     }
