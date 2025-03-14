@@ -31,6 +31,10 @@ public class MainController {
         this.environment = new Environment(90, 16, 70, 85);
     }
 
+    public Environment getEnvironment() {
+        return environment;
+    }
+
     // GameState management
     public GameState getGameState() {
         return gameState;

@@ -6,6 +6,7 @@ import java.util.logging.Level;
 
 import com.algaecare.model.GameState;
 import com.algaecare.view.AnimationScreen;
+import com.algaecare.view.GameScreen;
 import com.algaecare.view.IdleScreen;
 import com.algaecare.view.Screen;
 import com.algaecare.view.Window;
@@ -42,7 +43,7 @@ public class ScreenController implements GameStateChangeListener {
 
         // Gameplay Screen
         String gameplayScreenPath = "/animations/Gameplay.mp4";
-        IdleScreen gameplayScreen = new IdleScreen(gameplayScreenPath);
+        GameScreen gameplayScreen = new GameScreen(gameplayScreenPath);
 
         // Cutscene Screen
         String cutsceneScreenPath = "/animations/Cutscene.mp4";
@@ -88,6 +89,9 @@ public class ScreenController implements GameStateChangeListener {
     private void updateScreen(GameState newState) {
         Screen newScreen = screens.get(newState);
         if (newScreen != null) {
+            if (newScreen instanceof GameScreen) {
+                ((GameScreen) newScreen).updateEnvironmentDisplay(mainController.getEnvironment());
+            }
             setScreen(newScreen);
         } else {
             LOGGER.warning("No screen found for game state: " + newState);
