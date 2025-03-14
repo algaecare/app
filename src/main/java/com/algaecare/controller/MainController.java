@@ -75,6 +75,7 @@ public class MainController {
                     if (index < objects.size()) {
                         EnvironmentObject environmentObject = objects.get(index);
                         environment.updateEnvironment(environmentObject);
+                        setGameState(GameState.CUTSCENE);
                     }
                 }
             });
