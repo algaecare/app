@@ -1,8 +1,13 @@
 package com.algaecare.model;
 
 import java.util.List;
+import java.util.logging.Logger;
+
+import com.algaecare.app.Main;
 
 public class Environment {
+    private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
+
     private static final double TEMPERATURE_CHANGE_FACTOR = 4.0; // 4°C per 100% CO2
     private static final double ALGAE_CHANGE_FACTOR = 40.0; // 40% decrease per 100% CO2
     private static final double OXYGEN_CHANGE_FACTOR = 20.0; // 20% decrease per 100% CO2
@@ -19,9 +24,14 @@ public class Environment {
         this.temperature = temperature;
         this.algaeLevel = algaeLevel;
         this.o2Level = o2Level;
+
+        // Initialize environment objects
+        this.environmentObjects = initializeEnvironmentObjects();
     }
 
     public void updateEnvironment(EnvironmentObject environmentObject) {
+        LOGGER.info("Updating environment with object: " + environmentObject.getName());
+
         setCo2Level(environmentObject.getCo2Change());
 
         double temperatureChange = (environmentObject.getTemperatureChange() / 100.0) * TEMPERATURE_CHANGE_FACTOR;
@@ -32,6 +42,9 @@ public class Environment {
 
         double oxygenChange = (environmentObject.getOxygenChange() / 100.0) * OXYGEN_CHANGE_FACTOR;
         setO2Level(-(int) Math.round(oxygenChange));
+
+        LOGGER.info("Environment updated: CO2 Level: " + co2Level + "%, Temperature: " + temperature
+                + "°C, Algae Level: " + algaeLevel + "%, O2 Level: " + o2Level + "%");
     }
 
     public int getCo2Level() {
@@ -66,7 +79,7 @@ public class Environment {
         this.o2Level = Math.max(0, Math.min(100, this.o2Level + change));
     }
 
-    public List<EnvironmentObject> getEnvironmentObjects() {
+    public List<EnvironmentObject> initializeEnvironmentObjects() {
         // CHECK DOCUMENTATION:
         // https://fhnw-projecttrack.atlassian.net/wiki/spaces/IP1224vt3/pages/594149391/Alltagsobjekte
         // Bad Objects
@@ -95,6 +108,10 @@ public class Environment {
                 shoppingBagLocal,
                 bicycle,
                 trashGrabber);
+        return environmentObjects;
+    }
+
+    public List<EnvironmentObject> getEnvironmentObjects() {
         return environmentObjects;
     }
 }

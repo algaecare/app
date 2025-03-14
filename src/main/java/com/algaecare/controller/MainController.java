@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.algaecare.model.Environment;
+import com.algaecare.model.EnvironmentObject;
 import com.algaecare.model.GameState;
 
 public class MainController {
@@ -63,10 +64,20 @@ public class MainController {
         keyboardInputController.bindKey(KeyCode.ESCAPE, event -> {
             setGameState(GameState.ENDING);
         });
-        keyboardInputController.bindKey(KeyCode.DIGIT1, event -> {
-            if (gameState == GameState.GAMEPLAY) {
-
-            }
-        });
+        KeyCode[] digitKeys = { KeyCode.DIGIT1, KeyCode.DIGIT2, KeyCode.DIGIT3, KeyCode.DIGIT4,
+                KeyCode.DIGIT5, KeyCode.DIGIT6, KeyCode.DIGIT7, KeyCode.DIGIT8,
+                KeyCode.DIGIT9 };
+        for (int i = 0; i < digitKeys.length; i++) {
+            final int index = i;
+            keyboardInputController.bindKey(digitKeys[i], event -> {
+                if (gameState == GameState.GAMEPLAY) {
+                    List<EnvironmentObject> objects = environment.getEnvironmentObjects();
+                    if (index < objects.size()) {
+                        EnvironmentObject environmentObject = objects.get(index);
+                        environment.updateEnvironment(environmentObject);
+                    }
+                }
+            });
+        }
     }
 }
