@@ -9,8 +9,8 @@ public class Environment {
     private static final Logger LOGGER = Logger.getLogger(Main.class.getName());
 
     private static final double TEMPERATURE_CHANGE_FACTOR = 4.0; // 4°C per 100% CO2
-    private static final double ALGAE_CHANGE_FACTOR = 40.0; // 40% decrease per 100% CO2
-    private static final double OXYGEN_CHANGE_FACTOR = 20.0; // 20% decrease per 100% CO2
+    private static final double ALGAE_CHANGE_FACTOR = 10.0; // 10% decrease per 1°C
+    private static final double OXYGEN_CHANGE_FACTOR = 0.5; // 50% of algae change
 
     private int co2Level; // in percentage (0-100)
     private int temperature; // in degrees Celsius
@@ -32,19 +32,25 @@ public class Environment {
     public void updateEnvironment(EnvironmentObject environmentObject) {
         LOGGER.info("Updating environment with object: " + environmentObject.getName());
 
-        setCo2Level(environmentObject.getCo2Change());
+        // First apply direct CO2 change
+        int co2Change = environmentObject.getCo2Change();
+        setCo2Level(co2Change);
 
-        double temperatureChange = (environmentObject.getTemperatureChange() / 100.0) * TEMPERATURE_CHANGE_FACTOR;
+        // Then calculate and apply temperature change based on CO2 change
+        double temperatureChange = (co2Change / 100.0) * TEMPERATURE_CHANGE_FACTOR;
         setTemperature((int) Math.round(temperatureChange));
 
-        double algaeChange = (environmentObject.getAlgaeChange() / 100.0) * ALGAE_CHANGE_FACTOR;
+        // Calculate and apply algae change based on temperature change
+        double algaeChange = temperatureChange * ALGAE_CHANGE_FACTOR;
         setAlgaeLevel(-(int) Math.round(algaeChange));
 
-        double oxygenChange = (environmentObject.getOxygenChange() / 100.0) * OXYGEN_CHANGE_FACTOR;
+        // Calculate and apply oxygen change (50% of algae change)
+        double oxygenChange = algaeChange * OXYGEN_CHANGE_FACTOR;
         setO2Level(-(int) Math.round(oxygenChange));
 
-        LOGGER.info("Environment updated: CO2 Level: " + co2Level + "%, Temperature: " + temperature
-                + "°C, Algae Level: " + algaeLevel + "%, O2 Level: " + o2Level + "%");
+        LOGGER.info(String.format(
+                "Environment updated: CO2 Level: %d%%, Temperature: %d°C, Algae Level: %d%%, O2 Level: %d%%",
+                co2Level, temperature, algaeLevel, o2Level));
     }
 
     public int getCo2Level() {
