@@ -15,14 +15,11 @@ public class MainController {
     private final List<GameStateChangeListener> listeners = new ArrayList<>();
 
     public MainController(Stage stage) {
-        // Initialize the game state
         this.gameState = GameState.TITLE;
 
-        // Initialize the ScreenController
         this.screenController = new ScreenController(this, stage);
         addGameStateChangeListener(this.screenController);
 
-        // Initialize the keyboard input controller
         this.keyboardInputController = new KeyboardInputController(stage);
         initializeKeyboardBindings();
     }
@@ -53,9 +50,10 @@ public class MainController {
         keyboardInputController.bindKey(KeyCode.SPACE, event -> {
             if (gameState == GameState.TITLE) {
                 setGameState(GameState.OPENING);
-            } else if (gameState == GameState.OPENING) {
-                setGameState(GameState.GAMEPLAY);
             }
+        });
+        keyboardInputController.bindKey(KeyCode.ESCAPE, event -> {
+            setGameState(GameState.ENDING);
         });
     }
 }

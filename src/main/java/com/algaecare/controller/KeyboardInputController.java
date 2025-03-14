@@ -49,7 +49,6 @@ public class KeyboardInputController {
             Consumer<KeyEvent> handler = keyHandlers.get(event.getCode());
             if (handler != null) {
                 handler.accept(event);
-                LOGGER.info("Handled key event: " + event.getCode());
             }
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Error handling key event: " + event.getCode(), e);

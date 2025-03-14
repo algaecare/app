@@ -1,6 +1,6 @@
 package com.algaecare.controller;
 
-import java.util.List;
+import java.util.Map;
 import java.util.logging.Logger;
 import java.util.logging.Level;
 
@@ -16,13 +16,13 @@ public class ScreenController implements GameStateChangeListener {
     private static final Logger LOGGER = Logger.getLogger(ScreenController.class.getName());
     private final Window window;
     private final MainController mainController;
-    List<Screen> screens;
+    Map<GameState, Screen> screens;
 
     public ScreenController(MainController controller, Stage stage) {
         this.window = new Window(stage);
         this.mainController = controller;
         initializeScreens();
-        setScreen(screens.get(0));
+        setScreen(screens.get(GameState.TITLE));
         window.setVisible(true);
         window.setDisable(false);
     }
@@ -37,11 +37,24 @@ public class ScreenController implements GameStateChangeListener {
         AnimationScreen openingScreen = new AnimationScreen(
                 openingScreenPath,
                 unused -> {
-                    LOGGER.info("Opening animation completed, transitioning to PLAYING state");
                     mainController.setGameState(GameState.GAMEPLAY);
                 });
 
-        screens = List.of(titleScreen, openingScreen);
+        // Gameplay Screen
+
+        // Ending Screen
+        String endingScreenPath = "/animations/Ending.mp4";
+        AnimationScreen endingScreen = new AnimationScreen(
+                endingScreenPath,
+                unused -> {
+                    mainController.setGameState(GameState.TITLE);
+                });
+
+        // Add screens to the map
+        screens = Map.of(
+                GameState.TITLE, titleScreen,
+                GameState.OPENING, openingScreen,
+                GameState.ENDING, endingScreen);
     }
 
     @Override
@@ -61,16 +74,11 @@ public class ScreenController implements GameStateChangeListener {
     }
 
     private void updateScreen(GameState newState) {
-        LOGGER.info("Updating screen to state: " + newState);
-        switch (newState) {
-            case TITLE:
-                setScreen(screens.get(0));
-                break;
-            case OPENING:
-                setScreen(screens.get(1));
-                break;
-            default:
-                break;
+        Screen newScreen = screens.get(newState);
+        if (newScreen != null) {
+            setScreen(newScreen);
+        } else {
+            LOGGER.warning("No screen found for game state: " + newState);
         }
     }
 }

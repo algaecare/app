@@ -23,7 +23,6 @@ public abstract class Screen extends VBox {
 
     protected void initialize() {
         try {
-            LOGGER.info("Initializing video with path: " + videoPath);
             URL resourceUrl = getClass().getResource(videoPath);
             if (resourceUrl == null) {
                 throw new IllegalArgumentException("Video file not found: " + videoPath);
@@ -76,7 +75,6 @@ public abstract class Screen extends VBox {
         if (mediaPlayer != null) {
             mediaPlayer.stop();
             mediaPlayer.dispose();
-            LOGGER.info("Video player disposed");
         }
     }
 }
