@@ -6,24 +6,31 @@ import javafx.stage.Stage;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
 
 public class MainController {
     private final ScreenController screenController;
     private final KeyboardInputController keyboardInputController;
+    private final GameState initialGameState = GameState.TITLE;
+    private final Environment environment;
     private GameState gameState;
     private final List<GameStateChangeListener> listeners = new ArrayList<>();
 
+    // Constructor
     public MainController(Stage stage) {
-        this.gameState = GameState.TITLE;
+        this.gameState = initialGameState;
 
         this.screenController = new ScreenController(this, stage);
         addGameStateChangeListener(this.screenController);
 
         this.keyboardInputController = new KeyboardInputController(stage);
         initializeKeyboardBindings();
+
+        this.environment = new Environment(90, 16, 70, 85);
     }
 
+    // GameState management
     public GameState getGameState() {
         return gameState;
     }
@@ -46,6 +53,7 @@ public class MainController {
         listeners.forEach(listener -> listener.onGameStateChanged(oldState, newState));
     }
 
+    // Keyboard Input
     private void initializeKeyboardBindings() {
         keyboardInputController.bindKey(KeyCode.SPACE, event -> {
             if (gameState == GameState.TITLE) {
@@ -54,6 +62,11 @@ public class MainController {
         });
         keyboardInputController.bindKey(KeyCode.ESCAPE, event -> {
             setGameState(GameState.ENDING);
+        });
+        keyboardInputController.bindKey(KeyCode.DIGIT1, event -> {
+            if (gameState == GameState.GAMEPLAY) {
+
+            }
         });
     }
 }
