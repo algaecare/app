@@ -23,3 +23,10 @@ mvn validate -P restart-on-Pi
 mvn clean package -P release,debug
 mvn install -P run-on-Pi
 ```
+
+## Testing the application
+
+### Unit tests
+```bash
+mvn test
+```

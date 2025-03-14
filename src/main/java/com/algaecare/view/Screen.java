@@ -21,6 +21,10 @@ public abstract class Screen extends VBox {
         initialize();
     }
 
+    protected MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
+    }
+
     protected void initialize() {
         try {
             URL resourceUrl = getClass().getResource(videoPath);

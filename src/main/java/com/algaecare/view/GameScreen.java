@@ -85,4 +85,8 @@ public class GameScreen extends Screen {
     protected void handleInitializationError(Exception e) {
         LOGGER.log(Level.SEVERE, "Failed to initialize game screen", e);
     }
+
+    protected Rectangle getColorOverlay() {
+        return colorOverlay;
+    }
 }
