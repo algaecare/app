@@ -8,6 +8,7 @@ import com.algaecare.model.GameState;
 import com.algaecare.view.AnimationScreen;
 import com.algaecare.view.GameScreen;
 import com.algaecare.view.IdleScreen;
+import com.algaecare.view.ImageSequence;
 import com.algaecare.view.Screen;
 import com.algaecare.view.Window;
 
@@ -23,7 +24,11 @@ public class ScreenController implements GameStateChangeListener {
         this.window = new Window(stage);
         this.mainController = controller;
         initializeScreens();
-        setScreen(screens.get(GameState.TITLE));
+        String imageSequencePath = "/Users/timbuser/Documents/PRIMEOENERGIE/algae-care/src/main/resources/animations/Idle";
+        ImageSequence imageSequence = new ImageSequence(imageSequencePath, 24);
+        // setScreen(screens.get(GameState.TITLE));
+        window.getChildren().add(imageSequence);
+        imageSequence.play();
         window.setVisible(true);
         window.setDisable(false);
     }
