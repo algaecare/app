@@ -4,18 +4,17 @@ import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
-import javafx.scene.layout.StackPane;
+import javafx.scene.layout.AnchorPane;
 import javafx.util.Duration;
 
 import java.io.File;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Objects;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
 
-public class ImageSequence extends StackPane {
+public class ImageSequence extends AnchorPane {
     private static final Logger LOGGER = Logger.getLogger(ImageSequence.class.getName());
 
     private final List<Image> images;
@@ -49,10 +48,15 @@ public class ImageSequence extends StackPane {
             throw new IllegalArgumentException("No images found in folder");
         }
 
+        setMaxWidth(Double.MAX_VALUE);
+        setMaxHeight(Double.MAX_VALUE);
+
         imageView = new ImageView(images.get(0));
         imageView.setPreserveRatio(true);
-        imageView.fitWidthProperty().bind(this.widthProperty());
-        imageView.fitHeightProperty().bind(this.heightProperty());
+        imageView.setFitWidth(images.get(0).getWidth());
+        imageView.setFitHeight(images.get(0).getHeight());
+        imageView.setSmooth(true);
+
         getChildren().add(imageView);
 
         Duration frameDuration = Duration.seconds(1.0 / frameRate);

@@ -12,6 +12,7 @@ import com.algaecare.view.ImageSequence;
 import com.algaecare.view.Screen;
 import com.algaecare.view.Window;
 
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class ScreenController implements GameStateChangeListener {
@@ -24,11 +25,7 @@ public class ScreenController implements GameStateChangeListener {
         this.window = new Window(stage);
         this.mainController = controller;
         initializeScreens();
-        String imageSequencePath = "/Users/timbuser/Documents/PRIMEOENERGIE/algae-care/src/main/resources/animations/Idle";
-        ImageSequence imageSequence = new ImageSequence(imageSequencePath, 24);
-        // setScreen(screens.get(GameState.TITLE));
-        window.getChildren().add(imageSequence);
-        imageSequence.play();
+        setScreen(screens.get(GameState.TITLE));
         window.setVisible(true);
         window.setDisable(false);
     }
@@ -85,10 +82,25 @@ public class ScreenController implements GameStateChangeListener {
     }
 
     private void setScreen(Screen screen) {
+        StackPane sequenceContainer = new StackPane();
+        sequenceContainer.setMaxWidth(Double.MAX_VALUE);
+        sequenceContainer.setMaxHeight(Double.MAX_VALUE);
+
+        ImageSequence backgroundSequence = new ImageSequence("/animations/background", 24);
+        ImageSequence overlaySequence = new ImageSequence("/animations/overlay", 24);
+
+        sequenceContainer.getChildren().addAll(backgroundSequence, overlaySequence);
+
+        screen.getChildren().add(sequenceContainer);
+
         window.getChildren().clear();
+        screen.setVisible(true);
         window.getChildren().add(screen);
         window.setVisible(true);
         window.setDisable(false);
+
+        backgroundSequence.play();
+        overlaySequence.play();
     }
 
     private void updateScreen(GameState newState) {
