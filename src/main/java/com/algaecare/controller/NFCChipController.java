@@ -28,7 +28,7 @@ public class NFCChipController {
                     Card card = terminal.connect("*");
                     CardChannel channel = card.getBasicChannel();
 
-                    byte[] command = new byte[]{ (byte) 0xFF, (byte) 0xB0, (byte) 0x04, (byte) 0x4};
+                    byte[] command = new byte[]{ (byte) 0xFF, (byte) 0xB0, (byte) 0x04, (byte) 0x04};
                     LOGGER.log(Level.INFO, "Sending command to NFC tag: " + bytesToHex(command));
                     ResponseAPDU response = channel.transmit(new CommandAPDU(command));
                     String responseString;
