@@ -8,16 +8,46 @@ import javax.smartcardio.CommandAPDU;
 import javax.smartcardio.ResponseAPDU;
 import javax.smartcardio.TerminalFactory;
 import java.io.IOException;
+import java.nio.ByteBuffer;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 public class NFCChipController {
     private static final Logger LOGGER = Logger.getLogger(NFCChipController.class.getName());
+    private List<NFCChipListener> listeners = new ArrayList<>();
 
+    public NFCChipController() {
+        Thread asyncThread = new Thread(() -> {
+            LOGGER.log(Level.INFO, "Starting NFCChip Controller...");
+            while (true) {
+                try {
+                    int integer = getIntFromChip();
+                    for (NFCChipListener listener : listeners) {
+                        listener.onNewTagDetected(integer);
+                    }
+                } catch (IOException ignored) {
+                    //does nothing
+                } finally {
+                    try {
+                        Thread.sleep(500);
+                    } catch (InterruptedException e) {
+                        LOGGER.log(Level.SEVERE, "NFC Chip controller async listening loop interrupted.", e);
+                    }
+                }
+            }
+        });
+
+        asyncThread.setDaemon(true);
+        asyncThread.start();
+    }
+
+    //<editor-fold desc="IO to chip">
     ///gets an array of 4 bytes from the NFC chips data block 4.
     /// if return is "null" no NFC reading device or no NFC chip could be found.
-    private static byte[] getDataOfChip() throws IOException {
+    public byte[] getDataOfChip() throws IOException {
         byte[] responseBytes = null;
         try {
             TerminalFactory factory = TerminalFactory.getDefault();
@@ -53,7 +83,7 @@ public class NFCChipController {
     ///sets 4 bytes of data on data block number 4 of the NFC chip.
     ///byte[] data must be length of 4.
     /// returns a boolean value based on success of operation.
-    private static boolean setDataOfChip(byte[] data) throws IllegalArgumentException{
+    public boolean setDataOfChip(byte[] data) throws IllegalArgumentException{
         if(data.length != 4) {
             throw new IllegalArgumentException("data block must consist of 4 bytes.");
         }
@@ -87,18 +117,47 @@ public class NFCChipController {
         return false;
     }
 
-    public static byte[] concatenateByteArrays(byte[] array1, byte[] array2) {
+    ///Get an integer from the 4 byte codeblock on the NFC tag
+    public int getIntFromChip() throws IOException {
+        try {
+            byte[] dataRaw = getDataOfChip();
+            if(dataRaw != null && dataRaw.length == 4) {
+                return ((0xFF & dataRaw[0]) << 24) | ((0xFF & dataRaw[1]) << 16) |
+                    ((0xFF & dataRaw[2]) << 8) | (0xFF & dataRaw[3]);
+            }
+        } catch (IOException e) {
+            throw new IOException();
+        }
+        throw new IOException();
+    }
+
+    ///Set an integer on the 4 byte codeblock on the NFC tag
+    public boolean setIntOnChip(int integer) {
+        byte[] dataRaw = ByteBuffer.allocate(4).putInt(integer).array();
+        return setDataOfChip(dataRaw);
+    }
+    //</editor-fold>
+
+    private byte[] concatenateByteArrays(byte[] array1, byte[] array2) {
         byte[] result = new byte[array1.length + array2.length];
         System.arraycopy(array1, 0, result, 0, array1.length);
         System.arraycopy(array2, 0, result, array1.length, array2.length);
         return result;
     }
 
-    private static String bytesToHex(byte[] bytes) {
+    private String bytesToHex(byte[] bytes) {
         StringBuilder sb = new StringBuilder();
         for (byte b : bytes) {
             sb.append(String.format("%02X ", b));
         }
         return sb.toString();
+    }
+
+    public void addListener(NFCChipListener toAdd) {
+        listeners.add(toAdd);
+    }
+
+    public void removeListener(NFCChipListener toRemove) {
+        listeners.remove(toRemove);
     }
 }
