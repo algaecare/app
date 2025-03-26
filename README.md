@@ -2,6 +2,11 @@
 
 ## Running the application
 
+- Really locally:
+```bash
+mvn clean javafx:run -P run-local
+```
+
 - Locally without Testing:
 ```bash
 mvn clean package -P release -DskipTests
@@ -15,8 +20,8 @@ mvn verify -P run-local
 ```
 - On Raspberry Pi:
 ```bash
-mvn clean package -P release
-mvn install -P run-on-Pi
+mvn clean package -P release -DskipTests
+mvn install -P run-on-Pi -DskipTests
 ```
 
 ### Restart the application on Raspberry Pi
