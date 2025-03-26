@@ -1,6 +1,8 @@
 package com.algaecare.controller;
 
 import static org.junit.jupiter.api.Assertions.*;
+
+import com.algaecare.view.GameVideoScreen;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -17,12 +19,11 @@ import java.util.concurrent.atomic.AtomicReference;
 
 import com.algaecare.model.GameState;
 import com.algaecare.model.Environment;
-import com.algaecare.view.GameScreen;
-import com.algaecare.view.IdleScreen;
-import com.algaecare.view.AnimationScreen;
+import com.algaecare.view.IdleVideoScreen;
+import com.algaecare.view.AnimationVideoScreen;
 
 @ExtendWith(ApplicationExtension.class)
-class ScreenControllerTest {
+class VideoScreenControllerTest {
     private MainController mainController;
     private Stage stage;
     private Environment environment;
@@ -55,7 +56,7 @@ class ScreenControllerTest {
         Platform.runLater(() -> {
             try {
                 Pane window = (Pane) stage.getScene().getRoot();
-                assertTrue(window.getChildren().get(0) instanceof IdleScreen,
+                assertTrue(window.getChildren().get(0) instanceof IdleVideoScreen,
                         "Initial screen should be IdleScreen");
                 assertEquals(GameState.TITLE, mainController.getGameState(),
                         "Initial state should be TITLE");
@@ -81,7 +82,7 @@ class ScreenControllerTest {
 
                 // Get the current screen
                 Pane window = (Pane) stage.getScene().getRoot();
-                isAnimationScreen.set(window.getChildren().get(0) instanceof AnimationScreen);
+                isAnimationScreen.set(window.getChildren().get(0) instanceof AnimationVideoScreen);
             } finally {
                 latch.countDown();
             }
@@ -102,7 +103,7 @@ class ScreenControllerTest {
             try {
                 mainController.setGameState(GameState.GAMEPLAY);
                 Pane window = (Pane) stage.getScene().getRoot();
-                assertTrue(window.getChildren().get(0) instanceof GameScreen,
+                assertTrue(window.getChildren().get(0) instanceof GameVideoScreen,
                         "Screen should change to GameScreen for GAMEPLAY state");
             } finally {
                 latch.countDown();
@@ -118,7 +119,7 @@ class ScreenControllerTest {
             try {
                 mainController.setGameState(GameState.GAMEPLAY);
                 Pane window = (Pane) stage.getScene().getRoot();
-                GameScreen gameScreen = (GameScreen) window.getChildren().get(0);
+                GameVideoScreen gameScreen = (GameVideoScreen) window.getChildren().get(0);
 
                 gameScreen.updateEnvironmentDisplay(environment);
 
