@@ -86,3 +86,6 @@ dist/
 *.sublime-theme
 .vscode/
 .idea/
+
+# ressources
+*.png
