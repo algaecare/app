@@ -7,7 +7,7 @@ test:
   image: maven:3.9.9-eclipse-temurin-21
   script:
     - apt-get update -y
-    - apt-get install -y libgtk-3-0 libxtst6 libxi6 libxrender1 libx11-6 libasound2 xvfb
+    - apt-get install -y libgtk-3-0 libxtst6 libxi6 libxrender1 libx11-6 libasound2t64 xvfb
     - mvn --version
     - xvfb-run mvn clean test
   artifacts:
