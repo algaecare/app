@@ -1,11 +1,10 @@
 stages:
-  - test
-  - build
+      - test
+      - build
 
-test:
-  stage: test
+default:
   image: maven:3.9.9-eclipse-temurin-21
-  script:
+  before_script:
     - apt-get update -y
     - >
       apt-get install -y 
@@ -14,6 +13,10 @@ test:
       gstreamer1.0-libav 
       xvfb
     - rm -rf /root/.cache/gstreamer-1.0
+
+test:
+  stage: test
+  script:
     - xvfb-run mvn clean test
   artifacts:
     when: always
@@ -22,10 +25,9 @@ test:
 
 build:
   stage: build
-  image: maven:3.9.9-eclipse-temurin-21
   script:
-    - mvn clean package -P release
+    - xvfb-run mvn clean package -P release
   artifacts:
     paths:
       - target/*.zip
-    expire_in: 2 week
+    expire_in: 1 weeks
