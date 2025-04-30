@@ -82,7 +82,7 @@ class VideoScreenControllerTest {
 
                 // Get the current screen
                 Pane window = (Pane) stage.getScene().getRoot();
-                isAnimationScreen.set(window.getChildren().get(0) instanceof AnimationVideoScreen);
+                isAnimationScreen.set(window.getChildren().get(0) instanceof AnimationScreen);
             } finally {
                 latch.countDown();
             }
@@ -103,7 +103,7 @@ class VideoScreenControllerTest {
             try {
                 mainController.setGameState(GameState.GAMEPLAY);
                 Pane window = (Pane) stage.getScene().getRoot();
-                assertTrue(window.getChildren().get(0) instanceof GameVideoScreen,
+                assertTrue(window.getChildren().get(0) instanceof GameScreen,
                         "Screen should change to GameScreen for GAMEPLAY state");
             } finally {
                 latch.countDown();
@@ -119,7 +119,7 @@ class VideoScreenControllerTest {
             try {
                 mainController.setGameState(GameState.GAMEPLAY);
                 Pane window = (Pane) stage.getScene().getRoot();
-                GameVideoScreen gameScreen = (GameVideoScreen) window.getChildren().get(0);
+                GameScreen gameScreen = (GameScreen) window.getChildren().get(0);
 
                 gameScreen.updateEnvironmentDisplay(environment);
 

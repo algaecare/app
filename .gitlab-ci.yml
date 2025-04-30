@@ -1,0 +1,33 @@
+stages:
+      - test
+      - build
+
+default:
+  image: maven:3.9.9-eclipse-temurin-21
+  before_script:
+    - apt-get update -y
+    - >
+      apt-get install -y 
+      libgtk-3-0 libxtst6 libxi6 libxrender1 libx11-6 libasound2t64 
+      gstreamer1.0-plugins-base gstreamer1.0-plugins-good gstreamer1.0-plugins-bad gstreamer1.0-plugins-ugly 
+      gstreamer1.0-libav 
+      xvfb
+    - rm -rf /root/.cache/gstreamer-1.0
+
+test:
+  stage: test
+  script:
+    - xvfb-run mvn clean test
+  artifacts:
+    when: always
+    reports:
+      junit: target/surefire-reports/*.xml
+
+build:
+  stage: build
+  script:
+    - xvfb-run mvn clean package -P release
+  artifacts:
+    paths:
+      - target/*.zip
+    expire_in: 1 weeks
