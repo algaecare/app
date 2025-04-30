@@ -10,13 +10,14 @@ import com.algaecare.model.Environment;
 import com.algaecare.model.EnvironmentObject;
 import com.algaecare.model.GameState;
 
-public class MainController {
+public class MainController implements NFCChipListener{
     private final ScreenController screenController;
     private final KeyboardInputController keyboardInputController;
     private final GameState initialGameState = GameState.TITLE;
     private final Environment environment;
     private GameState gameState;
     private final List<GameStateChangeListener> listeners = new ArrayList<>();
+    private final NFCChipController nfcController;
 
     // Constructor
     public MainController(Stage stage) {
@@ -29,6 +30,9 @@ public class MainController {
         initializeKeyboardBindings();
 
         this.environment = new Environment(90, 16, 70, 85);
+
+        this.nfcController = new NFCChipController();
+        this.nfcController.addListener(this);
     }
 
     public Environment getEnvironment() {
@@ -84,5 +88,10 @@ public class MainController {
                 }
             });
         }
+    }
+
+    @Override
+    public void onNewTagDetected(int detectedData) {
+        //TODO implement
     }
 }
