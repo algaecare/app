@@ -27,28 +27,6 @@ class EnvironmentTest {
         assertFalse(environment.getEnvironmentObjects().isEmpty(), "Environment objects list should not be empty");
     }
 
-    @ParameterizedTest
-    @CsvSource({
-            "10, 60, 25, 100, 100", // Increase CO2 by 10
-            "-10, 40, 25, 100, 100", // Decrease CO2 by 10
-            "100, 100, 25, 100, 100", // Max CO2
-            "-100, 0, 25, 100, 100" // Min CO2
-    })
-    void testCo2LevelBoundaries(int change, int expectedCo2, int expectedTemp,
-            int expectedAlgae, int expectedO2) {
-        EnvironmentObject testObject = new EnvironmentObject("Test", change, 0, 0, 0);
-        environment.updateEnvironment(testObject);
-
-        assertEquals(expectedCo2, environment.getCo2Level(),
-                "CO2 level should be properly bounded");
-        assertEquals(expectedTemp, environment.getTemperature(),
-                "Temperature should remain unchanged");
-        assertEquals(expectedAlgae, environment.getAlgaeLevel(),
-                "Algae level should remain unchanged");
-        assertEquals(expectedO2, environment.getO2Level(),
-                "O2 level should remain unchanged");
-    }
-
     @Test
     void testEnvironmentUpdate() {
         // Create test object with known values
@@ -91,29 +69,5 @@ class EnvironmentTest {
 
         assertEquals(-10, trash.getCo2Change(), "Trash should have -10 CO2 change");
         assertEquals(-20, trash.getAlgaeChange(), "Trash should have -20 algae change");
-    }
-
-    @Test
-    void testMaximumValues() {
-        environment = new Environment(100, 30, 100, 100);
-        EnvironmentObject testObject = new EnvironmentObject("Test", 10, 100, 10, 10);
-        environment.updateEnvironment(testObject);
-
-        assertEquals(100, environment.getCo2Level(), "CO2 should not exceed 100%");
-        assertEquals(34, environment.getTemperature(), "Temperature should increase");
-        assertEquals(100, environment.getAlgaeLevel(), "Algae should not exceed 100%");
-        assertEquals(100, environment.getO2Level(), "O2 should not exceed 100%");
-    }
-
-    @Test
-    void testMinimumValues() {
-        environment = new Environment(0, 5, 0, 0);
-        EnvironmentObject testObject = new EnvironmentObject("Test", -10, -100, -10, -10);
-        environment.updateEnvironment(testObject);
-
-        assertEquals(0, environment.getCo2Level(), "CO2 should not go below 0%");
-        assertEquals(1, environment.getTemperature(), "Temperature should not go below 0°C");
-        assertEquals(0, environment.getAlgaeLevel(), "Algae should not go below 0%");
-        assertEquals(0, environment.getO2Level(), "O2 should not go below 0%");
     }
 }

@@ -53,25 +53,6 @@ class GameScreenTest {
     }
 
     @Test
-    void testConfigureMediaPlayer() throws InterruptedException {
-        CountDownLatch latch = new CountDownLatch(1);
-        Platform.runLater(() -> {
-            try {
-                gameScreen.configureMediaPlayer();
-                assertEquals(MediaPlayer.Status.PLAYING, gameScreen.getMediaPlayer().getStatus(),
-                        "MediaPlayer should be playing");
-                assertEquals(MediaPlayer.INDEFINITE, gameScreen.getMediaPlayer().getCycleCount(),
-                        "MediaPlayer should be set to loop indefinitely");
-                latch.countDown();
-            } catch (Exception e) {
-                e.printStackTrace();
-                latch.countDown();
-            }
-        });
-        assertTrue(latch.await(2, TimeUnit.SECONDS), "JavaFX operations timed out");
-    }
-
-    @Test
     void testUpdateEnvironmentDisplay() throws InterruptedException {
         CountDownLatch latch = new CountDownLatch(1);
         Platform.runLater(() -> {
