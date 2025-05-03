@@ -1,7 +1,12 @@
 package com.algaecare.view;
 
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 
@@ -13,19 +18,33 @@ public class MainScene {
 
     public MainScene(Stage stage) {
         // Configure Stage
-        stage.initStyle(StageStyle.UNDECORATED);
         stage.setTitle("Algae Care");
         stage.setResizable(false);
-        stage.setWidth(WINDOW_WIDTH);
-        stage.setHeight(WINDOW_HEIGHT);
 
-        // Add root pane
+        // Set minimum, maximum and preferred size to force dimensions
+        stage.setMinWidth(WINDOW_WIDTH);
+        stage.setMaxWidth(WINDOW_WIDTH);
+        stage.setMinHeight(WINDOW_HEIGHT);
+        stage.setMaxHeight(WINDOW_HEIGHT);
+
+        // Add root pane with fixed size
         StackPane root = new StackPane();
+        root.setMinSize(WINDOW_WIDTH, WINDOW_HEIGHT);
+        root.setMaxSize(WINDOW_WIDTH, WINDOW_HEIGHT);
         root.setPrefSize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
-        // Create the base scene
+        // Create the base scene with fixed size
         scene = new Scene(root, WINDOW_WIDTH, WINDOW_HEIGHT);
+        scene.getRoot().setStyle("-fx-pref-width: " + WINDOW_WIDTH + "px; " +
+                "-fx-pref-height: " + WINDOW_HEIGHT + "px; " +
+                "-fx-min-width: " + WINDOW_WIDTH + "px; " +
+                "-fx-min-height: " + WINDOW_HEIGHT + "px; " +
+                "-fx-max-width: " + WINDOW_WIDTH + "px; " +
+                "-fx-max-height: " + WINDOW_HEIGHT + "px;");
+
         stage.setScene(scene);
+        stage.sizeToScene();
+        stage.centerOnScreen();
         stage.show();
     }
 
