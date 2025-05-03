@@ -6,6 +6,11 @@ import javafx.scene.layout.Background;
 import javafx.scene.layout.BackgroundFill;
 import javafx.scene.layout.CornerRadii;
 import javafx.scene.paint.Color;
+import javafx.animation.Timeline;
+import javafx.animation.KeyFrame;
+import javafx.animation.KeyValue;
+import javafx.animation.Animation;
+import javafx.util.Duration;
 import javafx.geometry.Insets;
 import javafx.scene.text.Font;
 
@@ -70,6 +75,16 @@ public class TextLayer extends Layer {
             textLabel.setTextFill(Color.rgb(204, 243, 255));
             textLabel.setStyle("-fx-font-family: 'Super Water'; -fx-font-size: 40px; -fx-font-weight: normal;");
             backgroundFill = new BackgroundFill(Color.TRANSPARENT, cornerRadii, Insets.EMPTY);
+        }
+
+        // 80s blinking animation
+        if (fontType == FontType.SUPERWATER_SMALL) {
+            Timeline blinkTimeline = new Timeline(
+                    new KeyFrame(Duration.ZERO, new KeyValue(textLabel.opacityProperty(), 1.0)),
+                    new KeyFrame(Duration.seconds(0.8), new KeyValue(textLabel.opacityProperty(), 0.3)),
+                    new KeyFrame(Duration.seconds(1.6), new KeyValue(textLabel.opacityProperty(), 1.0)));
+            blinkTimeline.setCycleCount(Animation.INDEFINITE);
+            blinkTimeline.play();
         }
 
         // Style the label
