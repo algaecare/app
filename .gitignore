@@ -87,5 +87,4 @@ dist/
 .vscode/
 .idea/
 
-# ressources
-*.png
+src/main/resources/dynamic/*
