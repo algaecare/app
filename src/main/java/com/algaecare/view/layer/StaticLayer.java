@@ -8,7 +8,7 @@ import java.util.Objects;
 public class StaticLayer extends Layer {
     private final ColorAdjust colorAdjust;
 
-    public StaticLayer(String imagePath) {
+    public StaticLayer(int x, int y, String imagePath) {
         super(LayerType.STATIC);
 
         if (imagePath == null || imagePath.isEmpty()) {
@@ -20,6 +20,9 @@ public class StaticLayer extends Layer {
         imageView.setPreserveRatio(true);
         imageView.setFitWidth(1920);
         imageView.setFitHeight(1080);
+        imageView.setSmooth(true);
+        imageView.setX(x);
+        imageView.setY(y);
 
         colorAdjust = new ColorAdjust();
         imageView.setEffect(colorAdjust);
