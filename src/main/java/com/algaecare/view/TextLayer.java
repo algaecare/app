@@ -1,5 +1,6 @@
 package com.algaecare.view;
 
+import com.algaecare.model.TextLayerData;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
 import javafx.scene.layout.Background;
@@ -19,21 +20,22 @@ public class TextLayer extends Layer {
         INTER, SUPERWATER_BIG, SUPERWATER_SMALL
     }
 
-    private final String id;
-    private Label textLabel;
+    private final TextId id;
+    private final Label textLabel;
     private final int width;
     private final int height;
     private final int x;
     private final int y;
     private final FontType fontType;
 
-    public TextLayer(String id, int width, int height, int x, int y, String text, String fontType) {
+    public TextLayer(TextId id, int width, int height, int x, int y, String fontType) {
         this.id = id;
         this.width = width;
         this.height = height;
         this.x = x;
         this.y = y;
         this.fontType = FontType.valueOf(fontType.toUpperCase());
+        String text = TextLayerData.getText(String.valueOf(id));
         this.textLabel = new Label(text);
         initializeLayer();
         hideLayer();
@@ -99,7 +101,7 @@ public class TextLayer extends Layer {
         getChildren().add(textLabel);
     }
 
-    public String getLayer() {
+    public TextId getID() {
         return id;
     }
 }
