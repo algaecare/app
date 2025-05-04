@@ -8,6 +8,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
+import java.util.Objects;
+
 public class AxolotlLayer extends Layer {
 
     public enum AnimationState {
@@ -44,7 +46,7 @@ public class AxolotlLayer extends Layer {
         super(LayerType.DYNAMIC);
 
         // Base layer setup
-        baseImageView = new ImageView(new Image(getClass().getResource("/10-AXOLOTL-BASE.png").toExternalForm()));
+        baseImageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/10-AXOLOTL-BASE.png")).toExternalForm()));
         baseImageView.setPreserveRatio(true);
         baseImageView.setFitWidth(width);
         baseImageView.setFitHeight(height);

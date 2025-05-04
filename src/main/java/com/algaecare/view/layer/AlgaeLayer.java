@@ -8,6 +8,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
+import java.util.Objects;
+
 public class AlgaeLayer extends Layer {
 
     public enum AnimationState {
@@ -37,7 +39,7 @@ public class AlgaeLayer extends Layer {
         }
 
         // Set up the image view
-        Image image = new Image(getClass().getResource(imagePath).toExternalForm());
+        Image image = new Image(Objects.requireNonNull(getClass().getResource(imagePath)).toExternalForm());
         imageView = new ImageView(image);
         imageView.setPreserveRatio(true);
         imageView.setFitWidth(width);
