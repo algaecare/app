@@ -21,6 +21,7 @@ public class AlgaeLayer extends Layer {
     private final Timeline idleTimeline;
     private final Timeline outroTimeline;
     private AnimationState currentState = AnimationState.HIDDEN;
+    private boolean skipIntroAnimation;
 
     public AlgaeLayer(int x, int y, int width, int height, String imagePath) {
         if (imagePath == null || imagePath.isEmpty()) {
@@ -35,6 +36,8 @@ public class AlgaeLayer extends Layer {
         if (getClass().getResource(imagePath) == null) {
             throw new IllegalArgumentException("Image not found at path: " + imagePath);
         }
+
+        this.skipIntroAnimation = false;
 
         // Set up the image view
         Image image = new Image(Objects.requireNonNull(getClass().getResource(imagePath)).toExternalForm());
@@ -112,6 +115,14 @@ public class AlgaeLayer extends Layer {
 
     @Override
     public void showLayer() {
+        if (skipIntroAnimation) {
+            imageView.setOpacity(1);
+            imageView.setScaleX(1);
+            imageView.setScaleY(1);
+            imageView.setRotate(0);
+            setStateInternal(AnimationState.IDLE);
+            return;
+        }
         if (currentState == AnimationState.HIDDEN || currentState == AnimationState.OUTRO) {
             setStateInternal(AnimationState.INTRO);
         }
@@ -156,5 +167,9 @@ public class AlgaeLayer extends Layer {
 
     public AnimationState getState() {
         return currentState;
+    }
+
+    public void setSkipIntroAnimation(boolean skip) {
+        this.skipIntroAnimation = skip;
     }
 }

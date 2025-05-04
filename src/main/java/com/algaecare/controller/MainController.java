@@ -66,7 +66,7 @@ public class MainController implements NFCChipListener {
     private void initializeKeyboardBindings() {
         keyboardInputController.bindKey(KeyCode.SPACE, event -> {
             if (gameState == GameState.TITLE) {
-                setGameState(GameState.AXOLOTL_ERROR);
+                setGameState(GameState.OPENING);
             }
         });
         keyboardInputController.bindKey(KeyCode.ESCAPE, event -> {
