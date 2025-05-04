@@ -19,25 +19,25 @@ public class TextLayer extends Layer {
         INTER, SUPERWATER_BIG, SUPERWATER_SMALL
     }
 
+    private final String id;
     private Label textLabel;
     private final int width;
     private final int height;
     private final int x;
     private final int y;
-    private final String text;
     private final FontType fontType;
 
-    public TextLayer(int width, int height, int x, int y, String text, String fontType) {
+    public TextLayer(String id, int width, int height, int x, int y, String text, String fontType) {
         super(LayerType.STATIC);
-
+        this.id = id;
         this.width = width;
         this.height = height;
         this.x = x;
         this.y = y;
-        this.text = text;
         this.fontType = FontType.valueOf(fontType.toUpperCase());
         this.textLabel = new Label(text);
         initializeLayer();
+        hideLayer();
     }
 
     private void initializeLayer() {
@@ -61,9 +61,9 @@ public class TextLayer extends Layer {
 
         // Load the font
         if (fontType == FontType.INTER) {
-            Font.loadFont(getClass().getResourceAsStream("/fonts/Inter-VariableFont.ttf"), 50);
+            Font font = Font.loadFont(getClass().getResourceAsStream("/fonts/InterBold.ttf"), 28);
+            textLabel.setFont(Font.font(font.getFamily(), javafx.scene.text.FontWeight.BOLD, 50));
             textLabel.setTextFill(Color.BLACK);
-            textLabel.setStyle("-fx-font-family: Inter'; -fx-font-size: 50px; -fx-font-weight: bold;");
             backgroundFill = new BackgroundFill(Color.WHITE, cornerRadii, Insets.EMPTY);
         } else if (fontType == FontType.SUPERWATER_BIG) {
             Font.loadFont(getClass().getResourceAsStream("/fonts/SuperWater.ttf"), 170);
@@ -100,11 +100,7 @@ public class TextLayer extends Layer {
         getChildren().add(textLabel);
     }
 
-    public void setText(String text) {
-        textLabel.setText(text);
-    }
-
-    public String getText() {
-        return textLabel.getText();
+    public String getLayer() {
+        return id;
     }
 }

@@ -10,7 +10,7 @@ import com.algaecare.model.Environment;
 import com.algaecare.model.EnvironmentObject;
 import com.algaecare.model.GameState;
 
-public class MainController implements NFCChipListener{
+public class MainController implements NFCChipListener {
     private final ScreenController screenController;
     private final KeyboardInputController keyboardInputController;
     private final GameState initialGameState = GameState.TITLE;
@@ -66,11 +66,11 @@ public class MainController implements NFCChipListener{
     private void initializeKeyboardBindings() {
         keyboardInputController.bindKey(KeyCode.SPACE, event -> {
             if (gameState == GameState.TITLE) {
-                setGameState(GameState.OPENING);
+                setGameState(GameState.AXOLOTL_ERROR);
             }
         });
         keyboardInputController.bindKey(KeyCode.ESCAPE, event -> {
-            setGameState(GameState.ENDING);
+            setGameState(GameState.TITLE);
         });
         KeyCode[] digitKeys = { KeyCode.DIGIT1, KeyCode.DIGIT2, KeyCode.DIGIT3, KeyCode.DIGIT4,
                 KeyCode.DIGIT5, KeyCode.DIGIT6, KeyCode.DIGIT7, KeyCode.DIGIT8,
@@ -92,6 +92,6 @@ public class MainController implements NFCChipListener{
 
     @Override
     public void onNewTagDetected(int detectedData) {
-        //TODO implement
+        // TODO implement
     }
 }
