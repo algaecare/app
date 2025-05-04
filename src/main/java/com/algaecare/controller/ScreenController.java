@@ -1,27 +1,30 @@
 package com.algaecare.controller;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.algaecare.model.GameState;
 import com.algaecare.model.TextLayerData;
-import com.algaecare.view.MainScene;
-import com.algaecare.view.AlgaeLayer;
-import com.algaecare.view.AxolotlLayer;
-import com.algaecare.view.Layer;
-import com.algaecare.view.StaticLayer;
-import com.algaecare.view.TextLayer;
+import com.algaecare.view.*;
 
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class ScreenController implements GameStateChangeListener {
+    private enum LayerType {
+        STATIC,
+        AXOLOTL,
+        ALGAE,
+        TEXT
+    }
+
     private static final Logger LOGGER = Logger.getLogger(ScreenController.class.getName());
     private final List<Layer> layers = new ArrayList<>();
-    private final List<AlgaeLayer> coralLayers = new ArrayList<>();
-    private final List<TextLayer> titleTextLayers = new ArrayList<>();
+    private final AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
     private TextLayer notAxolotlLayer;
     private final MainScene scene;
 
@@ -32,152 +35,101 @@ public class ScreenController implements GameStateChangeListener {
     }
 
     private void initializeLayers() {
-        StaticLayer groundLayerNine = new StaticLayer(0, 0, "/09-LAYER.png");
-        layers.add(groundLayerNine);
-
-        StaticLayer groundLayerEight = new StaticLayer(0, 91, "/08-LAYER.png");
-        layers.add(groundLayerEight);
-
-        addCoralThreeLayer();
-
-        StaticLayer groundLayerFour = new StaticLayer(0, 237, "/04-LAYER.png");
-        layers.add(groundLayerFour);
-
-        addCoralFiveLayer();
-
-        StaticLayer groundLayerTwo = new StaticLayer(0, 225, "/02-LAYER.png");
-        layers.add(groundLayerTwo);
-
-        StaticLayer groundLayerOne = new StaticLayer(0, 353, "/01-LAYER.png");
-        layers.add(groundLayerOne);
-
-        // StaticLayer sheenLayer = new StaticLayer(0, 0, "00-LAYER.png");
-        // layers.add(sheenLayer);
-
-        TextLayer titleTextLayer = new TextLayer("TITLE", 1040, 220, 450, 125, TextLayerData.getText("TITLE"),
-                "SUPERWATER_BIG");
-        layers.add(titleTextLayer);
-        titleTextLayers.add(titleTextLayer);
-        titleTextLayer.showLayer();
-
-        TextLayer subtitleTextLayer = new TextLayer("SUBTITLE", 450, 100, 775, 350, TextLayerData.getText("SUBTITLE"),
-                "SUPERWATER_SMALL");
-        layers.add(subtitleTextLayer);
-        titleTextLayers.add(subtitleTextLayer);
-        subtitleTextLayer.showLayer();
-
-        notAxolotlLayer = new TextLayer("NOT_AXOLOTL", 1800, 325, 40, 720,
-                TextLayerData.getText("NOT_AXOLOTL"),
-                "INTER");
-        layers.add(notAxolotlLayer);
-
-        AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
+        // STATIC LAYERS 07 && 06
+        layers.add(new StaticLayer(0, 0, "/07-LAYER.png"));
+        layers.add(new StaticLayer(0, 91, "/06-LAYER.png"));
+        // ALGAE LAYERS 05
+        layers.add(new AlgaeLayer(1205, 640, 190, 225,
+                "/05-LAYER-CORAL-1.png"));
+        layers.add(new AlgaeLayer(1660, 370, 120, 175,
+                "/05-LAYER-CORAL-2.png"));
+        layers.add(new AlgaeLayer(120, 390, 190, 300,
+                "/05-LAYER-CORAL-3.png"));
+        layers.add(new AlgaeLayer(1445, 405, 190, 300,
+                "/05-LAYER-CORAL-4.png"));
+        layers.add(new AlgaeLayer(365, 615, 205, 240,
+                "/05-LAYER-CORAL-5.png"));
+        layers.add(new AlgaeLayer(830, 560, 335, 330,
+                "/05-LAYER-CORAL-6.png"));
+        layers.add(new AlgaeLayer(605, 705, 155, 165,
+                "/05-LAYER-CORAL-7.png"));
+        // STATIC LAYER 04
+        layers.add(new StaticLayer(0, 237, "/04-LAYER.png"));
+        // ALGAE LAYERS 03
+        layers.add(new AlgaeLayer(1545, 700, 130, 70,
+                "/03-LAYER-CORAL-1.png"));
+        layers.add(new AlgaeLayer(210, 705, 245, 235,
+                "/03-LAYER-CORAL-2.png"));
+        layers.add(new AlgaeLayer(800, 765, 170, 220,
+                "/03-LAYER-CORAL-3.png"));
+        layers.add(new AlgaeLayer(480, 775, 135, 200,
+                "/03-LAYER-CORAL-4.png"));
+        layers.add(new AlgaeLayer(1285, 670, 170, 250,
+                "/03-LAYER-CORAL-5.png"));
+        layers.add(new AlgaeLayer(1075, 805, 175, 145,
+                "/03-LAYER-CORAL-6.png"));
+        // STATIC LAYER 02 && 01
+        layers.add(new StaticLayer(0, 225, "/02-LAYER.png"));
+        layers.add(new StaticLayer(0, 353, "/01-LAYER.png"));
+        // layers.add(new StaticLayer(0, 0, "00-LAYER.png"););
+        // TEXT LAYERS
+        layers.add(new TextLayer(TextId.TITLE, 1040, 220, 450, 125, "SUPERWATER_BIG"));
+        layers.add(new TextLayer(TextId.SUBTITLE, 450, 100, 775, 350, "SUPERWATER_SMALL"));
+        layers.add(new TextLayer(TextId.NOT_AXOLOTL, 1800, 325, 40, 720, "INTER"));
+        layers.add(new TextLayer(TextId.AXOLOTL_INTRODUCTION, 1735, 480, 90, 100, "INTER"));
+        // AXOLOTL LAYER
         layers.add(axolotlLayer);
-        axolotlLayer.showLayer();
-    }
 
-    public void addCoralThreeLayer() {
-        AlgaeLayer coralOneLayerFive = new AlgaeLayer(1205, 640, 190, 225,
-                "/05-LAYER-CORAL-1.png");
-        layers.add(coralOneLayerFive);
-        coralLayers.add(coralOneLayerFive);
-        coralOneLayerFive.showLayer();
-
-        AlgaeLayer coralTwoLayerFive = new AlgaeLayer(1660, 370, 120, 175,
-                "/05-LAYER-CORAL-2.png");
-        layers.add(coralTwoLayerFive);
-        coralLayers.add(coralTwoLayerFive);
-        coralTwoLayerFive.showLayer();
-
-        AlgaeLayer coralThreeLayerFive = new AlgaeLayer(120, 390, 190, 300,
-                "/05-LAYER-CORAL-3.png");
-        layers.add(coralThreeLayerFive);
-        coralLayers.add(coralThreeLayerFive);
-        coralThreeLayerFive.showLayer();
-
-        AlgaeLayer coralFourLayerFive = new AlgaeLayer(1445, 405, 190, 300,
-                "/05-LAYER-CORAL-4.png");
-        layers.add(coralFourLayerFive);
-        coralLayers.add(coralFourLayerFive);
-        coralFourLayerFive.showLayer();
-
-        AlgaeLayer coralFiveLayerFive = new AlgaeLayer(365, 615, 205, 240,
-                "/05-LAYER-CORAL-5.png");
-        layers.add(coralFiveLayerFive);
-        coralLayers.add(coralFiveLayerFive);
-        coralFiveLayerFive.showLayer();
-
-        AlgaeLayer coralSixLayerFive = new AlgaeLayer(830, 560, 335, 330,
-                "/05-LAYER-CORAL-6.png");
-        layers.add(coralSixLayerFive);
-        coralLayers.add(coralSixLayerFive);
-        coralSixLayerFive.showLayer();
-
-        AlgaeLayer coralSevenLayerFive = new AlgaeLayer(605, 705, 155, 165,
-                "/05-LAYER-CORAL-7.png");
-        layers.add(coralSevenLayerFive);
-        coralLayers.add(coralSevenLayerFive);
-        coralSevenLayerFive.showLayer();
-    }
-
-    public void addCoralFiveLayer() {
-        AlgaeLayer coralOneLayerThree = new AlgaeLayer(1545, 700, 130, 70,
-                "/03-LAYER-CORAL-1.png");
-        layers.add(coralOneLayerThree);
-        coralLayers.add(coralOneLayerThree);
-        coralOneLayerThree.showLayer();
-
-        AlgaeLayer coralTwoLayerThree = new AlgaeLayer(210, 705, 245, 235,
-                "/03-LAYER-CORAL-2.png");
-        layers.add(coralTwoLayerThree);
-        coralLayers.add(coralTwoLayerThree);
-        coralTwoLayerThree.showLayer();
-
-        AlgaeLayer coralThreeLayerThree = new AlgaeLayer(800, 765, 170, 220,
-                "/03-LAYER-CORAL-3.png");
-        layers.add(coralThreeLayerThree);
-        coralLayers.add(coralThreeLayerThree);
-        coralThreeLayerThree.showLayer();
-
-        AlgaeLayer coralFourLayerThree = new AlgaeLayer(480, 775, 135, 200,
-                "/03-LAYER-CORAL-4.png");
-        layers.add(coralFourLayerThree);
-        coralLayers.add(coralFourLayerThree);
-        coralFourLayerThree.showLayer();
-
-        AlgaeLayer coralFiveLayerThree = new AlgaeLayer(1285, 670, 170, 250,
-                "/03-LAYER-CORAL-5.png");
-        layers.add(coralFiveLayerThree);
-        coralLayers.add(coralFiveLayerThree);
-        coralFiveLayerThree.showLayer();
-
-        AlgaeLayer coralSixLayerThree = new AlgaeLayer(1075, 805, 175, 145,
-                "/03-LAYER-CORAL-6.png");
-        layers.add(coralSixLayerThree);
-        coralLayers.add(coralSixLayerThree);
-        coralSixLayerThree.showLayer();
+        // SET TITLE LAYER
+        updateScreen(GameState.TITLE);
     }
 
     public void updateScreen(GameState newState) {
-        notAxolotlLayer.hideLayer();
+        // Hide all layers first, except for static layers
+        for (Layer layer : layers) {
+            boolean isStaticLayer = layer instanceof StaticLayer;
+            if (!isStaticLayer) {
+                layer.hideLayer();
+            }
+        }
+        // Show only the relevant layers based on the new state
         switch (newState) {
             case TITLE -> {
-                for (AlgaeLayer layer : coralLayers) {
-                    layer.showLayer();
-                }
-                for (TextLayer layer : titleTextLayers) {
-                    layer.showLayer();
+                for (Layer layer : layers) {
+                    boolean isTitle = layer instanceof TextLayer && ((TextLayer) layer).getID() == TextId.TITLE;
+                    boolean isSubtitle = layer instanceof TextLayer && ((TextLayer) layer).getID() == TextId.SUBTITLE;
+                    if (isTitle || isSubtitle) {
+                        layer.showLayer();
+                    }
+                    if (layer instanceof AlgaeLayer) {
+                        ((AlgaeLayer) layer).setSkipIntroAnimation(true);
+                        layer.showLayer();
+                    }
                 }
             }
 
-            case AXOLOTL_ERROR -> {
-                notAxolotlLayer.showLayer();
+            case AXOLOTL_ERROR -> notAxolotlLayer.showLayer();
+
+            case OPENING -> {
+                for (Layer layer : layers) {
+                    boolean isAxolotlIntroduction = layer instanceof TextLayer
+                            && ((TextLayer) layer).getID() == TextId.AXOLOTL_INTRODUCTION;
+                    if (layer instanceof AlgaeLayer) {
+                        ((AlgaeLayer) layer).setSkipIntroAnimation(true);
+                        layer.showLayer();
+                    }
+                    if (isAxolotlIntroduction) {
+                        layer.showLayer();
+                    }
+                    if (layer instanceof AxolotlLayer) {
+                        layer.showLayer();
+                        ((AxolotlLayer) layer).setExpression(AxolotlLayer.Expression.HAPPY);
+                    }
+                }
             }
 
             default -> {
-                for (AlgaeLayer layer : coralLayers) {
-                    layer.hideLayer();
-                }
+                System.out.println("Default case: " + newState);
             }
         }
     }
