@@ -1,28 +1,28 @@
 package com.algaecare.controller;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.algaecare.model.GameState;
-import com.algaecare.model.TextLayerData;
 import com.algaecare.view.*;
 
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class ScreenController implements GameStateChangeListener {
+public class ScreenController implements GameStateEventManager, GameStateEventManager.EventEmitter {
     private static final Logger LOGGER = Logger.getLogger(ScreenController.class.getName());
     private final List<Layer> layers = new ArrayList<>();
     private final AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
+    private final List<GameStateEventManager.EventEmitter> stateEmitters = new ArrayList<>();
+    private GameState currentState;
 
     public ScreenController(Stage stage) {
         MainScene scene = new MainScene(stage);
         initializeLayers();
         ((StackPane) scene.getScene().getRoot()).getChildren().addAll(layers);
+        currentState = GameState.TITLE;
     }
 
     private void initializeLayers() {
@@ -74,6 +74,28 @@ public class ScreenController implements GameStateChangeListener {
         updateScreen(GameState.TITLE);
     }
 
+    @Override
+    public void onGameStateChanged(GameState oldState, GameState newState) {
+        try {
+            currentState = newState;
+            updateScreen(newState);
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, e,
+                    () -> String.format("Error changing game state from %s to %s", oldState, newState));
+        }
+    }
+
+    @Override
+    public void emitGameStateChange(GameState newState) {
+        // Screen controller can also emit state changes (e.g., after animations
+        // complete)
+        stateEmitters.forEach(emitter -> emitter.emitGameStateChange(newState));
+    }
+
+    public void addStateEmitter(GameStateEventManager.EventEmitter emitter) {
+        stateEmitters.add(emitter);
+    }
+
     public void updateScreen(GameState newState) {
         // Hide all layers first, except for static layers
         for (Layer layer : layers) {
@@ -100,7 +122,8 @@ public class ScreenController implements GameStateChangeListener {
 
             case AXOLOTL_ERROR -> {
                 for (Layer layer : layers) {
-                    boolean isAxolotlError = layer instanceof TextLayer textLayer && textLayer.getID() == TextId.NOT_AXOLOTL;
+                    boolean isAxolotlError = layer instanceof TextLayer textLayer
+                            && textLayer.getID() == TextId.NOT_AXOLOTL;
                     if (isAxolotlError) {
                         layer.showLayer();
                     }
@@ -113,7 +136,8 @@ public class ScreenController implements GameStateChangeListener {
 
             case OPENING -> {
                 for (Layer layer : layers) {
-                    boolean isAxolotlIntroduction = layer instanceof TextLayer textLayer && textLayer.getID() == TextId.AXOLOTL_INTRODUCTION;
+                    boolean isAxolotlIntroduction = layer instanceof TextLayer textLayer
+                            && textLayer.getID() == TextId.AXOLOTL_INTRODUCTION;
                     if (layer instanceof AlgaeLayer algaelayer) {
                         algaelayer.setSkipIntroAnimation(true);
                         algaelayer.showLayer();
@@ -129,15 +153,6 @@ public class ScreenController implements GameStateChangeListener {
             }
 
             default -> LOGGER.log(Level.INFO, () -> String.format("Updating screen to state %s", newState));
-        }
-    }
-
-    @Override
-    public void onGameStateChanged(GameState oldState, GameState newState) {
-        try {
-            updateScreen(newState);
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, e, () -> String.format("Error changing game state from %s to %s", oldState, newState));
         }
     }
 }
