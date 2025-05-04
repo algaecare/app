@@ -8,7 +8,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
-public class AnimationLayer extends Layer {
+public class AlgaeLayer extends Layer {
 
     public enum AnimationState {
         HIDDEN, INTRO, IDLE, OUTRO
@@ -20,7 +20,7 @@ public class AnimationLayer extends Layer {
     private final Timeline outroTimeline;
     private AnimationState currentState = AnimationState.HIDDEN;
 
-    public AnimationLayer(int x, int y, int width, int height, String imagePath) {
+    public AlgaeLayer(int x, int y, int width, int height, String imagePath) {
         super(LayerType.DYNAMIC);
 
         if (imagePath == null || imagePath.isEmpty()) {
