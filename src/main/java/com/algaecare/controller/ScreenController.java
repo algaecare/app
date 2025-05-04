@@ -15,21 +15,12 @@ import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
 public class ScreenController implements GameStateChangeListener {
-    private enum LayerType {
-        STATIC,
-        AXOLOTL,
-        ALGAE,
-        TEXT
-    }
-
     private static final Logger LOGGER = Logger.getLogger(ScreenController.class.getName());
     private final List<Layer> layers = new ArrayList<>();
     private final AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
-    private TextLayer notAxolotlLayer;
-    private final MainScene scene;
 
-    public ScreenController(MainController controller, Stage stage) {
-        this.scene = new MainScene(stage);
+    public ScreenController(Stage stage) {
+        MainScene scene = new MainScene(stage);
         initializeLayers();
         ((StackPane) scene.getScene().getRoot()).getChildren().addAll(layers);
     }
@@ -71,7 +62,6 @@ public class ScreenController implements GameStateChangeListener {
         // STATIC LAYER 02 && 01
         layers.add(new StaticLayer(0, 225, "/02-LAYER.png"));
         layers.add(new StaticLayer(0, 353, "/01-LAYER.png"));
-        // layers.add(new StaticLayer(0, 0, "00-LAYER.png"););
         // TEXT LAYERS
         layers.add(new TextLayer(TextId.TITLE, 1040, 220, 450, 125, "SUPERWATER_BIG"));
         layers.add(new TextLayer(TextId.SUBTITLE, 450, 100, 775, 350, "SUPERWATER_SMALL"));
@@ -96,41 +86,49 @@ public class ScreenController implements GameStateChangeListener {
         switch (newState) {
             case TITLE -> {
                 for (Layer layer : layers) {
-                    boolean isTitle = layer instanceof TextLayer && ((TextLayer) layer).getID() == TextId.TITLE;
-                    boolean isSubtitle = layer instanceof TextLayer && ((TextLayer) layer).getID() == TextId.SUBTITLE;
+                    boolean isTitle = layer instanceof TextLayer textLayer && textLayer.getID() == TextId.TITLE;
+                    boolean isSubtitle = layer instanceof TextLayer textLayer && textLayer.getID() == TextId.SUBTITLE;
                     if (isTitle || isSubtitle) {
                         layer.showLayer();
                     }
-                    if (layer instanceof AlgaeLayer) {
-                        ((AlgaeLayer) layer).setSkipIntroAnimation(true);
-                        layer.showLayer();
+                    if (layer instanceof AlgaeLayer algaelayer) {
+                        algaelayer.setSkipIntroAnimation(true);
+                        algaelayer.showLayer();
                     }
                 }
             }
 
-            case AXOLOTL_ERROR -> notAxolotlLayer.showLayer();
+            case AXOLOTL_ERROR -> {
+                for (Layer layer : layers) {
+                    boolean isAxolotlError = layer instanceof TextLayer textLayer && textLayer.getID() == TextId.NOT_AXOLOTL;
+                    if (isAxolotlError) {
+                        layer.showLayer();
+                    }
+                    if (layer instanceof AlgaeLayer algaelayer) {
+                        algaelayer.setSkipIntroAnimation(true);
+                        algaelayer.showLayer();
+                    }
+                }
+            }
 
             case OPENING -> {
                 for (Layer layer : layers) {
-                    boolean isAxolotlIntroduction = layer instanceof TextLayer
-                            && ((TextLayer) layer).getID() == TextId.AXOLOTL_INTRODUCTION;
-                    if (layer instanceof AlgaeLayer) {
-                        ((AlgaeLayer) layer).setSkipIntroAnimation(true);
-                        layer.showLayer();
+                    boolean isAxolotlIntroduction = layer instanceof TextLayer textLayer && textLayer.getID() == TextId.AXOLOTL_INTRODUCTION;
+                    if (layer instanceof AlgaeLayer algaelayer) {
+                        algaelayer.setSkipIntroAnimation(true);
+                        algaelayer.showLayer();
                     }
                     if (isAxolotlIntroduction) {
                         layer.showLayer();
                     }
-                    if (layer instanceof AxolotlLayer) {
-                        layer.showLayer();
-                        ((AxolotlLayer) layer).setExpression(AxolotlLayer.Expression.HAPPY);
+                    if (layer instanceof AxolotlLayer axolotllayer) {
+                        axolotllayer.showLayer();
+                        axolotllayer.setExpression(AxolotlLayer.Expression.HAPPY);
                     }
                 }
             }
 
-            default -> {
-                System.out.println("Default case: " + newState);
-            }
+            default -> LOGGER.log(Level.INFO, () -> String.format("Updating screen to state %s", newState));
         }
     }
 
@@ -138,9 +136,8 @@ public class ScreenController implements GameStateChangeListener {
     public void onGameStateChanged(GameState oldState, GameState newState) {
         try {
             updateScreen(newState);
-            return;
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error changing game state from " + oldState + " to " + newState, e);
+            LOGGER.log(Level.SEVERE, e, () -> String.format("Error changing game state from %s to %s", oldState, newState));
         }
     }
 }
