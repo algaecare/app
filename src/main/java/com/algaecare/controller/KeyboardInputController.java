@@ -36,7 +36,6 @@ public class KeyboardInputController implements GameStateEventManager {
 
     @Override
     public void onGameStateChanged(GameState oldState, GameState newState) {
-        LOGGER.info(String.format("Keyboard state updated from %s to %s", oldState, newState));
         this.currentState = newState;
     }
 
@@ -71,12 +70,8 @@ public class KeyboardInputController implements GameStateEventManager {
             final GameState targetState = gameplayStates[index];
 
             bindKey(digitKeys[index], event -> {
-                LOGGER.info("Key " + digitKeys[index] + " pressed in state " + currentState);
                 if (currentState == GameState.GAMEPLAY || currentState == GameState.OPENING) {
                     stateEmitter.emitGameStateChange(targetState);
-                } else {
-                    LOGGER.warning(String.format("Key %s pressed but current state is %s, expected GAMEPLAY or OPENING",
-                            digitKeys[index], currentState));
                 }
             });
         }
