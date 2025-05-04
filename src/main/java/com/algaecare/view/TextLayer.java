@@ -28,7 +28,6 @@ public class TextLayer extends Layer {
     private final FontType fontType;
 
     public TextLayer(String id, int width, int height, int x, int y, String text, String fontType) {
-        super(LayerType.STATIC);
         this.id = id;
         this.width = width;
         this.height = height;

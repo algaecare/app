@@ -9,8 +9,6 @@ public class StaticLayer extends Layer {
     private final ColorAdjust colorAdjust;
 
     public StaticLayer(int x, int y, String imagePath) {
-        super(LayerType.STATIC);
-
         if (imagePath == null || imagePath.isEmpty()) {
             throw new IllegalArgumentException("Image path cannot be null or empty");
         }

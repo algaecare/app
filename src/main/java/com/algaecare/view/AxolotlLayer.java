@@ -43,10 +43,9 @@ public class AxolotlLayer extends Layer {
     private Expression currentExpression = Expression.HAPPY;
 
     public AxolotlLayer(int x, int y, int width, int height) {
-        super(LayerType.DYNAMIC);
-
         // Base layer setup
-        baseImageView = new ImageView(new Image(Objects.requireNonNull(getClass().getResource("/10-AXOLOTL-BASE.png")).toExternalForm()));
+        baseImageView = new ImageView(
+                new Image(Objects.requireNonNull(getClass().getResource("/10-AXOLOTL-BASE.png")).toExternalForm()));
         baseImageView.setPreserveRatio(true);
         baseImageView.setFitWidth(width);
         baseImageView.setFitHeight(height);

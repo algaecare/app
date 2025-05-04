@@ -23,8 +23,6 @@ public class AlgaeLayer extends Layer {
     private AnimationState currentState = AnimationState.HIDDEN;
 
     public AlgaeLayer(int x, int y, int width, int height, String imagePath) {
-        super(LayerType.DYNAMIC);
-
         if (imagePath == null || imagePath.isEmpty()) {
             throw new IllegalArgumentException("Image path cannot be null or empty");
         }
