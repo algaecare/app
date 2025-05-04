@@ -8,11 +8,11 @@ import java.util.logging.Logger;
 import com.algaecare.model.GameState;
 import com.algaecare.model.TextLayerData;
 import com.algaecare.view.MainScene;
-import com.algaecare.view.layer.AlgaeLayer;
-import com.algaecare.view.layer.AxolotlLayer;
-import com.algaecare.view.layer.Layer;
-import com.algaecare.view.layer.StaticLayer;
-import com.algaecare.view.layer.TextLayer;
+import com.algaecare.view.AlgaeLayer;
+import com.algaecare.view.AxolotlLayer;
+import com.algaecare.view.Layer;
+import com.algaecare.view.StaticLayer;
+import com.algaecare.view.TextLayer;
 
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;

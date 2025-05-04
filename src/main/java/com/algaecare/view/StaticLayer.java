@@ -1,4 +1,4 @@
-package com.algaecare.view.layer;
+package com.algaecare.view;
 
 import javafx.scene.effect.ColorAdjust;
 import javafx.scene.image.Image;
