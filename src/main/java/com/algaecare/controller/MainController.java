@@ -5,9 +5,6 @@ import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
 
 public class MainController extends GameStateEventManager.Notifier {
-    private final KeyboardInputController keyboardInputController;
-    private final NFCChipController nfcController;
-    private final ScreenController screenController;
     private final Environment environment;
 
     public MainController(Stage stage) {
@@ -15,9 +12,9 @@ public class MainController extends GameStateEventManager.Notifier {
         this.environment = new Environment(90, 16, 70, 85);
 
         // Initialize controllers
-        this.keyboardInputController = new KeyboardInputController(stage);
-        this.screenController = new ScreenController(stage);
-        this.nfcController = new NFCChipController();
+        KeyboardInputController keyboardInputController = new KeyboardInputController(stage);
+        ScreenController screenController = new ScreenController(stage);
+        NFCChipController nfcController = new NFCChipController();
 
         // Wire up event chain:
         // Keyboard -> MainController -> ScreenController
