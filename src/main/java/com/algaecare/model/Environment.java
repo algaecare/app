@@ -4,8 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
-import com.algaecare.app.Main;
-
 public class Environment {
     private static final Logger LOGGER = Logger.getLogger(Environment.class.getName());
 
@@ -62,6 +60,15 @@ public class Environment {
         LOGGER.info(String.format(
                 "Environment updated: CO2 Level: %d%%, Temperature: %d°C, Algae Level: %d%%, O2 Level: %d%%",
                 co2Level, temperature, algaeLevel, o2Level));
+    }
+
+    public void reset() {
+        this.co2Level = 0;
+        this.temperature = 0;
+        this.algaeLevel = 0;
+        this.o2Level = 0;
+
+        LOGGER.info("Environment reset to default values.");
     }
 
     public int getAlgaeLevel() {
