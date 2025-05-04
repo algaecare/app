@@ -17,6 +17,7 @@ public class ScreenController implements GameStateEventManager {
     private final List<Layer> layers = new ArrayList<>();
     private final AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
     private final Label debugText = createDebugText();
+    private final GameStateEventManager.EventEmitter stateEmitter;
 
     private Label createDebugText() {
         Label label = new Label();
@@ -29,7 +30,8 @@ public class ScreenController implements GameStateEventManager {
         return label;
     }
 
-    public ScreenController(Stage stage) {
+    public ScreenController(Stage stage, GameStateEventManager.EventEmitter stateEmitter) {
+        this.stateEmitter = stateEmitter;
         MainScene scene = new MainScene(stage);
         initializeLayers();
         ((StackPane) scene.getScene().getRoot()).getChildren().addAll(layers);
@@ -84,6 +86,11 @@ public class ScreenController implements GameStateEventManager {
 
         // SET TITLE LAYER
         updateScreen(GameState.TITLE);
+    }
+
+    private void emitStateChange(GameState newState) {
+        LOGGER.info("Screen emitting state change to: " + newState);
+        stateEmitter.emitGameStateChange(newState);
     }
 
     @Override
@@ -167,6 +174,49 @@ public class ScreenController implements GameStateEventManager {
                         algaelayer.showLayer();
                     }
                 }
+            }
+
+            case TRASH, CAR, AIRPLANE, SHOPPING_BAG_WORLD -> {
+                for (Layer layer : layers) {
+                    if (layer instanceof AlgaeLayer algaelayer) {
+                        algaelayer.setSkipIntroAnimation(false);
+                        algaelayer.showLayer();
+                    }
+                    if (layer instanceof AxolotlLayer axolotllayer) {
+                        switch (axolotllayer.getExpression()) {
+                            case HAPPY -> axolotllayer.setExpression(AxolotlLayer.Expression.BAD);
+                            case BAD -> axolotllayer.setExpression(AxolotlLayer.Expression.WORSE);
+                            case WORSE -> axolotllayer.setExpression(AxolotlLayer.Expression.WORST);
+                            default -> axolotllayer.setExpression(AxolotlLayer.Expression.SAD);
+                        }
+                        axolotllayer.showLayer();
+                    }
+                }
+                javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(
+                        javafx.util.Duration.seconds(4));
+                pause.setOnFinished(event -> emitStateChange(GameState.GAMEPLAY));
+                pause.play();
+            }
+
+            case RECYCLING, TRAIN, SHOPPING_BAG_LOCAL, BICYCLE, TRASH_GRABBER -> {
+                for (Layer layer : layers) {
+                    if (layer instanceof AlgaeLayer algaelayer) {
+                        algaelayer.setSkipIntroAnimation(false);
+                        algaelayer.showLayer();
+                    }
+                    if (layer instanceof AxolotlLayer axolotllayer) {
+                        switch (axolotllayer.getExpression()) {
+                            case WORST -> axolotllayer.setExpression(AxolotlLayer.Expression.WORSE);
+                            case WORSE -> axolotllayer.setExpression(AxolotlLayer.Expression.BAD);
+                            default -> axolotllayer.setExpression(AxolotlLayer.Expression.HAPPY);
+                        }
+                        axolotllayer.showLayer();
+                    }
+                }
+                javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(
+                        javafx.util.Duration.seconds(4));
+                pause.setOnFinished(event -> emitStateChange(GameState.GAMEPLAY));
+                pause.play();
             }
 
             default -> LOGGER.log(Level.INFO, () -> String.format("Updating screen to state %s", newState));

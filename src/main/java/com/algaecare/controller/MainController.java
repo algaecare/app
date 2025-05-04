@@ -19,7 +19,7 @@ public class MainController implements GameStateEventManager, GameStateEventMana
 
         // Initialize controllers
         KeyboardInputController keyboardInputController = new KeyboardInputController(stage, this);
-        ScreenController screenController = new ScreenController(stage);
+        ScreenController screenController = new ScreenController(stage, this);
         NFCChipController nfcController = new NFCChipController();
 
         // Wire up event chain
