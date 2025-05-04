@@ -8,21 +8,33 @@ import java.util.logging.Logger;
 import com.algaecare.model.GameState;
 import com.algaecare.view.*;
 
+import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class ScreenController implements GameStateEventManager, GameStateEventManager.EventEmitter {
+public class ScreenController implements GameStateEventManager {
     private static final Logger LOGGER = Logger.getLogger(ScreenController.class.getName());
     private final List<Layer> layers = new ArrayList<>();
     private final AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
-    private final List<GameStateEventManager.EventEmitter> stateEmitters = new ArrayList<>();
-    private GameState currentState;
+    private final Label debugText = createDebugText();
+
+    private Label createDebugText() {
+        Label label = new Label();
+        label.setStyle(
+                "-fx-font-size: 20px; -fx-text-fill: white; -fx-background-color: black; -fx-padding: 10px; -fx-opacity: 1;");
+        // Position the label at the bottom left corner
+        label.setTranslateX(10); // 10px from the left
+        label.setTranslateY(-10); // 10px from the bottom (will be set using StackPane alignment)
+        StackPane.setAlignment(label, javafx.geometry.Pos.BOTTOM_LEFT);
+        return label;
+    }
 
     public ScreenController(Stage stage) {
         MainScene scene = new MainScene(stage);
         initializeLayers();
         ((StackPane) scene.getScene().getRoot()).getChildren().addAll(layers);
-        currentState = GameState.TITLE;
+        ((StackPane) scene.getScene().getRoot()).getChildren().add(debugText);
+        updateScreen(GameState.TITLE);
     }
 
     private void initializeLayers() {
@@ -77,7 +89,6 @@ public class ScreenController implements GameStateEventManager, GameStateEventMa
     @Override
     public void onGameStateChanged(GameState oldState, GameState newState) {
         try {
-            currentState = newState;
             updateScreen(newState);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e,
@@ -86,17 +97,14 @@ public class ScreenController implements GameStateEventManager, GameStateEventMa
     }
 
     @Override
-    public void emitGameStateChange(GameState newState) {
-        // Screen controller can also emit state changes (e.g., after animations
-        // complete)
-        stateEmitters.forEach(emitter -> emitter.emitGameStateChange(newState));
-    }
-
-    public void addStateEmitter(GameStateEventManager.EventEmitter emitter) {
-        stateEmitters.add(emitter);
+    public GameState getCurrentState() {
+        throw new UnsupportedOperationException("ScreenController doesn't manage game state");
     }
 
     public void updateScreen(GameState newState) {
+        debugText.setText("Current Game State: " + newState);
+        LOGGER.log(Level.INFO, () -> String.format("Updating screen to state %s", newState));
+
         // Hide all layers first, except for static layers
         for (Layer layer : layers) {
             boolean isStaticLayer = layer instanceof StaticLayer;
@@ -148,6 +156,15 @@ public class ScreenController implements GameStateEventManager, GameStateEventMa
                     if (layer instanceof AxolotlLayer axolotllayer) {
                         axolotllayer.showLayer();
                         axolotllayer.setExpression(AxolotlLayer.Expression.HAPPY);
+                    }
+                }
+            }
+
+            case GAMEPLAY -> {
+                for (Layer layer : layers) {
+                    if (layer instanceof AlgaeLayer algaelayer) {
+                        algaelayer.setSkipIntroAnimation(true);
+                        algaelayer.showLayer();
                     }
                 }
             }
