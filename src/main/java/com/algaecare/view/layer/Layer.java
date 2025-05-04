@@ -15,7 +15,11 @@ public abstract class Layer extends StackPane {
         setAlignment(javafx.geometry.Pos.TOP_LEFT);
     }
 
-    public LayerType getLayerType() {
-        return layerType;
+    public void showLayer() {
+        setVisible(true);
+    }
+
+    public void hideLayer() {
+        setVisible(false);
     }
 }
