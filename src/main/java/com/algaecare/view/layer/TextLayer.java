@@ -61,17 +61,17 @@ public class TextLayer extends Layer {
 
         // Load the font
         if (fontType == FontType.INTER) {
-            Font font = Font.loadFont(getClass().getResourceAsStream("/fonts/InterBold.ttf"), 28);
+            Font font = Font.loadFont(getClass().getResourceAsStream("/InterBold.ttf"), 28);
             textLabel.setFont(Font.font(font.getFamily(), javafx.scene.text.FontWeight.BOLD, 50));
             textLabel.setTextFill(Color.BLACK);
             backgroundFill = new BackgroundFill(Color.WHITE, cornerRadii, Insets.EMPTY);
         } else if (fontType == FontType.SUPERWATER_BIG) {
-            Font.loadFont(getClass().getResourceAsStream("/fonts/SuperWater.ttf"), 170);
+            Font.loadFont(getClass().getResourceAsStream("/SuperWater.ttf"), 170);
             textLabel.setTextFill(Color.rgb(204, 243, 255));
             textLabel.setStyle("-fx-font-family: 'Super Water'; -fx-font-size: 170px; -fx-font-weight: normal;");
             backgroundFill = new BackgroundFill(Color.TRANSPARENT, cornerRadii, Insets.EMPTY);
         } else if (fontType == FontType.SUPERWATER_SMALL) {
-            Font.loadFont(getClass().getResourceAsStream("/fonts/SuperWater.ttf"), 40);
+            Font.loadFont(getClass().getResourceAsStream("/SuperWater.ttf"), 40);
             textLabel.setTextFill(Color.rgb(204, 243, 255));
             textLabel.setStyle("-fx-font-family: 'Super Water'; -fx-font-size: 40px; -fx-font-weight: normal;");
             backgroundFill = new BackgroundFill(Color.TRANSPARENT, cornerRadii, Insets.EMPTY);

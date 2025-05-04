@@ -14,6 +14,13 @@ public class StaticLayer extends Layer {
         if (imagePath == null || imagePath.isEmpty()) {
             throw new IllegalArgumentException("Image path cannot be null or empty");
         }
+        if (getClass().getResource(imagePath) == null) {
+            throw new IllegalArgumentException("Image not found at path: " + imagePath);
+        }
+        if (x < 0 || y < 0) {
+            throw new IllegalArgumentException("X and Y coordinates must be non-negative");
+        }
+        // Set up the image view
         Image image = new Image(Objects.requireNonNull(getClass().getResource(imagePath)).toExternalForm());
 
         ImageView imageView = new ImageView(image);
