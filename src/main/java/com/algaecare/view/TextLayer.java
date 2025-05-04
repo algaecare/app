@@ -35,8 +35,7 @@ public class TextLayer extends Layer {
         this.x = x;
         this.y = y;
         this.fontType = FontType.valueOf(fontType.toUpperCase());
-        String text = TextLayerData.getText(String.valueOf(id));
-        this.textLabel = new Label(text);
+        this.textLabel = new Label(TextLayerData.getText(String.valueOf(id)));
         initializeLayer();
         hideLayer();
     }

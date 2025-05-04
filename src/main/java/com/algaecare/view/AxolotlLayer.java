@@ -92,7 +92,7 @@ public class AxolotlLayer extends Layer {
     }
 
     private void updateExpression(Expression expression) {
-        Image newImage = new Image(getClass().getResource(expression.getImagePath()).toExternalForm());
+        Image newImage = new Image(Objects.requireNonNull(getClass().getResource(expression.getImagePath())).toExternalForm());
         expressionImageView.setImage(newImage);
         currentExpression = expression;
     }
