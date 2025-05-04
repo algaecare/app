@@ -19,6 +19,7 @@ public class MainScene {
     public MainScene(Stage stage) {
         // Configure Stage
         stage.setTitle("Algae Care");
+        stage.initStyle(StageStyle.UNDECORATED);
         stage.setResizable(false);
 
         // Set minimum, maximum and preferred size to force dimensions
