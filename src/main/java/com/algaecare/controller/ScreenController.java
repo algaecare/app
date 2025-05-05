@@ -1,73 +1,96 @@
 package com.algaecare.controller;
 
-import java.util.Map;
-import java.util.logging.Logger;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import com.algaecare.model.GameState;
-import com.algaecare.view.AnimationScreen;
-import com.algaecare.view.GameScreen;
-import com.algaecare.view.IdleScreen;
-import com.algaecare.view.Screen;
-import com.algaecare.view.Window;
+import com.algaecare.view.*;
 
+import javafx.scene.control.Label;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
 
-public class ScreenController implements GameStateChangeListener {
+public class ScreenController implements GameStateEventManager {
     private static final Logger LOGGER = Logger.getLogger(ScreenController.class.getName());
-    private final Window window;
-    private final MainController mainController;
-    Map<GameState, Screen> screens;
+    private final List<Layer> layers = new ArrayList<>();
+    private final AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
+    private final Label debugText = createDebugText();
+    private final GameStateEventManager.EventEmitter stateEmitter;
 
-    public ScreenController(MainController controller, Stage stage) {
-        this.window = new Window(stage);
-        this.mainController = controller;
-        initializeScreens();
-        setScreen(screens.get(GameState.TITLE));
-        window.setVisible(true);
-        window.setDisable(false);
+    private Label createDebugText() {
+        Label label = new Label();
+        label.setStyle(
+                "-fx-font-size: 20px; -fx-text-fill: white; -fx-background-color: black; -fx-padding: 10px; -fx-opacity: 1;");
+        // Position the label at the bottom left corner
+        label.setTranslateX(10); // 10px from the left
+        label.setTranslateY(-10); // 10px from the bottom (will be set using StackPane alignment)
+        StackPane.setAlignment(label, javafx.geometry.Pos.BOTTOM_LEFT);
+        return label;
     }
 
-    private void initializeScreens() {
-        // Title Screen
-        String titleScreenPath = "/animations/Title.mp4";
-        IdleScreen titleScreen = new IdleScreen(titleScreenPath);
+    public ScreenController(Stage stage, GameStateEventManager.EventEmitter stateEmitter) {
+        this.stateEmitter = stateEmitter;
+        MainScene scene = new MainScene(stage);
+        initializeLayers();
+        ((StackPane) scene.getScene().getRoot()).getChildren().addAll(layers);
+        ((StackPane) scene.getScene().getRoot()).getChildren().add(debugText);
+        updateScreen(GameState.TITLE);
+    }
 
-        // Opening Screen
-        String openingScreenPath = "/animations/Opening.mp4";
-        AnimationScreen openingScreen = new AnimationScreen(
-                openingScreenPath,
-                unused -> {
-                    mainController.setGameState(GameState.GAMEPLAY);
-                });
+    private void initializeLayers() {
+        // STATIC LAYERS 07 && 06
+        layers.add(new StaticLayer(0, 0, "/07-LAYER.png"));
+        layers.add(new StaticLayer(0, 91, "/06-LAYER.png"));
+        // ALGAE LAYERS 05
+        layers.add(new AlgaeLayer(1205, 640, 190, 225,
+                "/05-LAYER-CORAL-1.png"));
+        layers.add(new AlgaeLayer(1660, 370, 120, 175,
+                "/05-LAYER-CORAL-2.png"));
+        layers.add(new AlgaeLayer(120, 390, 190, 300,
+                "/05-LAYER-CORAL-3.png"));
+        layers.add(new AlgaeLayer(1445, 405, 190, 300,
+                "/05-LAYER-CORAL-4.png"));
+        layers.add(new AlgaeLayer(365, 615, 205, 240,
+                "/05-LAYER-CORAL-5.png"));
+        layers.add(new AlgaeLayer(830, 560, 335, 330,
+                "/05-LAYER-CORAL-6.png"));
+        layers.add(new AlgaeLayer(605, 705, 155, 165,
+                "/05-LAYER-CORAL-7.png"));
+        // STATIC LAYER 04
+        layers.add(new StaticLayer(0, 237, "/04-LAYER.png"));
+        // ALGAE LAYERS 03
+        layers.add(new AlgaeLayer(1545, 700, 130, 70,
+                "/03-LAYER-CORAL-1.png"));
+        layers.add(new AlgaeLayer(210, 705, 245, 235,
+                "/03-LAYER-CORAL-2.png"));
+        layers.add(new AlgaeLayer(800, 765, 170, 220,
+                "/03-LAYER-CORAL-3.png"));
+        layers.add(new AlgaeLayer(480, 775, 135, 200,
+                "/03-LAYER-CORAL-4.png"));
+        layers.add(new AlgaeLayer(1285, 670, 170, 250,
+                "/03-LAYER-CORAL-5.png"));
+        layers.add(new AlgaeLayer(1075, 805, 175, 145,
+                "/03-LAYER-CORAL-6.png"));
+        // STATIC LAYER 02 && 01
+        layers.add(new StaticLayer(0, 225, "/02-LAYER.png"));
+        layers.add(new StaticLayer(0, 353, "/01-LAYER.png"));
+        // TEXT LAYERS
+        layers.add(new TextLayer(TextId.TITLE, 1040, 220, 450, 125, "SUPERWATER_BIG"));
+        layers.add(new TextLayer(TextId.SUBTITLE, 450, 100, 775, 350, "SUPERWATER_SMALL"));
+        layers.add(new TextLayer(TextId.NOT_AXOLOTL, 1800, 325, 40, 720, "INTER"));
+        layers.add(new TextLayer(TextId.AXOLOTL_INTRODUCTION, 1735, 480, 90, 100, "INTER"));
+        // AXOLOTL LAYER
+        layers.add(axolotlLayer);
 
-        // Gameplay Screen
-        String gameplayScreenPath = "/animations/Gameplay.mp4";
-        GameScreen gameplayScreen = new GameScreen(gameplayScreenPath);
+        // SET TITLE LAYER
+        updateScreen(GameState.TITLE);
+    }
 
-        // Cutscene Screen
-        String cutsceneScreenPath = "/animations/Cutscene.mp4";
-        AnimationScreen cutsceneScreen = new AnimationScreen(
-                cutsceneScreenPath,
-                unused -> {
-                    mainController.setGameState(GameState.GAMEPLAY);
-                });
-
-        // Ending Screen
-        String endingScreenPath = "/animations/Ending.mp4";
-        AnimationScreen endingScreen = new AnimationScreen(
-                endingScreenPath,
-                unused -> {
-                    mainController.setGameState(GameState.TITLE);
-                });
-
-        // Add screens to the map
-        screens = Map.of(
-                GameState.TITLE, titleScreen,
-                GameState.OPENING, openingScreen,
-                GameState.GAMEPLAY, gameplayScreen,
-                GameState.CUTSCENE, cutsceneScreen,
-                GameState.ENDING, endingScreen);
+    private void emitStateChange(GameState newState) {
+        LOGGER.info("Screen emitting state change to: " + newState);
+        stateEmitter.emitGameStateChange(newState);
     }
 
     @Override
@@ -75,26 +98,128 @@ public class ScreenController implements GameStateChangeListener {
         try {
             updateScreen(newState);
         } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error changing game state from " + oldState + " to " + newState, e);
+            LOGGER.log(Level.SEVERE, e,
+                    () -> String.format("Error changing game state from %s to %s", oldState, newState));
         }
     }
 
-    private void setScreen(Screen screen) {
-        window.getChildren().clear();
-        window.getChildren().add(screen);
-        window.setVisible(true);
-        window.setDisable(false);
+    @Override
+    public GameState getCurrentState() {
+        throw new UnsupportedOperationException("ScreenController doesn't manage game state");
     }
 
-    private void updateScreen(GameState newState) {
-        Screen newScreen = screens.get(newState);
-        if (newScreen != null) {
-            if (newScreen instanceof GameScreen) {
-                ((GameScreen) newScreen).updateEnvironmentDisplay(mainController.getEnvironment());
+    public void updateScreen(GameState newState) {
+        debugText.setText("Current Game State: " + newState);
+        LOGGER.log(Level.INFO, () -> String.format("Updating screen to state %s", newState));
+
+        // Hide all layers first, except for static layers
+        for (Layer layer : layers) {
+            boolean isStaticLayer = layer instanceof StaticLayer;
+            if (!isStaticLayer) {
+                layer.hideLayer();
             }
-            setScreen(newScreen);
-        } else {
-            LOGGER.warning("No screen found for game state: " + newState);
+        }
+        // Show only the relevant layers based on the new state
+        switch (newState) {
+            case TITLE -> {
+                for (Layer layer : layers) {
+                    boolean isTitle = layer instanceof TextLayer textLayer && textLayer.getID() == TextId.TITLE;
+                    boolean isSubtitle = layer instanceof TextLayer textLayer && textLayer.getID() == TextId.SUBTITLE;
+                    if (isTitle || isSubtitle) {
+                        layer.showLayer();
+                    }
+                    if (layer instanceof AlgaeLayer algaelayer) {
+                        algaelayer.setSkipIntroAnimation(true);
+                        algaelayer.showLayer();
+                    }
+                }
+            }
+
+            case AXOLOTL_ERROR -> {
+                for (Layer layer : layers) {
+                    boolean isAxolotlError = layer instanceof TextLayer textLayer
+                            && textLayer.getID() == TextId.NOT_AXOLOTL;
+                    if (isAxolotlError) {
+                        layer.showLayer();
+                    }
+                    if (layer instanceof AlgaeLayer algaelayer) {
+                        algaelayer.setSkipIntroAnimation(true);
+                        algaelayer.showLayer();
+                    }
+                }
+            }
+
+            case OPENING -> {
+                for (Layer layer : layers) {
+                    boolean isAxolotlIntroduction = layer instanceof TextLayer textLayer
+                            && textLayer.getID() == TextId.AXOLOTL_INTRODUCTION;
+                    if (layer instanceof AlgaeLayer algaelayer) {
+                        algaelayer.setSkipIntroAnimation(true);
+                        algaelayer.showLayer();
+                    }
+                    if (isAxolotlIntroduction) {
+                        layer.showLayer();
+                    }
+                    if (layer instanceof AxolotlLayer axolotllayer) {
+                        axolotllayer.showLayer();
+                        axolotllayer.setExpression(AxolotlLayer.Expression.HAPPY);
+                    }
+                }
+            }
+
+            case GAMEPLAY -> {
+                for (Layer layer : layers) {
+                    if (layer instanceof AlgaeLayer algaelayer) {
+                        algaelayer.setSkipIntroAnimation(true);
+                        algaelayer.showLayer();
+                    }
+                }
+            }
+
+            case TRASH, CAR, AIRPLANE, SHOPPING_BAG_WORLD -> {
+                for (Layer layer : layers) {
+                    if (layer instanceof AlgaeLayer algaelayer) {
+                        algaelayer.setSkipIntroAnimation(false);
+                        algaelayer.showLayer();
+                    }
+                    if (layer instanceof AxolotlLayer axolotllayer) {
+                        switch (axolotllayer.getExpression()) {
+                            case HAPPY -> axolotllayer.setExpression(AxolotlLayer.Expression.BAD);
+                            case BAD -> axolotllayer.setExpression(AxolotlLayer.Expression.WORSE);
+                            case WORSE -> axolotllayer.setExpression(AxolotlLayer.Expression.WORST);
+                            default -> axolotllayer.setExpression(AxolotlLayer.Expression.SAD);
+                        }
+                        axolotllayer.showLayer();
+                    }
+                }
+                javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(
+                        javafx.util.Duration.seconds(4));
+                pause.setOnFinished(event -> emitStateChange(GameState.GAMEPLAY));
+                pause.play();
+            }
+
+            case RECYCLING, TRAIN, SHOPPING_BAG_LOCAL, BICYCLE, TRASH_GRABBER -> {
+                for (Layer layer : layers) {
+                    if (layer instanceof AlgaeLayer algaelayer) {
+                        algaelayer.setSkipIntroAnimation(false);
+                        algaelayer.showLayer();
+                    }
+                    if (layer instanceof AxolotlLayer axolotllayer) {
+                        switch (axolotllayer.getExpression()) {
+                            case WORST -> axolotllayer.setExpression(AxolotlLayer.Expression.WORSE);
+                            case WORSE -> axolotllayer.setExpression(AxolotlLayer.Expression.BAD);
+                            default -> axolotllayer.setExpression(AxolotlLayer.Expression.HAPPY);
+                        }
+                        axolotllayer.showLayer();
+                    }
+                }
+                javafx.animation.PauseTransition pause = new javafx.animation.PauseTransition(
+                        javafx.util.Duration.seconds(4));
+                pause.setOnFinished(event -> emitStateChange(GameState.GAMEPLAY));
+                pause.play();
+            }
+
+            default -> LOGGER.log(Level.INFO, () -> String.format("Updating screen to state %s", newState));
         }
     }
 }

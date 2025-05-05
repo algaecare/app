@@ -34,5 +34,4 @@ public class EnvironmentObject {
     public int getOxygenChange() {
         return oxygenChange;
     }
-
 }

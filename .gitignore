@@ -86,3 +86,5 @@ dist/
 *.sublime-theme
 .vscode/
 .idea/
+
+src/main/resources/dynamic/*
