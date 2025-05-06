@@ -1,6 +1,12 @@
 package com.algaecare.model;
 
-import java.sql.*;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
+
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.logging.Level;
@@ -8,7 +14,8 @@ import java.util.logging.Logger;
 
 public class TextLayerData {
     private static final Logger LOGGER = Logger.getLogger(TextLayerData.class.getName());
-    private static final String DB_URL = "jdbc:sqlite:src/main/resources/data.sqlite";
+    private static final String TEXT_LAYERS_CSV = "/text_layers.csv";
+    private static final String SETTINGS_CSV = "/settings.csv";
     private static Language defaultLanguage;
 
     private enum Language {
@@ -20,15 +27,27 @@ public class TextLayerData {
     }
 
     private static void loadDefaultLanguage() {
-        String sql = "SELECT value FROM settings WHERE name = 'DEFAULT_LANGUAGE'";
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+        try (InputStream is = TextLayerData.class.getResourceAsStream(SETTINGS_CSV)) {
+            assert is != null;
+            try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
 
-            if (rs.next()) {
-                defaultLanguage = Language.valueOf(rs.getString("value"));
+                Iterable<CSVRecord> records = CSVFormat.RFC4180.builder()
+                        .setHeader("name", "value")
+                        .setSkipHeaderRecord(true)
+                        .get()
+                        .parse(reader);
+
+                for (CSVRecord record : records) {
+                    if ("DEFAULT_LANGUAGE".equals(record.get("name"))) {
+                        defaultLanguage = Language.valueOf(record.get("value"));
+                        return;
+                    }
+                }
+                LOGGER.warning("Default language not found in settings, using DE");
+                defaultLanguage = Language.DE;
+
             }
-        } catch (SQLException | IllegalArgumentException e) {
+        } catch (IOException | IllegalArgumentException e) {
             LOGGER.log(Level.WARNING, "Failed to load default language, using DE", e);
             defaultLanguage = Language.DE;
         }
@@ -37,18 +56,28 @@ public class TextLayerData {
     public static Map<String, String> fetchAll() {
         Map<String, String> textData = new HashMap<>();
         String languageColumn = defaultLanguage.name().toLowerCase();
-        String sql = "SELECT id, " + languageColumn + " FROM text_layers";
 
-        try (Connection conn = DriverManager.getConnection(DB_URL);
-                Statement stmt = conn.createStatement();
-                ResultSet rs = stmt.executeQuery(sql)) {
+        try (InputStream is = TextLayerData.class.getResourceAsStream(TEXT_LAYERS_CSV)) {
+            assert is != null;
+            try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                ;
 
-            while (rs.next()) {
-                String id = rs.getString("id");
-                String text = rs.getString(languageColumn);
-                textData.put(id, text);
+                Iterable<CSVRecord> records = CSVFormat.RFC4180.builder()
+                        .setHeader("id", "de", "fr", "it")
+                        .setSkipHeaderRecord(true)
+                        .get()
+                        .parse(reader);
+
+                for (CSVRecord record : records) {
+                    String id = record.get("id");
+                    String text = record.get(languageColumn);
+                    textData.put(id, text);
+                }
+
             }
-        } catch (SQLException e) {
+        } catch (
+
+        IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to fetch text layers", e);
             throw new RuntimeException("Failed to fetch text layers", e);
         }
