@@ -6,12 +6,25 @@ import com.pi4j.*;
 
 import java.util.logging.Level;
 
-public class LedController implements GameStateEventManager{
+public class LedController implements GameStateEventManager {
     private static final int[] PIN_LEDS = {4, 17, 27, 22, 23, 24, 25, 29, 31}; //Pins BCM 7, 11, 13, 15, 16, 18, 22, 5, 6
     private Environment environment = null;
+
+    /**
+     * Constructor for the LED controller
+     *
+     * @param environment The environment object to be used for getting the CO2 level
+     */
     public LedController(Environment environment) {
         this.environment = environment;
     }
+
+    /**
+     * Updates the LED state based on the given pin and state
+     *
+     * @param ledPin The pin number of the LED
+     * @param on     The state to set the LED to (true for ON, false for OFF)
+     */
     public static void updateLed(int ledPin, boolean on) {
         var pi4j = Pi4J.newAutoContext();
 
@@ -23,17 +36,23 @@ public class LedController implements GameStateEventManager{
             led.low();
         }
     }
+
+    /**
+     * Updates the LED state based on the CO2 level
+     *
+     * @param co2Level The CO2 level to be used for updating the LED state
+     */
     @Override
     public void onGameStateChanged(GameState oldState, GameState newState) {
         int co2Level = environment.getCo2Level();
         int temperature = environment.getTemperature();
-        int o2Level = environment.getO2Level();
+        int o2Level = environment.getTemperature();
 
         // Calculate LED threshold based on CO2 level
-        int thresholdIndex = Math.max(0, Math.min(PIN_LEDS.length - 1, Math.round((float) (co2Level + 50) / 100 * 8)));
+        int thresholdIndex = Math.max(0, Math.round((float) (temperature + 50) / 100 * 8));
 
         for (int i = 0; i < PIN_LEDS.length; i++) {
-            if (i <= thresholdIndex && temperature > -50 && temperature <= 50) {
+            if (i <= thresholdIndex) {
                 updateLed(PIN_LEDS[i], true);
             } else {
                 updateLed(PIN_LEDS[i], false);
@@ -41,6 +60,11 @@ public class LedController implements GameStateEventManager{
         }
     }
 
+    /**
+     * Returns the current state of the game
+     *
+     * @return The current game state
+     */
     @Override
     public GameState getCurrentState() {
         return null;

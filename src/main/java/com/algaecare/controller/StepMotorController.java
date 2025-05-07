@@ -1,5 +1,7 @@
 package com.algaecare.controller;
 
+import com.algaecare.model.Environment;
+import com.algaecare.model.GameState;
 import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.DigitalOutput;
@@ -14,11 +16,12 @@ import static java.lang.Thread.sleep;
 /**
  * Implementation of the CrowPi Step Motor using GPIO with Pi4J
  */
-public class StepMotorController {
+public class StepMotorController implements GameStateEventManager {
     /**
      * Default GPIO BCM addresses used as part of the various steps
      */
-    private final static int[] DEFAULT_PINS = {5, 6, 13, 19};
+    private final static int[] DEFAULT_PINS = {5, 6, 13, 19}; //TODO change pins
+    private Environment environment = null;
     /**
      * Default set of steps which will be executed once in order when turning one step
      *
@@ -34,6 +37,7 @@ public class StepMotorController {
         {3, 2},
         {3},
     };
+
     /**
      * Default duration in milliseconds when pulsing one step, increasing this value makes the step motor turn slower.
      */
@@ -43,14 +47,17 @@ public class StepMotorController {
      * Desired pulse duration in milliseconds when executing a single step
      */
     private final long pulseMilliseconds;
+
     /**
      * Array of digital outputs used by this component, can be contained within {@link #stepsForward} or {@link #stepsBackward}
      */
     private final DigitalOutput[] digitalOutputs;
+
     /**
      * Pre-generated list of forward steps, containing a set of all digital outputs which need to be pulsed for each step
      */
     private final List<Set<DigitalOutput>> stepsForward;
+
     /**
      * Pre-generated list of backward steps, always equal to {@link #stepsForward} in reversed order.
      */
@@ -223,5 +230,15 @@ public class StepMotorController {
             .initial(DigitalState.LOW)
             .shutdown(DigitalState.LOW)
             .build();
+    }
+
+    @Override
+    public void onGameStateChanged(GameState oldState, GameState newState) {
+        //TODO implement
+    }
+
+    @Override
+    public GameState getCurrentState() {
+        return null;
     }
 }
