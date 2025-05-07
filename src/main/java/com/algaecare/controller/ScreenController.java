@@ -79,8 +79,22 @@ public class ScreenController implements GameStateEventManager {
         // TEXT LAYERS
         layers.add(new TextLayer(TextId.TITLE, 1040, 220, 450, 125, "SUPERWATER_BIG"));
         layers.add(new TextLayer(TextId.SUBTITLE, 450, 100, 775, 350, "SUPERWATER_SMALL"));
-        layers.add(new TextLayer(TextId.NOT_AXOLOTL, 1800, 325, 40, 720, "INTER"));
-        layers.add(new TextLayer(TextId.AXOLOTL_INTRODUCTION, 1735, 480, 90, 100, "INTER"));
+        layers.add(new TextLayer(TextId.NOT_AXOLOTL, 1800, 480, 60, 55, "INTER"));
+        layers.add(new TextLayer(TextId.AXOLOTL_INTRODUCTION, 1800, 540, 60, 55, "INTER"));
+        layers.add(new TextLayer(TextId.NOT_OBJECT, 1800, 540, 60, 55, "INTER"));
+        layers.add(new TextLayer(TextId.OBJECT_GARBAGE_BAG, 1800, 355, 60, 55, "INTER"));
+        layers.add(new TextLayer(TextId.OBJECT_RECYCLING_BIN, 1800, 415, 60, 55, "INTER"));
+        layers.add(new TextLayer(TextId.OBJECT_CAR, 1800, 415, 60, 55, "INTER"));
+        layers.add(new TextLayer(TextId.OBJECT_AIRPLANE, 1800, 355, 60, 55, "INTER"));
+        layers.add(new TextLayer(TextId.OBJECT_TRAIN, 1800, 355, 60, 55, "INTER"));
+        layers.add(new TextLayer(TextId.OBJECT_BICYCLE, 1800, 355, 60, 55, "INTER"));
+        layers.add(new TextLayer(TextId.OBJECT_SHOPPING_BASKET_INTERNATIONAL, 1800, 355, 60, 55, "INTER"));
+        layers.add(new TextLayer(TextId.OBJECT_SHOPPING_BASKET_LOCAL, 1800, 415, 60, 55, "INTER"));
+        layers.add(new TextLayer(TextId.ENDSCREEN_NEGATIVE, 1800, 480, 60, 55, "INTER"));
+        layers.add(new TextLayer(TextId.ENDSCREEN_POSITIVE, 1800, 355, 60, 55, "INTER"));
+        layers.add(new TextLayer(TextId.GOODBYE, 1800, 415, 60, 55, "INTER"));
+
+
         // AXOLOTL LAYER
         layers.add(axolotlLayer);
 
