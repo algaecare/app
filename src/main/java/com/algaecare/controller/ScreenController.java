@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
 import com.algaecare.view.*;
 
@@ -18,6 +19,8 @@ public class ScreenController implements GameStateEventManager {
     private final AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
     private final Label debugText = createDebugText();
     private final GameStateEventManager.EventEmitter stateEmitter;
+    private Environment environment;
+    private final StaticLayer environmentLayer = new StaticLayer(0, 0, "/30-ENVIRONMENT.png");
 
     private Label createDebugText() {
         Label label = new Label();
@@ -30,8 +33,9 @@ public class ScreenController implements GameStateEventManager {
         return label;
     }
 
-    public ScreenController(Stage stage, GameStateEventManager.EventEmitter stateEmitter) {
+    public ScreenController(Stage stage, GameStateEventManager.EventEmitter stateEmitter, Environment environment) {
         this.stateEmitter = stateEmitter;
+        this.environment = environment;
         MainScene scene = new MainScene(stage);
         initializeLayers();
         ((StackPane) scene.getScene().getRoot()).getChildren().addAll(layers);
@@ -81,6 +85,9 @@ public class ScreenController implements GameStateEventManager {
         // STATIC LAYER 02 && 01
         layers.add(new StaticLayer(0, 225, "/02-LAYER.png"));
         layers.add(new StaticLayer(0, 353, "/01-LAYER.png"));
+        // ENVIRONMENT LAYER
+        environmentLayer.setOpacity(0);
+        layers.add(environmentLayer);
         // TEXT LAYERS
         layers.add(new TextLayer(TextId.TITLE, 1040, 220, 450, 125, "SUPERWATER_BIG"));
         layers.add(new TextLayer(TextId.SUBTITLE, 450, 100, 775, 350, "SUPERWATER_SMALL"));
@@ -165,23 +172,18 @@ public class ScreenController implements GameStateEventManager {
                 }
             }
 
-            case GAMEPLAY -> {
-                for (Layer layer : layers) {
-                    break;
-                }
-            }
-
             case TRASH, SHOPPING_BAG_WORLD, RECYCLING, SHOPPING_BAG_LOCAL -> {
                 for (Layer layer : layers) {
-                    if (layer instanceof ItemLayer itemLayer) {
-                        if (itemLayer.getGameState() == newState) {
+                    if (layer instanceof ItemLayer itemLayer && itemLayer.getGameState() == newState) {
                             itemLayer.showLayer();
                             itemLayer.setOnAnimationComplete(() -> {
                                 emitStateChange(GameState.GAMEPLAY);
                                 itemLayer.hideLayer();
                             });
                         }
-                    }
+
+                    int algaeLevel = environment.getAlgaeLevel();
+                    environmentLayer.setTargetOpacity(1 - algaeLevel / 100.0);
                 }
             }
 
