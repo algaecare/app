@@ -22,6 +22,7 @@ public class AlgaeLayer extends Layer {
     private final Timeline outroTimeline;
     private AnimationState currentState = AnimationState.HIDDEN;
     private boolean skipIntroAnimation;
+    private boolean isHidden = true;
     private int x;
     private int y;
 
@@ -133,6 +134,7 @@ public class AlgaeLayer extends Layer {
         if (currentState == AnimationState.HIDDEN || currentState == AnimationState.OUTRO) {
             setStateInternal(AnimationState.INTRO);
         }
+        this.isHidden = false;
     }
 
     @Override
@@ -140,6 +142,7 @@ public class AlgaeLayer extends Layer {
         if (currentState == AnimationState.IDLE || currentState == AnimationState.INTRO) {
             setStateInternal(AnimationState.OUTRO);
         }
+        this.isHidden = true;
     }
 
     private void setStateInternal(AnimationState newState) {
@@ -178,5 +181,9 @@ public class AlgaeLayer extends Layer {
 
     public void setSkipIntroAnimation(boolean skip) {
         this.skipIntroAnimation = skip;
+    }
+
+    public boolean isHidden() {
+        return isHidden;
     }
 }
