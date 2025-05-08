@@ -1,25 +1,19 @@
 package com.algaecare.model;
 
 public class EnvironmentObject {
-    private final String name;
-    int co2Change;
-    int temperatureChange;
-    int algaeChange;
-    int oxygenChange;
+    private final GameState objectID;
+    private int algaeChange;
 
-    public EnvironmentObject(String name, int algaeChange) {
-        this.name = name;
+    public EnvironmentObject(GameState objectIdFGameState, int algaeChange) {
+        this.objectID = objectIdFGameState;
         this.algaeChange = algaeChange;
-
     }
 
-    public String getName() {
-        return name;
+    public GameState getObjectID() {
+        return objectID;
     }
 
     public int getAlgaeChange() {
         return algaeChange;
     }
-
-
 }

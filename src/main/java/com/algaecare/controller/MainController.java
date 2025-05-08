@@ -49,9 +49,7 @@ public class MainController implements GameStateEventManager, GameStateEventMana
 
     @Override
     public void onGameStateChanged(GameState oldState, GameState newState) {
-        if (newState == GameState.TITLE) {
-            environment.reset();
-        }
+        return;
     }
 
     protected void notifyGameStateChanged(GameState oldState, GameState newState) {
