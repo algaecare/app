@@ -61,7 +61,7 @@ public class TextLayer extends Layer {
 
         // Load the font
         if (fontType == FontType.INTER) {
-            Font font = Font.loadFont(getClass().getResourceAsStream("/InterBold.ttf"), 28);
+            Font font = Font.loadFont(getClass().getResourceAsStream("/Inter_24pt-Medium.ttf"), 28);
             textLabel.setFont(Font.font(font.getFamily(), javafx.scene.text.FontWeight.BOLD, 50));
             textLabel.setTextFill(Color.BLACK);
             backgroundFill = new BackgroundFill(Color.WHITE, cornerRadii, Insets.EMPTY);
