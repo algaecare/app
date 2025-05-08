@@ -20,7 +20,7 @@ import com.algaecare.model.GameState;
 
 public class ActionLayer extends Layer {
     private static final Logger LOGGER = Logger.getLogger(ActionLayer.class.getName());
-    private static final Duration FRAME_DURATION = Duration.millis(1240); // 10 FPS
+    private static final Duration FRAME_DURATION = Duration.millis(41.7710944027); // 23.94 FPS (1000ms/23.94)
 
     private final ImageView imageView;
     private final Timeline animation;
