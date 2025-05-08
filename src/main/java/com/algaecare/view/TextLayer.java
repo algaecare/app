@@ -1,5 +1,6 @@
 package com.algaecare.view;
 
+import com.algaecare.model.GameState;
 import com.algaecare.model.TextLayerData;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
@@ -20,7 +21,7 @@ public class TextLayer extends Layer {
         INTER, SUPERWATER_BIG, SUPERWATER_SMALL
     }
 
-    private final TextId id;
+    private final GameState id;
     private final Label textLabel;
     private final int width;
     private final int height;
@@ -28,7 +29,7 @@ public class TextLayer extends Layer {
     private final int y;
     private final FontType fontType;
 
-    public TextLayer(TextId id, int width, int height, int x, int y, String fontType) {
+    public TextLayer(GameState id, int width, int height, int x, int y, String fontType) {
         this.id = id;
         this.width = width;
         this.height = height;
@@ -100,7 +101,7 @@ public class TextLayer extends Layer {
         getChildren().add(textLabel);
     }
 
-    public TextId getID() {
+    public GameState getID() {
         return id;
     }
 }

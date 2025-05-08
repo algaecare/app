@@ -43,7 +43,7 @@ public class KeyboardInputController implements GameStateEventManager {
         // Title screen control
         bindKey(KeyCode.SPACE, event -> {
             if (currentState == GameState.TITLE) {
-                stateEmitter.emitGameStateChange(GameState.OPENING);
+                stateEmitter.emitGameStateChange(GameState.AXOLOTL_INTRODUCTION);
             }
         });
 
@@ -54,9 +54,9 @@ public class KeyboardInputController implements GameStateEventManager {
 
         // Gameplay controls
         GameState[] gameplayStates = {
-                GameState.TRASH, GameState.CAR, GameState.AIRPLANE,
-                GameState.SHOPPING_BAG_WORLD, GameState.RECYCLING, GameState.TRAIN,
-                GameState.SHOPPING_BAG_LOCAL, GameState.BICYCLE, GameState.TRASH_GRABBER
+                GameState.OBJECT_GARBAGE_BAG, GameState.OBJECT_CAR, GameState.OBJECT_AIRPLANE,
+                GameState.OBJECT_SHOPPING_BASKET_INTERNATIONAL, GameState.OBJECT_RECYCLING_BIN, GameState.OBJECT_TRAIN,
+                GameState.OBJECT_SHOPPING_BASKET_LOCAL, GameState.OBJECT_BICYCLE, GameState.TRASH_GRABBER
         };
 
         KeyCode[] digitKeys = {
@@ -70,7 +70,7 @@ public class KeyboardInputController implements GameStateEventManager {
             final GameState targetState = gameplayStates[index];
 
             bindKey(digitKeys[index], event -> {
-                if (currentState == GameState.GAMEPLAY || currentState == GameState.OPENING) {
+                if (currentState == GameState.GAMEPLAY || currentState == GameState.AXOLOTL_INTRODUCTION) {
                     stateEmitter.emitGameStateChange(targetState);
                 }
             });
@@ -78,7 +78,7 @@ public class KeyboardInputController implements GameStateEventManager {
 
         // Development shortcuts
         bindKey(KeyCode.ENTER, event -> {
-            if (currentState == GameState.OPENING) {
+            if (currentState == GameState.AXOLOTL_INTRODUCTION) {
                 stateEmitter.emitGameStateChange(GameState.GAMEPLAY);
             }
         });

@@ -44,10 +44,10 @@ public class ScreenController implements GameStateEventManager {
         layers.add(new StaticLayer(0, 0, "/07-LAYER.png"));
         layers.add(new StaticLayer(0, 91, "/06-LAYER.png"));
         // ITEM LAYERS
-        layers.add(new ItemLayer(GameState.TRASH, 250, 358, "/20-ITEM-BAG.png"));
-        layers.add(new ItemLayer(GameState.RECYCLING, 250, 335, "/20-ITEM-COMPOST.png"));
-        layers.add(new ItemLayer(GameState.SHOPPING_BAG_LOCAL, 250, 385, "/20-ITEM-LOCAL.png"));
-        layers.add(new ItemLayer(GameState.SHOPPING_BAG_WORLD, 250, 385, "/20-ITEM-WORLD.png"));
+        layers.add(new ItemLayer(GameState.OBJECT_GARBAGE_BAG, 250, 358, "/20-ITEM-BAG.png"));
+        layers.add(new ItemLayer(GameState.OBJECT_RECYCLING_BIN, 250, 335, "/20-ITEM-COMPOST.png"));
+        layers.add(new ItemLayer(GameState.OBJECT_SHOPPING_BASKET_LOCAL, 250, 385, "/20-ITEM-LOCAL.png"));
+        layers.add(new ItemLayer(GameState.OBJECT_SHOPPING_BASKET_INTERNATIONAL, 250, 385, "/20-ITEM-WORLD.png"));
         // ALGAE LAYERS 05
         layers.add(new AlgaeLayer(1205, 640, 190, 225,
                 "/05-LAYER-CORAL-1.png"));
@@ -82,22 +82,21 @@ public class ScreenController implements GameStateEventManager {
         layers.add(new StaticLayer(0, 225, "/02-LAYER.png"));
         layers.add(new StaticLayer(0, 353, "/01-LAYER.png"));
         // TEXT LAYERS
-        layers.add(new TextLayer(TextId.TITLE, 1040, 220, 450, 125, "SUPERWATER_BIG"));
-        layers.add(new TextLayer(TextId.SUBTITLE, 450, 100, 775, 350, "SUPERWATER_SMALL"));
-        layers.add(new TextLayer(TextId.NOT_AXOLOTL, 1800, 480, 60, 55, "INTER"));
-        layers.add(new TextLayer(TextId.AXOLOTL_INTRODUCTION, 1800, 540, 60, 55, "INTER"));
-        layers.add(new TextLayer(TextId.NOT_OBJECT, 1800, 540, 60, 55, "INTER"));
-        layers.add(new TextLayer(TextId.OBJECT_GARBAGE_BAG, 1800, 355, 60, 55, "INTER"));
-        layers.add(new TextLayer(TextId.OBJECT_RECYCLING_BIN, 1800, 415, 60, 55, "INTER"));
-        layers.add(new TextLayer(TextId.OBJECT_CAR, 1800, 415, 60, 55, "INTER"));
-        layers.add(new TextLayer(TextId.OBJECT_AIRPLANE, 1800, 355, 60, 55, "INTER"));
-        layers.add(new TextLayer(TextId.OBJECT_TRAIN, 1800, 355, 60, 55, "INTER"));
-        layers.add(new TextLayer(TextId.OBJECT_BICYCLE, 1800, 355, 60, 55, "INTER"));
-        layers.add(new TextLayer(TextId.OBJECT_SHOPPING_BASKET_INTERNATIONAL, 1800, 355, 60, 55, "INTER"));
-        layers.add(new TextLayer(TextId.OBJECT_SHOPPING_BASKET_LOCAL, 1800, 415, 60, 55, "INTER"));
-        layers.add(new TextLayer(TextId.ENDSCREEN_NEGATIVE, 1800, 480, 60, 55, "INTER"));
-        layers.add(new TextLayer(TextId.ENDSCREEN_POSITIVE, 1800, 355, 60, 55, "INTER"));
-        layers.add(new TextLayer(TextId.GOODBYE, 1800, 415, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.TITLE, 1040, 220, 450, 125, "SUPERWATER_BIG"));
+        layers.add(new TextLayer(GameState.SUBTITLE, 450, 100, 775, 350, "SUPERWATER_SMALL"));
+        layers.add(new TextLayer(GameState.NOT_AXOLOTL, 1800, 480, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.AXOLOTL_INTRODUCTION, 1800, 540, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_GARBAGE_BAG, 1800, 355, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_RECYCLING_BIN, 1800, 415, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_CAR, 1800, 415, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_AIRPLANE, 1800, 355, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_TRAIN, 1800, 355, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_BICYCLE, 1800, 355, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_SHOPPING_BASKET_INTERNATIONAL, 1800, 355, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_SHOPPING_BASKET_LOCAL, 1800, 415, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.ENDSCREEN_NEGATIVE, 1800, 480, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.ENDSCREEN_POSITIVE, 1800, 355, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.GOODBYE, 1800, 415, 60, 55, "INTER"));
 
 
         // AXOLOTL LAYER
@@ -147,28 +146,28 @@ public class ScreenController implements GameStateEventManager {
         switch (newState) {
             case TITLE -> {
                 for (Layer layer : layers) {
-                    boolean isTitle = layer instanceof TextLayer textLayer && textLayer.getID() == TextId.TITLE;
-                    boolean isSubtitle = layer instanceof TextLayer textLayer && textLayer.getID() == TextId.SUBTITLE;
+                    boolean isTitle = layer instanceof TextLayer textLayer && textLayer.getID() == GameState.TITLE;
+                    boolean isSubtitle = layer instanceof TextLayer textLayer && textLayer.getID() == GameState.SUBTITLE;
                     if (isTitle || isSubtitle) {
                         layer.showLayer();
                     }
                 }
             }
 
-            case AXOLOTL_ERROR -> {
+            case NOT_AXOLOTL -> {
                 for (Layer layer : layers) {
                     boolean isAxolotlError = layer instanceof TextLayer textLayer
-                            && textLayer.getID() == TextId.NOT_AXOLOTL;
+                            && textLayer.getID() == GameState.NOT_AXOLOTL;
                     if (isAxolotlError) {
                         layer.showLayer();
                     }
                 }
             }
 
-            case OPENING -> {
+            case AXOLOTL_INTRODUCTION -> {
                 for (Layer layer : layers) {
                     boolean isAxolotlIntroduction = layer instanceof TextLayer textLayer
-                            && textLayer.getID() == TextId.AXOLOTL_INTRODUCTION;
+                            && textLayer.getID() == GameState.AXOLOTL_INTRODUCTION;
                     if (isAxolotlIntroduction) {
                         layer.showLayer();
                     }
@@ -185,7 +184,8 @@ public class ScreenController implements GameStateEventManager {
                 }
             }
 
-            case TRASH, SHOPPING_BAG_WORLD, RECYCLING, SHOPPING_BAG_LOCAL -> {
+            case OBJECT_GARBAGE_BAG, OBJECT_SHOPPING_BASKET_INTERNATIONAL, OBJECT_RECYCLING_BIN,
+                 OBJECT_SHOPPING_BASKET_LOCAL -> {
                 for (Layer layer : layers) {
                     if (layer instanceof ItemLayer itemLayer) {
                         if (itemLayer.getGameState() == newState) {
@@ -194,6 +194,15 @@ public class ScreenController implements GameStateEventManager {
                                 emitStateChange(GameState.GAMEPLAY);
                                 itemLayer.hideLayer();
                             });
+                        }
+                    }
+                    if (layer instanceof AxolotlLayer axolotllayer) {
+                        axolotllayer.showLayer();
+                        axolotllayer.setExpression(AxolotlLayer.Expression.HAPPY);
+                    }
+                    if (layer instanceof TextLayer textLayer) {
+                        if (textLayer.getID() == GameState.OBJECT_GARBAGE_BAG) {
+                            textLayer.showLayer();
                         }
                     }
                 }
