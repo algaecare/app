@@ -56,11 +56,11 @@ public class StaticLayer extends Layer {
 
     @Override
     public void showLayer() {
-        setTargetOpacity(1.0);
+        setOpacity(1);
     }
 
     @Override
     public void hideLayer() {
-        setTargetOpacity(0.0);
+        setOpacity(0);
     }
 }
