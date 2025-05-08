@@ -36,7 +36,7 @@ public class ScreenController implements GameStateEventManager {
         initializeLayers();
         ((StackPane) scene.getScene().getRoot()).getChildren().addAll(layers);
         ((StackPane) scene.getScene().getRoot()).getChildren().add(debugText);
-        updateScreen(GameState.TITLE);
+        updateScreen(GameState.TITLE, GameState.TITLE);
     }
 
     private void initializeLayers() {
@@ -101,11 +101,11 @@ public class ScreenController implements GameStateEventManager {
         // AXOLOTL LAYER
         layers.add(axolotlLayer);
         // ACTION LAYERS
-        layers.add(new ActionLayer(GameState.OBJECT_BICYCLE, "/bike/"));
-        layers.add(new ActionLayer(GameState.OBJECT_CAR, "/car/"));
-        layers.add(new ActionLayer(GameState.OBJECT_AIRPLANE, "/airplane/"));
-        layers.add(new ActionLayer(GameState.OBJECT_TRAIN, "/train/"));
-        layers.add(new ActionLayer(GameState.TRASH_GRABBER, "/trash-grabber/"));
+        layers.add(new ActionLayer(GameState.OBJECT_BICYCLE, "/actions/bike/"));
+        layers.add(new ActionLayer(GameState.OBJECT_CAR, "/actions/car/"));
+        layers.add(new ActionLayer(GameState.OBJECT_AIRPLANE, "/actions/airplane/"));
+        layers.add(new ActionLayer(GameState.OBJECT_TRAIN, "/actions/train/"));
+        layers.add(new ActionLayer(GameState.TRASH_GRABBER, "/actions/trash-grabber/"));
         // SET TITLE LAYER AND ALGAE LAYER TO SHOW
         for (Layer layer : layers) {
             if (layer instanceof AlgaeLayer) {
@@ -113,7 +113,7 @@ public class ScreenController implements GameStateEventManager {
                 ((AlgaeLayer) layer).setSkipIntroAnimation(true);
             }
         }
-        updateScreen(GameState.TITLE);
+        updateScreen(GameState.TITLE, GameState.TITLE);
     }
 
     private void emitStateChange(GameState newState) {
@@ -124,7 +124,7 @@ public class ScreenController implements GameStateEventManager {
     @Override
     public void onGameStateChanged(GameState oldState, GameState newState) {
         try {
-            updateScreen(newState);
+            updateScreen(oldState, newState);
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, e,
                     () -> String.format("Error changing game state from %s to %s", oldState, newState));
@@ -136,7 +136,7 @@ public class ScreenController implements GameStateEventManager {
         throw new UnsupportedOperationException("ScreenController doesn't manage game state");
     }
 
-    public void updateScreen(GameState newState) {
+    public void updateScreen(GameState oldState, GameState newState) {
         debugText.setText("Current Game State: " + newState);
         // Hide all layers first, except for static layers and algae layers
         for (Layer layer : layers) {
@@ -185,7 +185,15 @@ public class ScreenController implements GameStateEventManager {
 
             case GAMEPLAY -> {
                 for (Layer layer : layers) {
-                    break;
+                    if (layer instanceof AxolotlLayer axolotllayer) {
+                        axolotllayer.showLayer();
+                        axolotllayer.setExpression(AxolotlLayer.Expression.HAPPY);
+                    }
+                    if (layer instanceof TextLayer textLayer) {
+                        if (textLayer.getID() == oldState) {
+                            layer.showLayer();
+                        }
+                    }
                 }
             }
 
@@ -201,13 +209,18 @@ public class ScreenController implements GameStateEventManager {
                             });
                         }
                     }
-                    if (layer instanceof AxolotlLayer axolotllayer) {
-                        axolotllayer.showLayer();
-                        axolotllayer.setExpression(AxolotlLayer.Expression.HAPPY);
-                    }
-                    if (layer instanceof TextLayer textLayer) {
-                        if (textLayer.getID() == GameState.OBJECT_GARBAGE_BAG) {
-                            textLayer.showLayer();
+                }
+            }
+
+            case OBJECT_CAR, OBJECT_AIRPLANE, OBJECT_TRAIN, OBJECT_BICYCLE -> {
+                for (Layer layer : layers) {
+                    if (layer instanceof ActionLayer actionLayer) {
+                        if (actionLayer.getGameState() == newState) {
+                            actionLayer.showLayer();
+                            actionLayer.setOnSequenceComplete(() -> {
+                                emitStateChange(GameState.GAMEPLAY);
+                                actionLayer.hideLayer();
+                            });
                         }
                     }
                 }
