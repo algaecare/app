@@ -60,24 +60,31 @@ public class TextLayerData {
         try (InputStream is = TextLayerData.class.getResourceAsStream(TEXT_LAYERS_CSV)) {
             assert is != null;
             try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-                ;
-
-                Iterable<CSVRecord> records = CSVFormat.RFC4180.builder()
-                        .setHeader("id", "de", "fr", "it")
+                CSVFormat format = CSVFormat.DEFAULT.builder()
+                        .setDelimiter(';')
+                        .setHeader() // Use first record as header
                         .setSkipHeaderRecord(true)
-                        .get()
-                        .parse(reader);
+                        .build();
 
-                for (CSVRecord record : records) {
-                    String id = record.get("id");
+                var parser = format.parse(reader);
+                var headers = parser.getHeaderNames();
+
+                if (!headers.contains(languageColumn)) {
+                    LOGGER.severe("Language column '" + languageColumn + "' not found in CSV");
+                    throw new RuntimeException("Language column not found in CSV");
+                }
+
+                for (CSVRecord record : parser) {
+                    if (record.size() < 2) {
+                        LOGGER.warning("Skipping malformed record: " + record);
+                        continue;
+                    }
+                    String id = record.get(0); // First column is always ID
                     String text = record.get(languageColumn);
                     textData.put(id, text);
                 }
-
             }
-        } catch (
-
-        IOException e) {
+        } catch (IOException e) {
             LOGGER.log(Level.SEVERE, "Failed to fetch text layers", e);
             throw new RuntimeException("Failed to fetch text layers", e);
         }
