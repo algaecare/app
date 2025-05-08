@@ -316,6 +316,9 @@
                         <configuration>
                             <mainClass>${launcher.class}</mainClass>
                             <options>
+                                <jvmArgs>
+                                    -Xmx2048m
+                                </jvmArgs>
                                 <option>--add-exports</option>
                                 <option>javafx.base/com.sun.javafx=ALL-UNNAMED</option>
                                 <option>--add-exports</option>

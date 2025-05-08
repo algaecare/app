@@ -56,7 +56,7 @@ public class KeyboardInputController implements GameStateEventManager {
         GameState[] gameplayStates = {
                 GameState.OBJECT_GARBAGE_BAG, GameState.OBJECT_CAR, GameState.OBJECT_AIRPLANE,
                 GameState.OBJECT_SHOPPING_BASKET_INTERNATIONAL, GameState.OBJECT_RECYCLING_BIN, GameState.OBJECT_TRAIN,
-                GameState.OBJECT_SHOPPING_BASKET_LOCAL, GameState.OBJECT_BICYCLE, GameState.TRASH_GRABBER
+                GameState.OBJECT_SHOPPING_BASKET_LOCAL, GameState.OBJECT_BICYCLE, GameState.OBJECT_TRASH_GRABBER
         };
 
         KeyCode[] digitKeys = {

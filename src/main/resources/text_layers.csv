@@ -25,7 +25,7 @@ Algae are not just plants! They clean the water, are food for many marine animal
 > Pick an object and find out how it affects the sea. Place it on top of the glowing spot."
 ;;;
 NOT_OBJECT;Oh nein! Dieses Objekt kennen ich leider nicht. Wähle ein Objekt von unten aus.;Oh non ! Je ne connais malheureusement pas cet objet. Choisis un objet en bas.;Oh no! Unfortunately I don't know this object. Select an object from below.
-OBJECT_GARBAGE_BAG;"Oh nein,  Müll landet leider oft im Meer! Er verschmutzt unser Wasser, blockiert das Sonnenlicht für die Algen wodurch sie absterben und ist gefährlich für alle Meerestiere. Das schadet dem ganzen Ökosystem!
+OBJECT_GARBAGE_BAG;"Oh nein, Müll landet leider oft im Meer! Er verschmutzt unser Wasser, blockiert das Sonnenlicht für die Algen wodurch sie absterben und ist gefährlich für alle Meerestiere. Das schadet dem ganzen Ökosystem!
 
 > Versuche es mit einem anderen Objekt";Ces déchets finissent souvent dans la mer ! Les algues s'y emmêlent et meurent, alors que nous avons tant besoin d'elles pour produire de l'oxygène !;"Oh no, unfortunately garbage often ends up in the sea! It pollutes our water, blocks the sunlight for the algae, causing them to die and is dangerous for all marine animals. It harms the whole ecosystem!
 
@@ -79,6 +79,9 @@ OBJECT_SHOPPING_BASKET_LOCAL;"Lokales Einkaufen spart lange Transportwege und sc
 > Choisir un prochain objet";"Local shopping saves long transportation routes and protects our environment. The algae in the sea remain strong and can continue to produce oxygen. You get fresh algae and the algae can continue to grow!
 
 > Select a next object"
+OBJECT_TRASH_GRABBER;"Stark! Mit Abfallzangen können wir Küsten und Strände sauber halten und Abfall aus dem Meer fischen. Sie helfen das Wasser sauber zu halten um Algen genug Licht und Platz zum wachsen zu geben. Das ist zwar hilfreich aber nicht die Lösung für das Problem!
+
+> Wähle ein nächstes Objekt aus";;
 ;schluss bildschirm;écran de fin;end screen
 ENDSCREEN_NEGATIVE;"Oh nein, das Meer wurde zu stark verschmutzt! Alle Algen sind gestorben und ohne sie konnten viele Tiere nicht mehr überleben. Auch Axolina musste fliehen und hat dieses Meer verlassen...
 

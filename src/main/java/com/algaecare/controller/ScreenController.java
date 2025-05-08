@@ -85,18 +85,19 @@ public class ScreenController implements GameStateEventManager {
         layers.add(new TextLayer(GameState.TITLE, 1040, 220, 450, 125, "SUPERWATER_BIG"));
         layers.add(new TextLayer(GameState.SUBTITLE, 450, 100, 775, 350, "SUPERWATER_SMALL"));
         layers.add(new TextLayer(GameState.NOT_AXOLOTL, 1800, 480, 60, 55, "INTER"));
-        layers.add(new TextLayer(GameState.AXOLOTL_INTRODUCTION, 1800, 540, 60, 55, "INTER"));
-        layers.add(new TextLayer(GameState.OBJECT_GARBAGE_BAG, 1800, 355, 60, 55, "INTER"));
-        layers.add(new TextLayer(GameState.OBJECT_RECYCLING_BIN, 1800, 415, 60, 55, "INTER"));
-        layers.add(new TextLayer(GameState.OBJECT_CAR, 1800, 415, 60, 55, "INTER"));
-        layers.add(new TextLayer(GameState.OBJECT_AIRPLANE, 1800, 355, 60, 55, "INTER"));
-        layers.add(new TextLayer(GameState.OBJECT_TRAIN, 1800, 355, 60, 55, "INTER"));
-        layers.add(new TextLayer(GameState.OBJECT_BICYCLE, 1800, 355, 60, 55, "INTER"));
-        layers.add(new TextLayer(GameState.OBJECT_SHOPPING_BASKET_INTERNATIONAL, 1800, 355, 60, 55, "INTER"));
-        layers.add(new TextLayer(GameState.OBJECT_SHOPPING_BASKET_LOCAL, 1800, 415, 60, 55, "INTER"));
-        layers.add(new TextLayer(GameState.ENDSCREEN_NEGATIVE, 1800, 480, 60, 55, "INTER"));
-        layers.add(new TextLayer(GameState.ENDSCREEN_POSITIVE, 1800, 355, 60, 55, "INTER"));
-        layers.add(new TextLayer(GameState.GOODBYE, 1800, 415, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.AXOLOTL_INTRODUCTION, 1800, 435, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_GARBAGE_BAG, 1800, 290, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_RECYCLING_BIN, 1800, 290, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_CAR, 1800, 290, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_AIRPLANE, 1800, 240, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_TRAIN, 1800, 240, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_BICYCLE, 1800, 240, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_SHOPPING_BASKET_INTERNATIONAL, 1800, 240, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_SHOPPING_BASKET_LOCAL, 1800, 290, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.OBJECT_TRASH_GRABBER, 1800, 290, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.ENDSCREEN_NEGATIVE, 1800, 340, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.ENDSCREEN_POSITIVE, 1800, 240, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.GOODBYE, 1800, 290, 60, 55, "INTER"));
 
         // AXOLOTL LAYER
         layers.add(axolotlLayer);
@@ -105,7 +106,7 @@ public class ScreenController implements GameStateEventManager {
         layers.add(new ActionLayer(GameState.OBJECT_CAR, "/actions/car/"));
         layers.add(new ActionLayer(GameState.OBJECT_AIRPLANE, "/actions/airplane/"));
         layers.add(new ActionLayer(GameState.OBJECT_TRAIN, "/actions/train/"));
-        layers.add(new ActionLayer(GameState.TRASH_GRABBER, "/actions/trash-grabber/"));
+        layers.add(new ActionLayer(GameState.OBJECT_TRASH_GRABBER, "/actions/trash-grabber/"));
         // SET TITLE LAYER AND ALGAE LAYER TO SHOW
         for (Layer layer : layers) {
             if (layer instanceof AlgaeLayer) {
