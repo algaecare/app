@@ -1,23 +1,106 @@
-id,DE,FR,IT
-TITLE,ALGAE CARE,ALGAE CARE,ALGAE CARE
-SUBTITLE,> axolotl einwerfen <,jeter axolotl,lancio di axolotl
-NOT_AXOLOTL,"Das war leider das falsche Objekt.
+﻿id;de;fr;en
+TITLE;ALGAE CARE;ALGAE CARE;ALGAE CARE
+;start bildschirm;écran de démarrage;start screen
+STARTSCREEN;Willkommen bei Algae Care! Wusstest du, dass Algen die Lunge unseres Planeten sind? Hilf mit, sie zu schützen!;Bienvenue chez Algae Care ! Savais-tu que les algues sont les poumons de notre planète ? Aide-nous à les protéger !;Welcome to Algae Care! Did you know that algae are the lungs of our planet? Help protect them!
+SUBTITLE;> axolotl einwerfen <;> jeter axolotl < ;> throw in axolotl < 
+NOT_AXOLOTL;"Das war leider nicht das Axolotl.
 
-Finde das Axolotl und wirf es in den Trichter um das Spiel zu beginnen.","Malheureusement, ce n'était pas le bon objet.
+Finde das richtige Objekt und platziere es oben auf die leuchtende Stelle um das Spiel zu beginnen.";"Malheureusement, ce n'était pas l'axolotl.
 
-Trouve l'axolotl et jette-le dans l'entonnoir pour commencer le jeu.","Purtroppo era l'oggetto sbagliato.
+Trouve le bon objet et place-le en haut de la zone lumineuse pour commencer le jeu.";"Unfortunately, that wasn't the axolotl.
 
-Trova l'axolotl e gettalo nell'imbuto per iniziare il gioco."
-AXOLOTL_INTRODUCTION,"Hi! Ich bin Axolotl, dein Begleiter. Algen produzieren Sauerstoff und sind superwichtig für das Leben im Meer!
+Find the right object and place it on top of the glowing spot to start the game."
+AXOLOTL_INTRODUCTION;"Hi! Ich bin Axolina, deine Begleiterin. Algen produzieren Sauerstoff und sind superwichtig für mein Leben im Meer!
 
-Algen sind nicht nur Pflanzen! Sie reinigen das Wasser und ernähren viele Meerestiere! Finde das Objekt, das ihnen hilft!
+Algen sind nicht nur Pflanzen! Sie reinigen das Wasser, sind Futter für viele Meerestiere und sind wichtig für unser Klima!
 
-=> Wirf ein Objekt ein","Salut ! Je suis Axolotl, ton compagnon. Les algues produisent de l'oxygène et sont super importantes pour la vie marine !
+> Such dir ein Objekt aus und finde heraus, wie es das Meer beeinflusst. Platziere es oben auf die leuchtende Stelle.";"Salut ! Je suis Axolina, ta compagne. Les algues produisent de l'oxygène et sont super importantes pour ma vie dans la mer !
 
-Les algues ne sont pas que des plantes ! Elles purifient l'eau et nourrissent de nombreux animaux marins ! Trouve l'objet qui les aide !
+Les algues ne sont pas que des plantes ! Elles purifient l'eau, nourrissent de nombreux animaux marins et sont importantes pour notre climat !
 
-=> Lance un objet","Ciao, sono Axolotl, il tuo compagno. Le alghe producono ossigeno e sono importantissime per la vita marina!
+> Choisis un objet et découvre comment il influence la mer. Place-le en haut de la zone lumineuse.";"Hi! I'm Axolina, your companion. Algae produce oxygen and are super important for my life in the sea!
 
-Le alghe non sono solo piante! Puliscono l'acqua e nutrono molti animali marini! Trova l'oggetto che le aiuta!
+Algae are not just plants! They clean the water, are food for many marine animals and are important for our climate!
 
-=> Getta un oggetto"
+> Pick an object and find out how it affects the sea. Place it on top of the glowing spot."
+;;;
+NOT_OBJECT;Oh nein! Dieses Objekt kennen ich leider nicht. Wähle ein Objekt von unten aus.;Oh non ! Je ne connais malheureusement pas cet objet. Choisis un objet en bas.;Oh no! Unfortunately I don't know this object. Select an object from below.
+OBJECT_GARBAGE_BAG;"Oh nein, Müll landet leider oft im Meer! Er verschmutzt unser Wasser, blockiert das Sonnenlicht für die Algen wodurch sie absterben und ist gefährlich für alle Meerestiere. Das schadet dem ganzen Ökosystem!
+
+> Versuche es mit einem anderen Objekt";Ces déchets finissent souvent dans la mer ! Les algues s'y emmêlent et meurent, alors que nous avons tant besoin d'elles pour produire de l'oxygène !;"Oh no, unfortunately garbage often ends up in the sea! It pollutes our water, blocks the sunlight for the algae, causing them to die and is dangerous for all marine animals. It harms the whole ecosystem!
+
+> Try another object"
+OBJECT_RECYCLING_BIN;"Super! Kompost bringt Nährstoffe ins Meer, die Algen zum Wachsen brauchen. Aber Achtung: bei zu viel Nährstoffen stört das das Gleichgewicht. Es können somit auch schlechte Algen wachsen. Diese heissen Algenblüten.
+
+> Wähle das nächste Objekt";"Super ! Le compost apporte à la mer des nutriments dont les algues ont besoin pour se développer. Mais attention : s'il y a trop de nutriments, cela perturbe l'équilibre. De mauvaises algues peuvent alors se développer. Celles-ci s'appellent des fleurs d'algues.
+
+> Choisir l'objet suivant";"Super! Compost brings nutrients into the sea that algae need to grow. But beware: too much nutrient disturbs the balance. This means that bad algae can also grow. These are called algal blooms.
+
+> Select the next object"
+OBJECT_CAR;"Autofahren produziert viel Abgase! Das wärmt das Klima auf und verändert die Meere. Das Wasser wird wärmer und sauer wodurch Algen sterben und auch vielen Tieren geschadet wird. Weniger Autofahren hilft auch dem Ozean!
+
+> Versuche es mit einem anderen Objekt";"La conduite automobile produit beaucoup de gaz d'échappement ! Cela réchauffe le climat et modifie les mers. L'eau devient plus chaude et plus acide, ce qui provoque la mort des algues et nuit à de nombreux animaux. Moins de voitures aide aussi l'océan !
+
+> Essaie avec un autre objet";"Driving produces a lot of exhaust fumes! This warms the climate and changes the oceans. The water becomes warmer and more acidic, causing algae to die and also harming many animals. Less driving also helps the ocean!
+
+> Try another object"
+OBJECT_AIRPLANE;"Fliegen ist zwar praktisch aber schlecht für unsere Meere! Durch die vielen Abgase wird das Meer viel zu warm. Das bringt unsere Algen und Meerestiere in grosse Gefahr! 
+
+> Versuche es mit einem anderen Objekt";"Voler est certes pratique, mais mauvais pour nos mers ! En raison des nombreux gaz d'échappement, la mer devient beaucoup trop chaude. Cela met nos algues et nos animaux marins en grand danger ! 
+
+> Essaie avec un autre objet";"Flying is practical but bad for our oceans! The sea becomes far too warm due to all the exhaust fumes. This puts our algae and marine animals in great danger! 
+
+> Try another object"
+OBJECT_TRAIN;"Gute Wahl! Züge sind ein umweltfreudliches Transportmittel und helfen das Klima und die Meere zu schützen! So hälst du die Algen gesund und sie können weiterhin viel Sauerstoff produzieren, klasse!
+
+> Wähle ein nächstes Objekt aus";"Bon choix ! Les trains sont un moyen de transport écologique et contribuent à la protection du climat et des mers ! Ainsi, tu maintiens les algues en bonne santé et elles peuvent continuer à produire beaucoup d'oxygène, génial !
+
+> Choisis un prochain objet";"Good choice! Trains are an environmentally friendly means of transportation and help protect the climate and the oceans! This way you keep the algae healthy and they can continue to produce lots of oxygen, great!
+
+> Select a next object"
+OBJECT_BICYCLE;"Super Wahl! Ein Velo verursacht keine Abgase und die Algen im Meer können frei atmen und wachsen. Das Wasser bleibt sauber und das ganze Ökosystem stark. Gesund für dich und die Natur!
+
+> Wähle ein nächstes Objekt aus";"Super choix ! Un vélo ne produit pas de gaz d'échappement et les algues dans la mer peuvent respirer et se développer librement. L'eau reste propre et tout l'écosystème reste fort. Sain pour toi et pour la nature !
+
+> Choisir un prochain objet";"Great choice! A bike produces no exhaust fumes and the algae in the sea can breathe and grow freely. The water stays clean and the whole ecosystem remains strong. Healthy for you and nature!
+
+> Select a next object"
+OBJECT_SHOPPING_BASKET_INTERNATIONAL;"Einkaufen aus aller Welt klingt zwar spannend aber lange Transportwege verursachen viele Abgase. Das erwärmt die Meere und die Algen geraten aus dem Gleichgewicht.
+
+> Versuche es mit einem anderen Objekt ";"Acheter dans le monde entier semble certes passionnant, mais les longues distances de transport génèrent beaucoup de gaz d'échappement. Cela réchauffe les mers et les algues perdent leur équilibre.
+
+> Essaie avec un autre objet ";"Shopping from all over the world may sound exciting, but long transportation routes cause a lot of emissions. This warms the oceans and throws the algae out of balance.
+
+> Try another object "
+OBJECT_SHOPPING_BASKET_LOCAL;"Lokales Einkaufen spart lange Transportwege und schont unsere Umwelt. Die Algen im Meer bleiben Starkt und können weiter Sauerstoff produzieren. Du erhälst frische Wahre und die Algen können weiterhin wachsen!
+
+> Wähle ein nächstes Objekt aus";"Les achats locaux permettent d'éviter les longs transports et de préserver notre environnement. Les algues dans la mer restent fortes et peuvent continuer à produire de l'oxygène. Tu reçois des produits frais et les algues peuvent continuer à se développer !
+
+> Choisir un prochain objet";"Local shopping saves long transportation routes and protects our environment. The algae in the sea remain strong and can continue to produce oxygen. You get fresh algae and the algae can continue to grow!
+
+> Select a next object"
+OBJECT_TRASH_GRABBER;"Stark! Mit Abfallzangen können wir Küsten und Strände sauber halten und Abfall aus dem Meer fischen. Sie helfen das Wasser sauber zu halten um Algen genug Licht und Platz zum wachsen zu geben. Das ist zwar hilfreich aber nicht die Lösung für das Problem!
+
+> Wähle ein nächstes Objekt aus";;
+;schluss bildschirm;écran de fin;end screen
+ENDSCREEN_NEGATIVE;"Oh nein, das Meer wurde zu stark verschmutzt! Alle Algen sind gestorben und ohne sie konnten viele Tiere nicht mehr überleben. Auch Axolina musste fliehen und hat dieses Meer verlassen...
+
+Jetzt bleibt nur noch die Hoffnung, dass das Meer mit viel Umweltbewusstsein und Veränderung der Menschen eines Tages wieder gesund wird.";"Oh non, la mer a été trop polluée ! Toutes les algues sont mortes et sans elles, de nombreux animaux ne pouvaient plus survivre. Axolina aussi a dû fuir et a quitté cette mer...
+
+Il ne reste plus qu'à espérer qu'avec beaucoup de conscience écologique et de changement de la part des gens, la mer retrouvera un jour sa santé.";"Oh no, the sea was too polluted! All the algae died and without them many animals could no longer survive. Axolina also had to flee and left this sea...
+
+Now all that remains is the hope that with a lot of environmental awareness and change on the part of people, the sea will one day become healthy again."
+ENDSCREEN_POSITIVE;"Glückwunsch! Dank deiner Hilfe ist das Meer sauber geblieben und die Algen sind gesund und stark! Sie produzieren Sauerstoff und sorgen dafür, dass das ganze Ökosystem blüht. 
+
+Danke dass du zu meinem Zuhause geschaut hast!";"Félicitations ! Grâce à ton aide, la mer est restée propre et les algues sont saines et fortes ! Elles produisent de l'oxygène et permettent à tout l'écosystème de s'épanouir. 
+
+Merci d'avoir regardé chez moi !";"Congratulations! Thanks to your help, the sea has remained clean and the algae are healthy and strong! They produce oxygen and keep the whole ecosystem thriving. 
+
+Thank you for looking after my home!"
+GOODBYE;"Danke fürs Spielen! Algen sind superwichtig für sauberes Wasser und frische Luft! Mit kleinen Entscheidungen - wie weniger Müll und umweltfreudliches Verhalten wie Fahrradfahren - kannst du den Algen und dem ganzen Meer helfen!
+
+Ich zähle auf dich, damit mein Zuhause schön bleibt!";"Merci d'avoir joué ! Les algues sont super importantes pour l'eau propre et l'air frais ! En faisant de petits choix - comme réduire tes déchets et adopter un comportement écologique comme faire du vélo - tu peux aider les algues et l'océan tout entier !
+
+Je compte sur toi pour que ma maison reste belle !";"Thanks for playing! Algae are super important for clean water and fresh air! By making small choices - like littering less and being eco-friendly like riding your bike - you can help the algae and the ocean as a whole!
+
+I'm counting on you to keep my home beautiful!"
