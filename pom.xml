@@ -153,11 +153,11 @@
             <scope>test</scope>
         </dependency>
 
-        <!-- SQL Lite DB-Driver -->
+        <!-- Common-CSV -->
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
-            <version>1.14.0</version>
+            <version>1.10.0</version>
         </dependency>
     </dependencies>
 
@@ -316,6 +316,8 @@
                         <configuration>
                             <mainClass>${launcher.class}</mainClass>
                             <options>
+                                <option>-Xmx2g</option>
+                                <option>-XX:+UseG1GC</option>
                                 <option>--add-exports</option>
                                 <option>javafx.base/com.sun.javafx=ALL-UNNAMED</option>
                                 <option>--add-exports</option>

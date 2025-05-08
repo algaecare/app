@@ -22,6 +22,9 @@ public class AlgaeLayer extends Layer {
     private final Timeline outroTimeline;
     private AnimationState currentState = AnimationState.HIDDEN;
     private boolean skipIntroAnimation;
+    private boolean isHidden = true;
+    private int x;
+    private int y;
 
     public AlgaeLayer(int x, int y, int width, int height, String imagePath) {
         if (imagePath == null || imagePath.isEmpty()) {
@@ -36,6 +39,9 @@ public class AlgaeLayer extends Layer {
         if (getClass().getResource(imagePath) == null) {
             throw new IllegalArgumentException("Image not found at path: " + imagePath);
         }
+
+        this.x = x;
+        this.y = y;
 
         this.skipIntroAnimation = false;
 
@@ -66,11 +72,13 @@ public class AlgaeLayer extends Layer {
     private Timeline createIntroAnimation() {
         Timeline timeline = new Timeline(
                 new KeyFrame(Duration.ZERO,
+                        new KeyValue(imageView.translateYProperty(), y + 125),
                         new KeyValue(imageView.opacityProperty(), 0),
                         new KeyValue(imageView.scaleXProperty(), 0),
                         new KeyValue(imageView.scaleYProperty(), 0),
                         new KeyValue(imageView.rotateProperty(), 0)),
                 new KeyFrame(Duration.seconds(2),
+                        new KeyValue(imageView.translateYProperty(), y),
                         new KeyValue(imageView.opacityProperty(), 1),
                         new KeyValue(imageView.scaleXProperty(), 1),
                         new KeyValue(imageView.scaleYProperty(), 1),
@@ -126,6 +134,7 @@ public class AlgaeLayer extends Layer {
         if (currentState == AnimationState.HIDDEN || currentState == AnimationState.OUTRO) {
             setStateInternal(AnimationState.INTRO);
         }
+        this.isHidden = false;
     }
 
     @Override
@@ -133,6 +142,7 @@ public class AlgaeLayer extends Layer {
         if (currentState == AnimationState.IDLE || currentState == AnimationState.INTRO) {
             setStateInternal(AnimationState.OUTRO);
         }
+        this.isHidden = true;
     }
 
     private void setStateInternal(AnimationState newState) {
@@ -171,5 +181,9 @@ public class AlgaeLayer extends Layer {
 
     public void setSkipIntroAnimation(boolean skip) {
         this.skipIntroAnimation = skip;
+    }
+
+    public boolean isHidden() {
+        return isHidden;
     }
 }

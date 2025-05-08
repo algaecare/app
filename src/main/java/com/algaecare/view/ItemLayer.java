@@ -51,11 +51,11 @@ public class ItemLayer extends Layer {
 
     private Timeline createAnimation(double startY) {
         Timeline timeline = new Timeline(
-                // Start hidden and scaled down
                 new KeyFrame(Duration.ZERO,
                         new KeyValue(objectImageView.translateYProperty(), startY),
                         new KeyValue(objectImageView.opacityProperty(), 1)),
-                // Move downward and fade out
+                new KeyFrame(Duration.seconds(2),
+                        new KeyValue(objectImageView.opacityProperty(), 1)),
                 new KeyFrame(Duration.seconds(4),
                         new KeyValue(objectImageView.translateYProperty(),
                                 startY + 1920.0 / 4 + objectImageView.getFitHeight()),

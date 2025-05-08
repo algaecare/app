@@ -6,69 +6,59 @@ import java.util.logging.Logger;
 
 public class Environment {
     private static final Logger LOGGER = Logger.getLogger(Environment.class.getName());
-
-    private int co2Level; // in percentage (0-100)
-    private int temperature; // in degrees Celsius
     private int algaeLevel; // in percentage (0-100)
-    private int o2Level; // in percentage (0-100)
-
+    private int timer;
+    private boolean timerStarted = false;
+    private final int TIMER_DURATION = 130;
     private List<EnvironmentObject> environmentObjects = new ArrayList<>();
 
-    public Environment(int co2Level, int temperature, int algaeLevel, int o2Level) {
-        this.co2Level = co2Level;
-        this.temperature = temperature;
+    public Environment(int algaeLevel) {
         this.algaeLevel = algaeLevel;
-        this.o2Level = o2Level;
-
         this.environmentObjects = initializeEnvironmentObjects();
     }
 
     private List<EnvironmentObject> initializeEnvironmentObjects() {
-        // https://fhnw-projecttrack.atlassian.net/wiki/spaces/IP1224vt3/pages/594149391/Alltagsobjekte
-        // Bad Objects
-        environmentObjects.add(new EnvironmentObject("Trash", -10, 1, -20, 0));
-        environmentObjects.add(new EnvironmentObject("Car", -20, 2, -30, 0));
-        environmentObjects.add(new EnvironmentObject("Airplane", -30, 3, -40, 0));
-        environmentObjects.add(new EnvironmentObject("Shopping Bag World", -40, 4, -50, 0));
-        // Neutral Objects
-        environmentObjects.add(new EnvironmentObject("Recycling", 0, 0, 0, 0));
-        environmentObjects.add(new EnvironmentObject("Train", 0, 0, 0, 0));
-        environmentObjects.add(new EnvironmentObject("Shopping Bag Local", 0, 0, 0, 0));
-        environmentObjects.add(new EnvironmentObject("Bicycle", 0, 0, 0, 0));
-        // Good Objects
-        environmentObjects.add(new EnvironmentObject("Trash Grabber", 10, -2, 20, 0));
+        environmentObjects.add(new EnvironmentObject(GameState.OBJECT_GARBAGE_BAG, -10));
+        environmentObjects.add(new EnvironmentObject(GameState.OBJECT_CAR, -5));
+        environmentObjects.add(new EnvironmentObject(GameState.OBJECT_AIRPLANE, -20));
+        environmentObjects.add(new EnvironmentObject(GameState.OBJECT_SHOPPING_BASKET_INTERNATIONAL, -15));
+        environmentObjects.add(new EnvironmentObject(GameState.OBJECT_RECYCLING_BIN, 5));
+        environmentObjects.add(new EnvironmentObject(GameState.OBJECT_TRAIN, 5));
+        environmentObjects.add(new EnvironmentObject(GameState.OBJECT_SHOPPING_BASKET_LOCAL, 5));
+        environmentObjects.add(new EnvironmentObject(GameState.OBJECT_BICYCLE, 10));
+        environmentObjects.add(new EnvironmentObject(GameState.OBJECT_TRASH_GRABBER, 10));
         return environmentObjects;
     }
 
-    public void updateEnvironment(EnvironmentObject environmentObject) {
-        LOGGER.info("Updating environment with object: " + environmentObject.getName());
+    public void updateEnvironment(GameState environmentObjectID) {
+        if (!timerStarted) {
+            timerStarted = true;
+            startTimer();
+        }
 
-        // Calculate changes based on the environment object
-        int co2Change = environmentObject.getCo2Change();
-        this.co2Level = co2Level + co2Change;
-
-        int temperatureChange = environmentObject.getTemperatureChange();
-        this.temperature = temperature + temperatureChange;
-
-        int oxygenChange = environmentObject.getOxygenChange();
-        this.o2Level = o2Level + oxygenChange;
-
-        // Calculate and apply algae change based on temperature change
-        int algaeChange = environmentObject.getAlgaeChange();
-        this.algaeLevel = algaeLevel + algaeChange;
-
-        LOGGER.info(String.format(
-                "Environment updated: CO2 Level: %d%%, Temperature: %d°C, Algae Level: %d%%, O2 Level: %d%%",
-                co2Level, temperature, algaeLevel, o2Level));
+        EnvironmentObject environmentObject = environmentObjects.stream()
+                .filter(obj -> obj.getObjectID() == environmentObjectID)
+                .findFirst()
+                .orElse(null);
+        if (environmentObject == null) {
+            LOGGER.warning("Umweltobjekt nicht gefunden: " + environmentObjectID);
+            return;
+        } else {
+            int newAlgaeLevel = algaeLevel + environmentObject.getAlgaeChange();
+            if (newAlgaeLevel < 0) {
+                newAlgaeLevel = 0;
+            } else if (newAlgaeLevel > 100) {
+                newAlgaeLevel = 100;
+            }
+            this.algaeLevel = newAlgaeLevel;
+            LOGGER.info("Algenlevel: " + algaeLevel + "%");
+        }
     }
 
     public void reset() {
-        this.co2Level = 0;
-        this.temperature = 0;
         this.algaeLevel = 0;
-        this.o2Level = 0;
-
-        LOGGER.info("Environment reset to default values.");
+        this.timer = 0;
+        this.timerStarted = false;
     }
 
     public int getAlgaeLevel() {
@@ -77,5 +67,34 @@ public class Environment {
 
     public List<EnvironmentObject> getEnvironmentObjects() {
         return environmentObjects;
+    }
+
+    public boolean isBelowZero() {
+        return algaeLevel <= 0;
+    }
+
+    public boolean finishGame() {
+        return (isBelowZero() && timer <= 130 || timer <= 130);
+    }
+
+    public void startTimer() {
+        timer = 0;
+        Thread timerThread = new Thread(() -> {
+            while (timer < TIMER_DURATION) {
+                LOGGER.info("Timer: " + timer + " Sekunden");
+                try {
+                    Thread.sleep(1000); // 1 Sekunde warten
+                } catch (InterruptedException e) {
+                    LOGGER.warning("Timer wurde unterbrochen.");
+                    Thread.currentThread().interrupt();
+                    return;
+                }
+                timer++;
+            }
+            LOGGER.info("Timer abgelaufen.");
+            timerStarted = false;
+        });
+        timerThread.setDaemon(true);
+        timerThread.start();
     }
 }
