@@ -34,7 +34,7 @@ public class TextLayerData {
                 Iterable<CSVRecord> records = CSVFormat.RFC4180.builder()
                         .setHeader("name", "value")
                         .setSkipHeaderRecord(true)
-                        .get()
+                        .build()
                         .parse(reader);
 
                 for (CSVRecord record : records) {
