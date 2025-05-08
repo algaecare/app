@@ -98,10 +98,14 @@ public class ScreenController implements GameStateEventManager {
         layers.add(new TextLayer(GameState.ENDSCREEN_POSITIVE, 1800, 355, 60, 55, "INTER"));
         layers.add(new TextLayer(GameState.GOODBYE, 1800, 415, 60, 55, "INTER"));
 
-
         // AXOLOTL LAYER
         layers.add(axolotlLayer);
-
+        // ACTION LAYERS
+        layers.add(new ActionLayer(GameState.OBJECT_BICYCLE, "/bike/"));
+        layers.add(new ActionLayer(GameState.OBJECT_CAR, "/car/"));
+        layers.add(new ActionLayer(GameState.OBJECT_AIRPLANE, "/airplane/"));
+        layers.add(new ActionLayer(GameState.OBJECT_TRAIN, "/train/"));
+        layers.add(new ActionLayer(GameState.TRASH_GRABBER, "/trash-grabber/"));
         // SET TITLE LAYER AND ALGAE LAYER TO SHOW
         for (Layer layer : layers) {
             if (layer instanceof AlgaeLayer) {
@@ -147,7 +151,8 @@ public class ScreenController implements GameStateEventManager {
             case TITLE -> {
                 for (Layer layer : layers) {
                     boolean isTitle = layer instanceof TextLayer textLayer && textLayer.getID() == GameState.TITLE;
-                    boolean isSubtitle = layer instanceof TextLayer textLayer && textLayer.getID() == GameState.SUBTITLE;
+                    boolean isSubtitle = layer instanceof TextLayer textLayer
+                            && textLayer.getID() == GameState.SUBTITLE;
                     if (isTitle || isSubtitle) {
                         layer.showLayer();
                     }
@@ -185,7 +190,7 @@ public class ScreenController implements GameStateEventManager {
             }
 
             case OBJECT_GARBAGE_BAG, OBJECT_SHOPPING_BASKET_INTERNATIONAL, OBJECT_RECYCLING_BIN,
-                 OBJECT_SHOPPING_BASKET_LOCAL -> {
+                    OBJECT_SHOPPING_BASKET_LOCAL -> {
                 for (Layer layer : layers) {
                     if (layer instanceof ItemLayer itemLayer) {
                         if (itemLayer.getGameState() == newState) {
