@@ -17,9 +17,10 @@ import com.algaecare.model.GameState;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
-public class MainController implements GameStateEventManager, GameStateEventManager.EventEmitter, NFCChipListener {
+public class MainController implements GameStateEventManager, GameStateEventManager.EventEmitter, NFCChipListener, LeverInputListener {
     private final List<GameStateEventManager> listeners = new ArrayList<>();
     private GameState currentState;
+    private GameState nextState;
     private final Environment environment;
 
     private NFCChipController nfcController;
@@ -120,14 +121,22 @@ public class MainController implements GameStateEventManager, GameStateEventMana
 
     @Override
     public void onNewTagDetected(int detectedData) {
-        GameState oldState = currentState;
         GameState object = nfcChipCodeHashmap.get(detectedData);
         if(currentState == GameState.GAMEPLAY) {
-            currentState = object;
-            notifyGameStateChanged(oldState, currentState);
+            nextState = object;
         }
         else if(currentState == GameState.TITLE && object == GameState.AXOLOTL_INTRODUCTION) {
-            currentState = object;
+            nextState = object;
+        }
+    }
+
+    @Override
+    public void onLeverInput() {
+        if(currentState == GameState.GAMEPLAY && nextState != null) {
+            motorController.openTrapDoor();
+            GameState oldState = currentState;
+            currentState = nextState;
+            nextState = null;
             notifyGameStateChanged(oldState, currentState);
         }
     }

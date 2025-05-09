@@ -3,6 +3,8 @@ import com.algaecare.model.Environment;
 import com.algaecare.model.EnvironmentObject;
 import com.algaecare.model.GameState;
 import com.pi4j.*;
+import com.pi4j.platform.Platform;
+import com.pi4j.platform.Platforms;
 
 import java.util.logging.Level;
 
@@ -27,13 +29,16 @@ public class LedController implements GameStateEventManager {
      */
     public static void updateLed(int ledPin, boolean on) {
         var pi4j = Pi4J.newAutoContext();
+        Platforms platforms = pi4j.platforms();
+        Platform defaultPlatform = platforms.defaultPlatform();
+        if (defaultPlatform.id().equals("raspberrypi")) {
+            var led = pi4j.digitalOutput().create(ledPin);
 
-        var led = pi4j.digitalOutput().create(ledPin);
-
-        if(on) {
-            led.high();
-        } else {
-            led.low();
+            if (on) {
+                led.high();
+            } else {
+                led.low();
+            }
         }
     }
 
