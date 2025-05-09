@@ -15,11 +15,11 @@ public class MainController implements GameStateEventManager, GameStateEventMana
 
     public MainController(Stage stage) {
         // Initialize model
-        this.environment = new Environment(90, 16, 70, 85);
+        this.environment = new Environment(50);
 
         // Initialize controllers
         KeyboardInputController keyboardInputController = new KeyboardInputController(stage, this);
-        ScreenController screenController = new ScreenController(stage, this);
+        ScreenController screenController = new ScreenController(stage, this, this.environment);
         NFCChipController nfcController = new NFCChipController();
 
         // Wire up event chain
@@ -49,9 +49,7 @@ public class MainController implements GameStateEventManager, GameStateEventMana
 
     @Override
     public void onGameStateChanged(GameState oldState, GameState newState) {
-        if (newState == GameState.TITLE) {
-            environment.reset();
-        }
+        return;
     }
 
     protected void notifyGameStateChanged(GameState oldState, GameState newState) {

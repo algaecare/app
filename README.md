@@ -22,17 +22,20 @@ src
 
 - Really locally:
 ```bash
+export MAVEN_OPTS="-Xmx2g -XX:+UseG1GC"
 mvn clean javafx:run -P run-local
 ```
 
 - Locally without Testing:
 ```bash
+export MAVEN_OPTS="-Xmx2g -XX:+UseG1GC"
 mvn clean package -P release -DskipTests
 mvn verify -P run-local -DskipTests
 ```
 
 - Locally with Testing: 
 ```bash
+export MAVEN_OPTS="-Xmx2g -XX:+UseG1GC"
 mvn clean package -P release
 mvn verify -P run-local
 ```
