@@ -37,19 +37,12 @@ public class LedController implements GameStateEventManager {
         }
     }
 
-    /**
-     * Updates the LED state based on the CO2 level
-     *
-     * @param co2Level The CO2 level to be used for updating the LED state
-     */
     @Override
     public void onGameStateChanged(GameState oldState, GameState newState) {
-        int co2Level = environment.getCo2Level();
-        int temperature = environment.getTemperature();
-        int o2Level = environment.getTemperature();
+        int level = environment.getAlgaeLevel();
 
         // Calculate LED threshold based on CO2 level
-        int thresholdIndex = Math.max(0, Math.round((float) (temperature + 50) / 100 * 8));
+        int thresholdIndex = Math.max(0, Math.round((float) level / 100 * 6));
 
         for (int i = 0; i < PIN_LEDS.length; i++) {
             if (i <= thresholdIndex) {

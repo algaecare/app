@@ -17,34 +17,6 @@ public class Environment {
         this.environmentObjects = initializeEnvironmentObjects();
     }
 
-    public int getCo2Level() {
-        return co2Level;
-    }
-
-    public void setCo2Level(int co2Level) {
-        this.co2Level = co2Level;
-    }
-
-    public int getTemperature() {
-        return temperature;
-    }
-
-    public void setTemperature(int temperature) {
-        this.temperature = temperature;
-    }
-
-    public void setAlgaeLevel(int algaeLevel) {
-        this.algaeLevel = algaeLevel;
-    }
-
-    public int getO2Level() {
-        return o2Level;
-    }
-
-    public void setO2Level(int o2Level) {
-        this.o2Level = o2Level;
-    }
-
     private List<EnvironmentObject> initializeEnvironmentObjects() {
         environmentObjects.add(new EnvironmentObject(GameState.OBJECT_GARBAGE_BAG, -10));
         environmentObjects.add(new EnvironmentObject(GameState.OBJECT_CAR, -5));
