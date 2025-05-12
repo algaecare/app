@@ -1,26 +1,50 @@
 package com.algaecare.controller;
 
+import com.algaecare.model.TextLayerData;
 import javafx.stage.Stage;
 
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.io.IOException;
+import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.logging.Logger;
 
 import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVRecord;
 
-public class MainController implements GameStateEventManager, GameStateEventManager.EventEmitter {
+public class MainController implements GameStateEventManager, GameStateEventManager.EventEmitter, NFCChipListener, LeverInputListener {
     private final List<GameStateEventManager> listeners = new ArrayList<>();
     private GameState currentState;
+    private GameState nextState;
     private final Environment environment;
+
+    private NFCChipController nfcController;
+    private LedController ledController;
+    private StepMotorController motorController;
+
+    private HashMap<Integer, GameState> nfcChipCodeHashmap;
+
+    private static final String SETTINGS_CSV = "/NfConfigs.csv";
+
+    private static final Logger LOGGER = Logger.getLogger(MainController.class.getName());
 
     public MainController(Stage stage) {
         // Initialize model
-        this.environment = new Environment(50);
+        environment = new Environment(50);
 
         // Initialize controllers
         KeyboardInputController keyboardInputController = new KeyboardInputController(stage, this);
         ScreenController screenController = new ScreenController(stage, this, this.environment);
-        NFCChipController nfcController = new NFCChipController();
+        nfcController = new NFCChipController();
+        ledController = new LedController(environment);
+        motorController = new StepMotorController(environment);
 
         // Wire up event chain
         addGameStateChangeListener(screenController);
@@ -29,6 +53,54 @@ public class MainController implements GameStateEventManager, GameStateEventMana
         // Set initial state
         currentState = GameState.TITLE;
         notifyGameStateChanged(null, currentState);
+
+        readNfcChipList();
+    }
+
+    public void readNfcChipList() {
+        HashMap<Integer, GameState> nfcChipCodes = new HashMap<>();
+
+        try (InputStream is = MainController.class.getResourceAsStream(SETTINGS_CSV)) {
+            if( is != null) {
+                try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                    CSVFormat format = CSVFormat.DEFAULT.builder()
+                        .setDelimiter(';')
+                        .build();
+
+                    var parser = format.parse(reader);
+
+                    for (CSVRecord record : parser) {
+                        if (record.size() < 2) {
+                            LOGGER.warning("Skipping malformed record: " + record);
+                            continue;
+                        }
+                        String id = record.get(0);
+                        String text = record.get(1);
+                        GameState[] gameStates = {GameState.AXOLOTL_INTRODUCTION, GameState.OBJECT_GARBAGE_BAG,
+                            GameState.OBJECT_CAR, GameState.OBJECT_AIRPLANE,
+                            GameState.OBJECT_SHOPPING_BASKET_INTERNATIONAL,
+                            GameState.OBJECT_RECYCLING_BIN, GameState.OBJECT_TRAIN,
+                            GameState.OBJECT_SHOPPING_BASKET_LOCAL,
+                            GameState.OBJECT_BICYCLE, GameState.OBJECT_TRASH_GRABBER};
+                        for (int i = 0; i < gameStates.length; i++) {
+                            if (gameStates[i].name().equals(text)) {
+                                nfcChipCodes.put(Integer.parseInt(id), gameStates[i]);
+                                break;
+                            }
+                        }
+                    }
+
+
+                } catch (IOException e) {
+                    LOGGER.warning("NFC Settings file could not bet read: " + e.getMessage());
+                }
+            } else {
+                LOGGER.warning("NFC Settings file not found: " + SETTINGS_CSV);
+            }
+        } catch (IOException e) {
+            LOGGER.warning("NFC Settings file inputstream could not be opened: " + e.getMessage());
+        }
+        nfcChipCodeHashmap = nfcChipCodes;
     }
 
     public void addGameStateChangeListener(GameStateEventManager listener) {
@@ -54,5 +126,27 @@ public class MainController implements GameStateEventManager, GameStateEventMana
 
     protected void notifyGameStateChanged(GameState oldState, GameState newState) {
         listeners.forEach(listener -> listener.onGameStateChanged(oldState, newState));
+    }
+
+    @Override
+    public void onNewTagDetected(int detectedData) {
+        GameState object = nfcChipCodeHashmap.get(detectedData);
+        if(currentState == GameState.GAMEPLAY) {
+            nextState = object;
+        }
+        else if(currentState == GameState.TITLE && object == GameState.AXOLOTL_INTRODUCTION) {
+            nextState = object;
+        }
+    }
+
+    @Override
+    public void onLeverInput() {
+        if(currentState == GameState.GAMEPLAY && nextState != null) {
+            motorController.openTrapDoor();
+            GameState oldState = currentState;
+            currentState = nextState;
+            nextState = null;
+            notifyGameStateChanged(oldState, currentState);
+        }
     }
 }
