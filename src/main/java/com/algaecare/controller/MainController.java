@@ -11,6 +11,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+import java.util.Objects;
+import java.util.logging.Logger;
 
 import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
@@ -30,6 +32,8 @@ public class MainController implements GameStateEventManager, GameStateEventMana
     private HashMap<Integer, GameState> nfcChipCodeHashmap;
 
     private static final String SETTINGS_CSV = "/NfConfigs.csv";
+
+    private static final Logger LOGGER = Logger.getLogger(MainController.class.getName());
 
     public MainController(Stage stage) {
         // Initialize model
@@ -56,40 +60,45 @@ public class MainController implements GameStateEventManager, GameStateEventMana
     public void readNfcChipList() {
         HashMap<Integer, GameState> nfcChipCodes = new HashMap<>();
 
-        try (InputStream is = TextLayerData.class.getResourceAsStream(SETTINGS_CSV)) {
-            assert is != null;
-            try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
-                CSVFormat format = CSVFormat.DEFAULT.builder()
-                    .setDelimiter(';')
-                    .build();
+        try (InputStream is = MainController.class.getResourceAsStream(SETTINGS_CSV)) {
+            if( is != null) {
+                try (InputStreamReader reader = new InputStreamReader(is, StandardCharsets.UTF_8)) {
+                    CSVFormat format = CSVFormat.DEFAULT.builder()
+                        .setDelimiter(';')
+                        .build();
 
-                var parser = format.parse(reader);
+                    var parser = format.parse(reader);
 
-                for (CSVRecord record : parser) {
-                    if (record.size() < 2) {
-                        //LOGGER.warning("Skipping malformed record: " + record); //TODO log
-                        continue;
-                    }
-                    String id = record.get(0);
-                    String text = record.get(1);
-                    GameState[] gameStates = {GameState.AXOLOTL_INTRODUCTION, GameState.OBJECT_GARBAGE_BAG,
-                        GameState.OBJECT_CAR, GameState.OBJECT_AIRPLANE, GameState.OBJECT_SHOPPING_BASKET_INTERNATIONAL,
-                        GameState.OBJECT_RECYCLING_BIN, GameState.OBJECT_TRAIN, GameState.OBJECT_SHOPPING_BASKET_LOCAL,
-                        GameState.OBJECT_BICYCLE, GameState.OBJECT_TRASH_GRABBER};
-                    for (int i = 0; i < gameStates.length; i++) {
-                        if (gameStates[i].name().equals(text)) {
-                            nfcChipCodes.put(Integer.parseInt(id), gameStates[i]);
-                            break;
+                    for (CSVRecord record : parser) {
+                        if (record.size() < 2) {
+                            LOGGER.warning("Skipping malformed record: " + record);
+                            continue;
+                        }
+                        String id = record.get(0);
+                        String text = record.get(1);
+                        GameState[] gameStates = {GameState.AXOLOTL_INTRODUCTION, GameState.OBJECT_GARBAGE_BAG,
+                            GameState.OBJECT_CAR, GameState.OBJECT_AIRPLANE,
+                            GameState.OBJECT_SHOPPING_BASKET_INTERNATIONAL,
+                            GameState.OBJECT_RECYCLING_BIN, GameState.OBJECT_TRAIN,
+                            GameState.OBJECT_SHOPPING_BASKET_LOCAL,
+                            GameState.OBJECT_BICYCLE, GameState.OBJECT_TRASH_GRABBER};
+                        for (int i = 0; i < gameStates.length; i++) {
+                            if (gameStates[i].name().equals(text)) {
+                                nfcChipCodes.put(Integer.parseInt(id), gameStates[i]);
+                                break;
+                            }
                         }
                     }
+
+
+                } catch (IOException e) {
+                    LOGGER.warning("NFC Settings file could not bet read: " + e.getMessage());
                 }
-
-
-            } catch (IOException e) {
-                e.printStackTrace();
+            } else {
+                LOGGER.warning("NFC Settings file not found: " + SETTINGS_CSV);
             }
         } catch (IOException e) {
-            e.printStackTrace();
+            LOGGER.warning("NFC Settings file inputstream could not be opened: " + e.getMessage());
         }
         nfcChipCodeHashmap = nfcChipCodes;
     }
