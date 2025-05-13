@@ -167,7 +167,7 @@ public class ScreenController implements GameStateEventManager {
     }
 
     public void updateScreen(GameState oldState, GameState newState) {
-        gameStateDebugText.setText("Current Game State: " + newState);
+        gameStateDebugText.setText(String.valueOf(newState));
 
         cleanupLayers();
 
@@ -189,7 +189,7 @@ public class ScreenController implements GameStateEventManager {
             showAxolotlExpression(algaeLevel);
         }
 
-        environmentLevelDebugText.setText("Algae Level: " + environment.getAlgaeLevel() + "%");
+        environmentLevelDebugText.setText(environment.getAlgaeLevel() + "%");
 
         // Show only the relevant layers based on the new state
         switch (newState) {
@@ -336,12 +336,12 @@ public class ScreenController implements GameStateEventManager {
     }
 
     private void showAxolotlExpression(int algaeLevel) {
-        if (algaeLevel < 75) {
-            axolotlLayer.setExpression(AxolotlLayer.Expression.BAD);
+        if (algaeLevel < 25) {
+            axolotlLayer.setExpression(AxolotlLayer.Expression.WORST);
         } else if (algaeLevel < 50) {
             axolotlLayer.setExpression(AxolotlLayer.Expression.WORSE);
-        } else if (algaeLevel < 25) {
-            axolotlLayer.setExpression(AxolotlLayer.Expression.WORST);
+        } else if (algaeLevel < 75) {
+            axolotlLayer.setExpression(AxolotlLayer.Expression.BAD);
         } else {
             axolotlLayer.setExpression(AxolotlLayer.Expression.HAPPY);
         }
