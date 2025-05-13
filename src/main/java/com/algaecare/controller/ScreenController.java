@@ -1,7 +1,6 @@
 package com.algaecare.controller;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -18,7 +17,8 @@ public class ScreenController implements GameStateEventManager {
     private static final Logger LOGGER = Logger.getLogger(ScreenController.class.getName());
     private final List<Layer> layers = new ArrayList<>();
     private final AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
-    private final Label debugText = createDebugText();
+    private final Label gameStateDebugText = createGameStateDebugText();
+    private final Label environmentLevelDebugText = createEnvironmentLevelDebugText();
     private final GameStateEventManager.EventEmitter stateEmitter;
     private Environment environment;
     private final StaticLayer environmentLayer = new StaticLayer(0, 0, "/30-ENVIRONMENT.png");
@@ -26,7 +26,7 @@ public class ScreenController implements GameStateEventManager {
     private List<AlgaeLayer> hiddenAlgaeLayers = new ArrayList<>();
     private List<AlgaeLayer> shownAlgaeLayers = new ArrayList<>();
 
-    private Label createDebugText() {
+    private Label createGameStateDebugText() {
         Label label = new Label();
         label.setStyle(
                 "-fx-font-size: 20px; -fx-text-fill: white; -fx-background-color: black; -fx-padding: 10px; -fx-opacity: 1;");
@@ -37,13 +37,25 @@ public class ScreenController implements GameStateEventManager {
         return label;
     }
 
+    private Label createEnvironmentLevelDebugText() {
+        Label label = new Label();
+        label.setStyle(
+                "-fx-font-size: 20px; -fx-text-fill: white; -fx-background-color: black; -fx-padding: 10px; -fx-opacity: 1;");
+        // Position the label at the bottom left corner
+        label.setTranslateX(-10); // 10px from the right
+        label.setTranslateY(-10); // 10px from the bottom (will be set using StackPane alignment)
+        StackPane.setAlignment(label, javafx.geometry.Pos.BOTTOM_RIGHT);
+        return label;
+    }
+
     public ScreenController(Stage stage, GameStateEventManager.EventEmitter stateEmitter, Environment environment) {
         this.stateEmitter = stateEmitter;
         this.environment = environment;
         MainScene scene = new MainScene(stage);
         initializeLayers();
         ((StackPane) scene.getScene().getRoot()).getChildren().addAll(layers);
-        ((StackPane) scene.getScene().getRoot()).getChildren().add(debugText);
+        ((StackPane) scene.getScene().getRoot()).getChildren().add(gameStateDebugText);
+        ((StackPane) scene.getScene().getRoot()).getChildren().add(environmentLevelDebugText);
         updateScreen(GameState.TITLE, GameState.TITLE);
     }
 
@@ -154,7 +166,8 @@ public class ScreenController implements GameStateEventManager {
     }
 
     public void updateScreen(GameState oldState, GameState newState) {
-        debugText.setText("Current Game State: " + newState);
+        gameStateDebugText.setText("Current Game State: " + newState);
+        environmentLevelDebugText.setText("Algae Level: " + environment.getAlgaeLevel() + "%");
 
         // Hide all layers first, except for static layers and algae layers
         for (Layer layer : layers) {
