@@ -5,30 +5,22 @@ import com.algaecare.model.GameState;
 import com.algaecare.model.StepMotor;
 import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
-import com.pi4j.io.gpio.digital.DigitalOutput;
-import com.pi4j.io.gpio.digital.DigitalOutputConfig;
 import com.pi4j.io.gpio.digital.DigitalOutputConfigBuilder;
 import com.pi4j.io.gpio.digital.DigitalState;
 import com.pi4j.platform.Platform;
 import com.pi4j.platform.Platforms;
-
-import java.util.*;
-import java.util.List;
-
-import static com.pi4j.boardinfo.datareader.CpuInfoReader.getCpuRevision;
 import static java.lang.Thread.sleep;
 
 public class StepMotorController implements GameStateEventManager {
 
-    private final static int[] DEFAULT_PINS = { 5, 6, 13, 19 }; // TODO change pins
-    private Environment environment;
+    private final Environment environment;
     private StepMotor o2Display;
     private StepMotor co2Display;
     private StepMotor trapDoor;
     private int stepCounterO2 = 0;
     private int stepCounterCO2 = 0;
     private int stepCounterTrapDoor = 0;
-    private Context pi4j = Pi4J.newAutoContext();
+    private Context pi4j;
 
     private final int[][] stepSequence = {
             { 1, 0, 0, 1 },
@@ -43,10 +35,11 @@ public class StepMotorController implements GameStateEventManager {
 
     public StepMotorController(Environment environment) {
         this.environment = environment;
+        this.pi4j = Pi4J.newAutoContext();
 
         Platforms platforms = pi4j.platforms();
         Platform defaultPlatform = platforms.defaultPlatform();
-        if (defaultPlatform.id().equals("raspberrypi")) {
+        if (defaultPlatform != null && "raspberrypi".equals(defaultPlatform.id())) {
             co2Display = new StepMotor(
                     pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
                             .id("IN1-1").address(5).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
