@@ -1,10 +1,11 @@
-package com.algaecare.controller;
+package com.algaecare.controller.output;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.algaecare.controller.GameStateEventManager;
 import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
 import com.algaecare.view.*;

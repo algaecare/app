@@ -1,5 +1,6 @@
-package com.algaecare.controller;
+package com.algaecare.controller.input;
 
+import com.algaecare.controller.GameStateEventManager;
 import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
 import javafx.animation.KeyFrame;

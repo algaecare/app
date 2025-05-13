@@ -1,5 +1,6 @@
-package com.algaecare.controller;
+package com.algaecare.controller.output;
 
+import com.algaecare.controller.GameStateEventManager;
 import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
 import com.pi4j.context.Context;

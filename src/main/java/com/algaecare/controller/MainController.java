@@ -1,5 +1,11 @@
 package com.algaecare.controller;
 
+import com.algaecare.controller.input.KeyboardInputController;
+import com.algaecare.controller.input.NFCInputController;
+import com.algaecare.controller.input.TimeController;
+import com.algaecare.controller.output.LedController;
+import com.algaecare.controller.output.ScreenController;
+import com.algaecare.controller.output.StepMotorController;
 import com.pi4j.Pi4J;
 import com.pi4j.context.Context;
 import com.pi4j.platform.Platform;
