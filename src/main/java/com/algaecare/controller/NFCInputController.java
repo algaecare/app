@@ -28,6 +28,7 @@ public class NFCInputController implements GameStateEventManager {
     private DigitalInput leverButton;
     private static final int LEVER_PIN = 16;
     private static final int DEBOUNCE_TIME = 100; // milliseconds
+    boolean isLeverPressed = false;
 
     public NFCInputController(GameStateEventManager.EventEmitter eventEmitter, Context pi4j) {
         this.eventEmitter = eventEmitter;
@@ -59,8 +60,7 @@ public class NFCInputController implements GameStateEventManager {
                 .id("LEVER")
                 .name("Lever Button")
                 .address(LEVER_PIN)
-                .pull(PullResistance.PULL_DOWN)
-                .provider("pigpio-digital-input");
+                .pull(PullResistance.PULL_DOWN);
 
         leverButton = pi4j.create(buttonConfig);
         LOGGER.info("Lever button initialized on pin " + LEVER_PIN);
@@ -71,8 +71,11 @@ public class NFCInputController implements GameStateEventManager {
             LOGGER.info("Starting lever input listener...");
             while (true) {
                 if (leverButton.isHigh()) {
-                    LOGGER.info("Lever pressed - checking for NFC tag");
-                    processNfcTag();
+                    if (!isLeverPressed) {
+                        LOGGER.info("Lever pressed - checking for NFC tag");
+                        isLeverPressed = true;
+                        processNfcTag();
+                    }
                 }
                 try {
                     Thread.sleep(DEBOUNCE_TIME);
@@ -263,6 +266,7 @@ public class NFCInputController implements GameStateEventManager {
     @Override
     public void onGameStateChanged(GameState oldState, GameState newState) {
         this.currentState = newState;
+        this.isLeverPressed = false; // Reset lever state after game state change
         LOGGER.fine("NFCInput Controller state changed from " + oldState + " to " + newState);
     }
 }
