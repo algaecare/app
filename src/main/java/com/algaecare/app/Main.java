@@ -1,6 +1,5 @@
 package com.algaecare.app;
 
-import com.algaecare.controller.NFCChipController;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.stage.Stage;
