@@ -9,7 +9,7 @@ import com.pi4j.platform.Platforms;
 import java.util.logging.Level;
 
 public class LedController implements GameStateEventManager {
-    private static final int[] PIN_LEDS = {4, 17, 27, 22, 23, 24, 25, 29, 31}; //Pins BCM 7, 11, 13, 15, 16, 18, 22, 5, 6
+    private static final int[] PIN_LEDS = {11, 14, 15, 18, 23, 24};
     private Environment environment = null;
 
     /**
@@ -47,7 +47,7 @@ public class LedController implements GameStateEventManager {
         int level = environment.getAlgaeLevel();
 
         // Calculate LED threshold based on CO2 level
-        int thresholdIndex = Math.max(0, Math.round((float) level / 100 * 6));
+        int thresholdIndex = Math.max(0, Math.round((float) level / (float) 100 * (float) 6));
 
         for (int i = 0; i < PIN_LEDS.length; i++) {
             if (i <= thresholdIndex) {

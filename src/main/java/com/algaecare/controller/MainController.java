@@ -49,6 +49,8 @@ public class MainController implements GameStateEventManager, GameStateEventMana
         // Wire up event chain
         addGameStateChangeListener(screenController);
         addGameStateChangeListener(keyboardInputController);
+        addGameStateChangeListener(ledController);
+        addGameStateChangeListener(motorController);
 
         // Set initial state
         currentState = GameState.TITLE;
