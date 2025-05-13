@@ -16,16 +16,20 @@ import javafx.stage.Stage;
 
 public class ScreenController implements GameStateEventManager {
     private static final Logger LOGGER = Logger.getLogger(ScreenController.class.getName());
-    private final List<Layer> layers = new ArrayList<>();
-    private final AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
+    private final GameStateEventManager.EventEmitter stateEmitter;
+
+    private final Environment environment;
+
+    private final boolean DEBUG_MODE = false;
     private final Label gameStateDebugText = createGameStateDebugText();
     private final Label environmentLevelDebugText = createEnvironmentLevelDebugText();
-    private final GameStateEventManager.EventEmitter stateEmitter;
-    private final Environment environment;
-    private final StaticLayer environmentLayer = new StaticLayer(0, 0, "/30-ENVIRONMENT.png");
+
+    private final List<Layer> layers = new ArrayList<>();
     private final List<AlgaeLayer> allAlgaeLayers = new ArrayList<>();
     private final List<AlgaeLayer> hiddenAlgaeLayers = new ArrayList<>();
     private final List<AlgaeLayer> shownAlgaeLayers = new ArrayList<>();
+    private final AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
+    private final StaticLayer environmentLayer = new StaticLayer(0, 0, "/30-ENVIRONMENT.png");
 
     private Label createGameStateDebugText() {
         Label label = new Label();
@@ -167,6 +171,14 @@ public class ScreenController implements GameStateEventManager {
     }
 
     public void updateScreen(GameState oldState, GameState newState) {
+        if (DEBUG_MODE) {
+            gameStateDebugText.setVisible(true);
+            environmentLevelDebugText.setVisible(true);
+        } else {
+            gameStateDebugText.setVisible(false);
+            environmentLevelDebugText.setVisible(false);
+        }
+
         gameStateDebugText.setText(String.valueOf(newState));
 
         cleanupLayers();
@@ -191,7 +203,6 @@ public class ScreenController implements GameStateEventManager {
 
         environmentLevelDebugText.setText(environment.getAlgaeLevel() + "%");
 
-        // Show only the relevant layers based on the new state
         switch (newState) {
             case TITLE -> {
                 showTextLayer(GameState.TITLE);
@@ -224,16 +235,19 @@ public class ScreenController implements GameStateEventManager {
 
             case ENDSCREEN_NEGATIVE -> {
                 showTextLayer(GameState.ENDSCREEN_NEGATIVE);
+                showAxolotlLayer(AxolotlLayer.Expression.WORST);
                 onTimerComplete(newState);
             }
 
             case ENDSCREEN_POSITIVE -> {
                 showTextLayer(GameState.ENDSCREEN_POSITIVE);
+                showAxolotlLayer(AxolotlLayer.Expression.HAPPY);
                 onTimerComplete(GameState.GOODBYE);
             }
 
             case GOODBYE -> {
                 showTextLayer(GameState.GOODBYE);
+                showAxolotlLayer(AxolotlLayer.Expression.HAPPY);
                 onTimerComplete(GameState.TITLE);
             }
 
