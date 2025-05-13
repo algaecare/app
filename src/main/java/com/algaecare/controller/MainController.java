@@ -73,7 +73,7 @@ public class MainController
         String osArch = System.getProperty("os.arch").toLowerCase();
         String osName = System.getProperty("os.name").toLowerCase();
 
-        if (osArch.contains("arm") && !osName.contains("mac")) {
+        if (osArch.contains("aarch64") && !osName.contains("mac")) {
             pi4j = Pi4J.newAutoContext();
             Platforms platforms = pi4j.platforms();
             Platform platform = platforms.get("raspberrypi");
