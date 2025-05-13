@@ -3,6 +3,10 @@ package com.algaecare.controller;
 import com.algaecare.model.GameState;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.*;
+
+import javafx.animation.AnimationTimer;
+import javafx.application.Platform;
+
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVRecord;
 
@@ -15,6 +19,8 @@ import java.nio.charset.StandardCharsets;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,6 +35,8 @@ public class NFCInputController implements GameStateEventManager {
     private static final int LEVER_PIN = 16;
     private static final int DEBOUNCE_TIME = 100; // milliseconds
     boolean isLeverPressed = false;
+    private AnimationTimer leverTimer;
+    private final ExecutorService executor = Executors.newSingleThreadExecutor();
 
     public NFCInputController(GameStateEventManager.EventEmitter eventEmitter, Context pi4j) {
         this.eventEmitter = eventEmitter;
@@ -52,7 +60,11 @@ public class NFCInputController implements GameStateEventManager {
         readNfcChipList();
 
         // Start listening for lever input
-        startLeverListener();
+        if (!Platform.isFxApplicationThread()) {
+            Platform.runLater(this::startLeverListener);
+        } else {
+            startLeverListener();
+        }
     }
 
     private void initializeLeverButton() {
@@ -67,43 +79,49 @@ public class NFCInputController implements GameStateEventManager {
     }
 
     private void startLeverListener() {
-        Thread asyncThread = new Thread(() -> {
-            LOGGER.info("Starting lever input listener...");
-            while (true) {
+        leverTimer = new AnimationTimer() {
+            private long lastUpdate = 0;
+
+            @Override
+            public void handle(long now) {
+                if (now - lastUpdate < DEBOUNCE_TIME * 1_000_000)
+                    return;
+                lastUpdate = now;
+
                 if (leverButton.isHigh()) {
                     if (!isLeverPressed) {
-                        LOGGER.info("Lever pressed - checking for NFC tag");
                         isLeverPressed = true;
-                        processNfcTag();
+                        LOGGER.info("Lever pressed - scheduling NFC read");
+                        executor.submit(this::readAndEmitNfc);
                     }
                 }
+            }
+
+            private void readAndEmitNfc() {
                 try {
-                    Thread.sleep(DEBOUNCE_TIME);
-                } catch (InterruptedException e) {
-                    Thread.currentThread().interrupt();
-                    LOGGER.warning("Lever listener interrupted");
-                    break;
+                    int tagId = getIntFromChip();
+                    LOGGER.info("NFC tag read in bg thread: " + tagId);
+                    GameState state = nfcChipCodeHashmap.get(tagId);
+                    if (state != null) {
+                        Platform.runLater(() -> {
+                            LOGGER.info("Emitting game state on FX thread: " + state);
+                            eventEmitter.emitGameStateChange(state);
+                        });
+                    } else {
+                        LOGGER.warning("No mapping for tag: " + tagId);
+                    }
+                } catch (IOException e) {
+                    LOGGER.log(Level.WARNING, "NFC read failed", e);
                 }
             }
-        });
-        asyncThread.setDaemon(true);
-        asyncThread.start();
+        };
+        leverTimer.start();
+        LOGGER.info("Started JavaFX lever listener (non-blocking)");
     }
 
-    private void processNfcTag() {
-        try {
-            int tagId = getIntFromChip();
-            LOGGER.info("NFC tag detected with ID: " + tagId);
-
-            GameState matchingState = nfcChipCodeHashmap.get(tagId);
-            if (matchingState != null) {
-                LOGGER.info("Emitting game state: " + matchingState);
-                eventEmitter.emitGameStateChange(matchingState);
-            } else {
-                LOGGER.warning("No matching game state found for tag ID: " + tagId);
-            }
-        } catch (IOException e) {
-            LOGGER.log(Level.WARNING, "Failed to process NFC tag", e);
+    public void shutdown() {
+        if (leverTimer != null) {
+            leverTimer.stop();
         }
     }
 
