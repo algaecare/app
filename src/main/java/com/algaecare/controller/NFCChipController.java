@@ -2,6 +2,7 @@ package com.algaecare.controller;
 
 import javax.smartcardio.Card;
 import javax.smartcardio.CardChannel;
+import javax.smartcardio.CardException;
 import javax.smartcardio.CardTerminal;
 import javax.smartcardio.CardTerminals;
 import javax.smartcardio.CommandAPDU;
@@ -20,21 +21,36 @@ public class NFCChipController {
     private List<NFCChipListener> listeners = new ArrayList<>();
 
     public NFCChipController() {
+        try {
+            TerminalFactory.getDefault();
+            LOGGER.info("PCSC system initialized successfully");
+        } catch (Exception e) {
+            LOGGER.severe("Failed to initialize PCSC system. Is pcscd running? Error: " + e.getMessage());
+            // Continue anyway - we'll handle errors in the polling thread
+        }
+
         Thread asyncThread = new Thread(() -> {
-            LOGGER.log(Level.INFO, "Starting NFCChip Controller...");
+            LOGGER.info("Starting NFCChip Controller...");
+            int retryCount = 0;
             while (true) {
                 try {
                     int integer = getIntFromChip();
+                    retryCount = 0; // Reset counter on success
                     for (NFCChipListener listener : listeners) {
                         listener.onNewTagDetected(integer);
                     }
-                } catch (IOException ignored) {
-                    //does nothing
+                } catch (IOException e) {
+                    retryCount++;
+                    if (retryCount % 60 == 0) { // Log every ~30 seconds
+                        LOGGER.warning("NFC reader not available. Retry count: " + retryCount);
+                    }
                 } finally {
                     try {
                         Thread.sleep(500);
                     } catch (InterruptedException e) {
-                        LOGGER.log(Level.SEVERE, "NFC Chip controller async listening loop interrupted.", e);
+                        LOGGER.severe("NFC Chip controller interrupted");
+                        Thread.currentThread().interrupt();
+                        break;
                     }
                 }
             }
@@ -44,105 +60,98 @@ public class NFCChipController {
         asyncThread.start();
     }
 
-    //<editor-fold desc="IO to chip">
-    ///gets an array of 4 bytes from the NFC chips data block 4.
-    /// if return is "null" no NFC reading device or no NFC chip could be found.
-    public byte[] getDataOfChip() throws IOException {
-        byte[] responseBytes = null;
+    private boolean ensurePCSCAvailable() {
         try {
             TerminalFactory factory = TerminalFactory.getDefault();
             CardTerminals terminals = factory.terminals();
+            return !terminals.list().isEmpty();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 
-            for (CardTerminal terminal : terminals.list()) {
-                if (terminal.isCardPresent()) {
-                    Card card = terminal.connect("*");
-                    CardChannel channel = card.getBasicChannel();
+    public byte[] getDataOfChip() throws IOException, CardException {
+        if (!ensurePCSCAvailable()) {
+            LOGGER.warning("PCSC system not available");
+            throw new IOException("PCSC system not available");
+        }
 
-                    byte[] command = new byte[]{ (byte) 0xFF, (byte) 0xB0, (byte) 0x04, (byte) 0x04};
-                    LOGGER.log(Level.INFO, "Sending command to NFC tag: " + bytesToHex(command));
-                    ResponseAPDU response = channel.transmit(new CommandAPDU(command));
-                    String responseString;
-                    responseString = bytesToHex(response.getBytes());
-                    LOGGER.log(Level.INFO, "Receiving data from NFC tag: " + responseString);
+        TerminalFactory factory = TerminalFactory.getDefault();
+        CardTerminals terminals = factory.terminals();
+        List<CardTerminal> terminalList = terminals.list();
 
-                    byte[] failureCode = new byte[]{ (byte) 0x63, (byte) 0x00};
-                    if(Arrays.equals(Arrays.copyOfRange(response.getBytes(), 0, 2), failureCode)) {
-                        throw new IOException("NFC-chip could not be read.");
-                    } else {
-                        responseBytes = Arrays.copyOfRange(response.getBytes(), 0, 4);
+        if (terminalList.isEmpty()) {
+            LOGGER.warning("No NFC terminals found");
+            throw new IOException("No NFC terminals available");
+        }
+
+        for (CardTerminal terminal : terminalList) {
+            if (!terminal.isCardPresent()) {
+                continue;
+            }
+
+            Card card = null;
+            try {
+                card = terminal.connect("*");
+                CardChannel channel = card.getBasicChannel();
+
+                // Command to read 4 bytes from block 4
+                byte[] command = { (byte) 0xFF, (byte) 0xB0, (byte) 0x04, (byte) 0x04 };
+                LOGGER.log(Level.FINE, "Sending command to NFC tag: {0}", bytesToHex(command));
+
+                ResponseAPDU response = channel.transmit(new CommandAPDU(command));
+                byte[] responseData = response.getBytes();
+
+                LOGGER.log(Level.FINE, "Received response: {0}", bytesToHex(responseData));
+
+                // Check response status
+                if (response.getSW() != 0x9000) {
+                    LOGGER.warning("NFC read failed with status: " + Integer.toHexString(response.getSW()));
+                    continue;
+                }
+
+                // Validate response length
+                if (responseData.length < 4) {
+                    LOGGER.warning("Invalid response length: " + responseData.length);
+                    continue;
+                }
+
+                return Arrays.copyOfRange(responseData, 0, 4);
+            } catch (CardException e) {
+                LOGGER.log(Level.WARNING, "Failed to read card in terminal: " + terminal.getName(), e);
+                // Continue to next terminal if available
+            } finally {
+                if (card != null) {
+                    try {
+                        card.disconnect(false);
+                    } catch (CardException e) {
+                        LOGGER.log(Level.WARNING, "Failed to disconnect card in terminal: " + terminal.getName(), e);
                     }
                 }
             }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error reading NFC tag.", e);
-            throw new IOException("NFC-chip could not be read.");
         }
-        return responseBytes;
+        throw new IOException("Could not read NFC tag from any available terminal");
     }
 
-    ///sets 4 bytes of data on data block number 4 of the NFC chip.
-    ///byte[] data must be length of 4.
-    /// returns a boolean value based on success of operation.
-    public boolean setDataOfChip(byte[] data) throws IllegalArgumentException{
-        if(data.length != 4) {
-            throw new IllegalArgumentException("data block must consist of 4 bytes.");
-        }
-        try {
-            TerminalFactory factory = TerminalFactory.getDefault();
-            CardTerminals terminals = factory.terminals();
-
-            for (CardTerminal terminal : terminals.list()) {
-                if (terminal.isCardPresent()) {
-                    Card card = terminal.connect("*");
-                    CardChannel channel = card.getBasicChannel();
-
-                    byte[] command = new byte[]{ (byte) 0xFF, (byte) 0xD6, (byte) 0x00, (byte) 0x04, (byte) 0x04};
-
-                    byte[] command2 = concatenateByteArrays(command, data);
-                    ResponseAPDU response = channel.transmit(new CommandAPDU(command2));
-                    LOGGER.log(Level.INFO, "Sending command to NFC tag: " + bytesToHex(command));
-                    String responseString = bytesToHex(response.getBytes());
-                    LOGGER.log(Level.INFO, "Receiving data from NFC tag: " + responseString);
-
-                    byte[] successCode = new byte[]{ (byte) 0x90, (byte) 0x00};
-                    if(Arrays.equals(response.getBytes(), successCode)) {
-                        return true;
-                    }
-                }
-            }
-        } catch (Exception e) {
-            LOGGER.log(Level.SEVERE, "Error writing NFC tag.", e);
-        }
-
-        return false;
-    }
-
-    ///Get an integer from the 4 byte codeblock on the NFC tag
     public int getIntFromChip() throws IOException {
         try {
             byte[] dataRaw = getDataOfChip();
-            if(dataRaw != null && dataRaw.length == 4) {
-                return ((0xFF & dataRaw[0]) << 24) | ((0xFF & dataRaw[1]) << 16) |
-                    ((0xFF & dataRaw[2]) << 8) | (0xFF & dataRaw[3]);
+            if (dataRaw == null) {
+                throw new IOException("No data received from NFC chip");
             }
-        } catch (IOException e) {
-            throw new IOException();
+            if (dataRaw.length != 4) {
+                throw new IOException("Invalid data length: expected 4 bytes, got " + dataRaw.length);
+            }
+
+            return ByteBuffer.wrap(dataRaw).getInt();
+
+        } catch (CardException e) {
+            LOGGER.log(Level.WARNING, "Failed to read NFC chip", e);
+            throw new IOException("Failed to read NFC chip: " + e.getMessage());
+        } catch (Exception e) {
+            LOGGER.log(Level.SEVERE, "Unexpected error reading NFC chip", e);
+            throw new IOException("Unexpected error reading NFC chip: " + e.getMessage());
         }
-        throw new IOException();
-    }
-
-    ///Set an integer on the 4 byte codeblock on the NFC tag
-    public boolean setIntOnChip(int integer) {
-        byte[] dataRaw = ByteBuffer.allocate(4).putInt(integer).array();
-        return setDataOfChip(dataRaw);
-    }
-    //</editor-fold>
-
-    private byte[] concatenateByteArrays(byte[] array1, byte[] array2) {
-        byte[] result = new byte[array1.length + array2.length];
-        System.arraycopy(array1, 0, result, 0, array1.length);
-        System.arraycopy(array2, 0, result, array1.length, array2.length);
-        return result;
     }
 
     private String bytesToHex(byte[] bytes) {
