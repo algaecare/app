@@ -25,9 +25,11 @@ public class MainController
         Environment environment = new Environment(50);
 
         // Initialize controllers
+        TimeController timeController = new TimeController(this, environment);
         KeyboardInputController keyboardInputController = new KeyboardInputController(stage, this);
         ScreenController screenController = new ScreenController(stage, this, environment);
 
+        addGameStateChangeListener(timeController);
         addGameStateChangeListener(screenController);
         addGameStateChangeListener(keyboardInputController);
 
@@ -36,6 +38,7 @@ public class MainController
             LedController ledController = new LedController(environment, pi4j);
             StepMotorController motorController = new StepMotorController(environment, pi4j);
 
+            addGameStateChangeListener(nfcController);
             addGameStateChangeListener(ledController);
             addGameStateChangeListener(motorController);
         }
