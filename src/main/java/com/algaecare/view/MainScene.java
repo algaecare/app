@@ -16,6 +16,7 @@ public class MainScene {
         stage.setTitle("Algae Care");
         stage.initStyle(StageStyle.UNDECORATED);
         stage.setResizable(false);
+        stage.setFullScreen(true);
 
         // Set minimum, maximum and preferred size to force dimensions
         stage.setMinWidth(WINDOW_WIDTH);
