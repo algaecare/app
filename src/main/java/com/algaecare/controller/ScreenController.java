@@ -20,11 +20,11 @@ public class ScreenController implements GameStateEventManager {
     private final Label gameStateDebugText = createGameStateDebugText();
     private final Label environmentLevelDebugText = createEnvironmentLevelDebugText();
     private final GameStateEventManager.EventEmitter stateEmitter;
-    private Environment environment;
+    private final Environment environment;
     private final StaticLayer environmentLayer = new StaticLayer(0, 0, "/30-ENVIRONMENT.png");
-    private List<AlgaeLayer> allAlgaeLayers = new ArrayList<>();
-    private List<AlgaeLayer> hiddenAlgaeLayers = new ArrayList<>();
-    private List<AlgaeLayer> shownAlgaeLayers = new ArrayList<>();
+    private final List<AlgaeLayer> allAlgaeLayers = new ArrayList<>();
+    private final List<AlgaeLayer> hiddenAlgaeLayers = new ArrayList<>();
+    private final List<AlgaeLayer> shownAlgaeLayers = new ArrayList<>();
 
     private Label createGameStateDebugText() {
         Label label = new Label();

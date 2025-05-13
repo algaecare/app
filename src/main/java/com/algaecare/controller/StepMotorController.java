@@ -20,8 +20,8 @@ import static java.lang.Thread.sleep;
 
 public class StepMotorController implements GameStateEventManager {
 
-    private final static int[] DEFAULT_PINS = {5, 6, 13, 19}; //TODO change pins
-    private Environment environment = null;
+    private final static int[] DEFAULT_PINS = { 5, 6, 13, 19 }; // TODO change pins
+    private Environment environment;
     private StepMotor o2Display;
     private StepMotor co2Display;
     private StepMotor trapDoor;
@@ -31,65 +31,65 @@ public class StepMotorController implements GameStateEventManager {
     private Context pi4j = Pi4J.newAutoContext();
 
     private final int[][] stepSequence = {
-        {1, 0, 0, 1},
-        {1, 0, 0, 0},
-        {1, 1, 0, 0},
-        {0, 1, 0, 0},
-        {0, 1, 1, 0},
-        {0, 0, 1, 0},
-        {0, 0, 1, 1},
-        {0, 0, 0, 1}
+            { 1, 0, 0, 1 },
+            { 1, 0, 0, 0 },
+            { 1, 1, 0, 0 },
+            { 0, 1, 0, 0 },
+            { 0, 1, 1, 0 },
+            { 0, 0, 1, 0 },
+            { 0, 0, 1, 1 },
+            { 0, 0, 0, 1 }
     };
 
     public StepMotorController(Environment environment) {
+        this.environment = environment;
+
         Platforms platforms = pi4j.platforms();
         Platform defaultPlatform = platforms.defaultPlatform();
         if (defaultPlatform.id().equals("raspberrypi")) {
-            this.environment = environment;
-
             co2Display = new StepMotor(
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                    .id("IN1-1").address(5).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                    .provider("gpiod-digital-output")),
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                    .id("IN1-2").address(6).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                    .provider("gpiod-digital-output")),
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                    .id("IN1-3").address(13).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                    .provider("gpiod-digital-output")),
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                    .id("IN1-4").address(19).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                    .provider("gpiod-digital-output")));
+                    pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                            .id("IN1-1").address(5).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                            .provider("gpiod-digital-output")),
+                    pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                            .id("IN1-2").address(6).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                            .provider("gpiod-digital-output")),
+                    pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                            .id("IN1-3").address(13).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                            .provider("gpiod-digital-output")),
+                    pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                            .id("IN1-4").address(19).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                            .provider("gpiod-digital-output")));
 
             o2Display = new StepMotor(
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                    .id("IN2-1").address(2).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                    .provider("gpiod-digital-output")),
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                    .id("IN2-2").address(3).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                    .provider("gpiod-digital-output")),
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                    .id("IN2-3").address(4).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                    .provider("gpiod-digital-output")),
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                    .id("IN2-4").address(17).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                    .provider("gpiod-digital-output")));
+                    pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                            .id("IN2-1").address(2).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                            .provider("gpiod-digital-output")),
+                    pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                            .id("IN2-2").address(3).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                            .provider("gpiod-digital-output")),
+                    pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                            .id("IN2-3").address(4).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                            .provider("gpiod-digital-output")),
+                    pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                            .id("IN2-4").address(17).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                            .provider("gpiod-digital-output")));
 
             trapDoor = new StepMotor(
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                    .id("IN3-1").address(27).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                    .provider("gpiod-digital-output")),
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                    .id("IN3-2").address(22).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                    .provider("gpiod-digital-output")),
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                    .id("IN3-3").address(10).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                    .provider("gpiod-digital-output")),
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                    .id("IN3-4").address(9).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                    .provider("gpiod-digital-output")));
+                    pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                            .id("IN3-1").address(27).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                            .provider("gpiod-digital-output")),
+                    pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                            .id("IN3-2").address(22).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                            .provider("gpiod-digital-output")),
+                    pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                            .id("IN3-3").address(10).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                            .provider("gpiod-digital-output")),
+                    pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                            .id("IN3-4").address(9).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                            .provider("gpiod-digital-output")));
 
-            //RESET POSITION
+            // RESET POSITION
             rotateMotor(co2Display, 4100);
             rotateMotor(o2Display, 4100);
             rotateMotor(trapDoor, 4100);
@@ -134,11 +134,11 @@ public class StepMotorController implements GameStateEventManager {
         int co2StepsToDo = stepsGood - stepCounterCO2;
         int o2StepsToDo = stepsGood - stepCounterO2;
 
-        if(co2StepsToDo != 0) {
+        if (co2StepsToDo != 0) {
             rotateMotor(co2Display, co2StepsToDo);
             stepCounterCO2 += co2StepsToDo;
         }
-        if(o2StepsToDo != 0) {
+        if (o2StepsToDo != 0) {
             rotateMotor(o2Display, o2StepsToDo);
             stepCounterO2 += o2StepsToDo;
         }
