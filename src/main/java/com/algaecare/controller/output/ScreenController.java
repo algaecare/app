@@ -196,6 +196,9 @@ public class ScreenController implements GameStateEventManager {
 
             // LOGIC FOR ALGAE LAYER
             int algaeLevel = environment.getAlgaeLevel();
+            if (algaeLevel == 0) {
+                emitStateChange(GameState.ENDSCREEN_NEGATIVE);
+            }
             environmentLayer.setTargetOpacity(1 - algaeLevel / 100.0);
             showAlgaeLayersFromAlgaeLevel(algaeLevel);
             showAxolotlExpression(algaeLevel);
