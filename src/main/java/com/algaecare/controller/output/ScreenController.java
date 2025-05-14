@@ -130,7 +130,7 @@ public class ScreenController implements GameStateEventManager {
         layers.add(new TextLayer(GameState.TITLE, 1040, 220, 450, 125, "SUPERWATER_BIG"));
         layers.add(new TextLayer(GameState.SUBTITLE, 450, 100, 775, 350, "SUPERWATER_SMALL"));
         layers.add(new TextLayer(GameState.NOT_AXOLOTL, 1800, 480, 60, 55, "INTER"));
-        layers.add(new TextLayer(GameState.AXOLOTL_INTRODUCTION, 1800, 435, 60, 55, "INTER"));
+        layers.add(new TextLayer(GameState.AXOLOTL_INTRODUCTION, 1800, 450, 60, 55, "INTER"));
         layers.add(new TextLayer(GameState.OBJECT_GARBAGE_BAG, 1800, 300, 60, 55, "INTER"));
         layers.add(new TextLayer(GameState.OBJECT_RECYCLING_BIN, 1800, 300, 60, 55, "INTER"));
         layers.add(new TextLayer(GameState.OBJECT_CAR, 1800, 300, 60, 55, "INTER"));
