@@ -2,25 +2,25 @@ default:
   image: maven:3.9-eclipse-temurin-21 # Use a Maven image with a recent LTS JDK
 
 stages:
-  - build
-  - test
-  - package
+- build
+- test
+- package
 
 maven_build:
   stage: build
   script:
-    - mvn compile
+  - mvn compile
   artifacts:
     paths:
-      - target/classes/ # Optional: if you need compiled classes for other jobs
+    - target/classes/ # Optional: if you need compiled classes for other jobs
 
 maven_test:
   stage: test
   image: maven:3.9-eclipse-temurin-21
   before_script:
-    - apt-get update && apt-get install -y xvfb libx11-6 libxrender1 libxtst6 libxi6
+  - apt-get update && apt-get install -y xvfb libx11-6 libxrender1 libxtst6 libxi6
   script:
-    - xvfb-run mvn test
+  - xvfb-run mvn test -Djavafx.platform=offscreen
   artifacts:
     when: always
     reports:
@@ -29,8 +29,8 @@ maven_test:
 maven_package:
   stage: package
   script:
-    - mvn package # This typically creates the JAR
+  - mvn package # This typically creates the JAR
   artifacts:
     paths:
-      - target/*.jar # Save the JAR file(s)
+    - target/*.jar # Save the JAR file(s)
     expire_in: 1 week
