@@ -1,9 +1,5 @@
 default:
-  image: maven:3.9-eclipse-temurin-21
-  before_script:
-  - apt-get update && apt-get install -y xvfb libx11-6 libxrender1 libxtst6 libxi6 libgtk-3-0 libglib2.0-0 libgdk-pixbuf2.0-0 libatk1.0-0 libpango-1.0-0 libpangocairo-1.0-0
-  script:
-  - xvfb-run mvn $CI_JOB_STAGE
+  image: maven:3.9-eclipse-temurin-21 # Use a Maven image with a recent LTS JDK
 
 stages:
 - build
@@ -13,13 +9,16 @@ stages:
 maven_build:
   stage: build
   script:
-  - xvfb-run mvn compile
+  - mvn compile
   artifacts:
     paths:
-    - target/classes/
+    - target/classes/ # Optional: if you need compiled classes for other jobs
 
 maven_test:
   stage: test
+  image: maven:3.9-eclipse-temurin-21
+  before_script:
+  - apt-get update && apt-get install -y xvfb libx11-6 libxrender1 libxtst6 libxi6 libgtk-3-0 libglib2.0-0 libgdk-pixbuf2.0-0 libatk1.0-0 libpango-1.0-0 libpangocairo-1.0-0
   script:
   - xvfb-run mvn test
   artifacts:
@@ -29,9 +28,12 @@ maven_test:
 
 maven_package:
   stage: package
+  image: maven:3.9-eclipse-temurin-21
+  before_script:
+  - apt-get update && apt-get install -y xvfb libx11-6 libxrender1 libxtst6 libxi6 libgtk-3-0 libglib2.0-0 libgdk-pixbuf2.0-0 libatk1.0-0 libpango-1.0-0 libpangocairo-1.0-0
   script:
-  - xvfb-run mvn package
+  - xvfb-run mvn package # This typically creates the JAR
   artifacts:
     paths:
-    - target/*.jar
+    - target/*.jar # Save the JAR file(s)
     expire_in: 1 week
