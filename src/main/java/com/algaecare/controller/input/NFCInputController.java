@@ -23,6 +23,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadFactory;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -288,9 +289,13 @@ public class NFCInputController implements GameStateEventManager {
 
     @Override
     public void onGameStateChanged(GameState oldState, GameState newState) {
+        if((oldState == GameState.GAMEPLAY || oldState == GameState.TITLE || oldState == GameState.AXOLOTL_INTRODUCTION) && newState != oldState) {
+            new Thread(() ->{
+                stepMotorController.openTrapDoor();
+            }).start();
+        }
         this.currentState = newState;
         this.isLeverPressed = false; // Reset lever state after game state change
-        stepMotorController.openTrapDoor();
         LOGGER.fine("NFCInput Controller state changed from " + oldState + " to " + newState);
     }
 }
