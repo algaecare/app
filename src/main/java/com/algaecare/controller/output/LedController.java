@@ -6,13 +6,15 @@ import com.algaecare.model.GameState;
 import com.pi4j.context.Context;
 
 public class LedController implements GameStateEventManager {
-    private static final int[] PIN_LEDS = { 11, 14, 15, 18, 23, 24 };
+    private static final int[] PIN_LEDS = {14, 15, 18, 23, 24, 25};
+    private static final int PIN_LEDS_LEVER = 11;
     private Environment environment;
     private Context pi4j;
 
     public LedController(Environment environment, Context pi4j) {
         this.environment = environment;
         this.pi4j = pi4j;
+        updateLed(PIN_LEDS_LEVER, true);
     }
 
     public void updateLed(int ledPin, boolean on) {
