@@ -1,5 +1,6 @@
 variables:
-  MAVEN_OPTS: "-Xmx2g"
+  MAVEN_OPTS: "-Xmx4g"
+  JAVA_TOOL_OPTIONS: "-Xmx4g"
 
 default:
   image: maven:3.9-eclipse-temurin-21
@@ -22,7 +23,7 @@ maven_build:
 maven_test:
   stage: test
   script:
-  - xvfb-run mvn test
+  - xvfb-run mvn test -DargLine="-Xmx4g"
   artifacts:
     when: always
     reports:
@@ -31,7 +32,7 @@ maven_test:
 maven_package:
   stage: package
   script:
-  - xvfb-run mvn package
+  - xvfb-run mvn package -DargLine="-Xmx4g"
   artifacts:
     paths:
     - target/*.jar
