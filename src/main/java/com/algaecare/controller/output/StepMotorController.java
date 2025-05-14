@@ -11,41 +11,45 @@ import static java.lang.Thread.sleep;
 
 public class StepMotorController implements GameStateEventManager {
 
-    private final Environment environment;
-    private final StepMotor o2Display;
-    private final StepMotor co2Display;
-    private final StepMotor trapDoor;
-    private int stepCounterO2 = 0;
-    private int stepCounterCO2 = 0;
-    private int stepCounterTrapDoor = 0;
+        private final Environment environment;
+        private final StepMotor o2Display;
+        private final StepMotor co2Display;
+        private final StepMotor trapDoor;
+        public int stepCounterO2 = 0;
+        public int stepCounterCO2 = 0;
+        private int stepCounterTrapDoor = 0;
 
-    private final int[][] stepSequence = {
-            { 1, 0, 0, 1 },
-            { 1, 0, 0, 0 },
-            { 1, 1, 0, 0 },
-            { 0, 1, 0, 0 },
-            { 0, 1, 1, 0 },
-            { 0, 0, 1, 0 },
-            { 0, 0, 1, 1 },
-            { 0, 0, 0, 1 }
-    };
+        private final int[][] stepSequence = {
+                        { 1, 0, 0, 1 },
+                        { 1, 0, 0, 0 },
+                        { 1, 1, 0, 0 },
+                        { 0, 1, 0, 0 },
+                        { 0, 1, 1, 0 },
+                        { 0, 0, 1, 0 },
+                        { 0, 0, 1, 1 },
+                        { 0, 0, 0, 1 }
+        };
 
-    public StepMotorController(Environment environment, Context pi4j) {
-        this.environment = environment;
+        public StepMotorController(Environment environment, Context pi4j) {
+                this.environment = environment;
 
-        co2Display = new StepMotor(
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                        .id("IN1-1").address(5).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                        .provider("gpiod-digital-output")),
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                        .id("IN1-2").address(6).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                        .provider("gpiod-digital-output")),
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                        .id("IN1-3").address(13).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                        .provider("gpiod-digital-output")),
-                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                        .id("IN1-4").address(19).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                        .provider("gpiod-digital-output")));
+                co2Display = new StepMotor(
+                                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                                                .id("IN1-1").address(5).shutdown(DigitalState.LOW)
+                                                .initial(DigitalState.LOW)
+                                                .provider("gpiod-digital-output")),
+                                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                                                .id("IN1-2").address(6).shutdown(DigitalState.LOW)
+                                                .initial(DigitalState.LOW)
+                                                .provider("gpiod-digital-output")),
+                                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                                                .id("IN1-3").address(13).shutdown(DigitalState.LOW)
+                                                .initial(DigitalState.LOW)
+                                                .provider("gpiod-digital-output")),
+                                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                                                .id("IN1-4").address(19).shutdown(DigitalState.LOW)
+                                                .initial(DigitalState.LOW)
+                                                .provider("gpiod-digital-output")));
 
         o2Display = new StepMotor(
                 pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)

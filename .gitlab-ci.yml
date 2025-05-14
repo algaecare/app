@@ -1,23 +1,28 @@
+variables:
+  MAVEN_OPTS: "-Xmx2g"
+
 default:
-  image: maven:3.9-eclipse-temurin-21 # Use a Maven image with a recent LTS JDK
+  image: maven:3.9-eclipse-temurin-21
+  before_script:
+  - apt-get update && apt-get install -y xvfb libx11-6 libxrender1 libxtst6 libxi6 libgtk-3-0 libglib2.0-0 libgdk-pixbuf2.0-0 libatk1.0-0 libpango-1.0-0 libpangocairo-1.0-0
 
 stages:
-  - build
-  - test
-  - package
+- build
+- test
+- package
 
 maven_build:
   stage: build
   script:
-    - mvn compile
+  - mvn compile
   artifacts:
     paths:
-      - target/classes/ # Optional: if you need compiled classes for other jobs
+    - target/classes/
 
 maven_test:
   stage: test
   script:
-    - mvn test
+  - xvfb-run mvn test
   artifacts:
     when: always
     reports:
@@ -26,8 +31,8 @@ maven_test:
 maven_package:
   stage: package
   script:
-    - mvn package # This typically creates the JAR
+  - xvfb-run mvn package
   artifacts:
     paths:
-      - target/*.jar # Save the JAR file(s)
+    - target/*.jar
     expire_in: 1 week
