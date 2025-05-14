@@ -165,6 +165,12 @@
             <version>4.0.18</version>
             <scope>test</scope>
         </dependency>
+        <dependency>
+            <groupId>org.openjfx</groupId>
+            <artifactId>javafx-swing</artifactId>
+            <version>${javafx.version}</version>
+            <scope>test</scope>
+        </dependency>
 
         <!-- Common-CSV -->
         <dependency>
