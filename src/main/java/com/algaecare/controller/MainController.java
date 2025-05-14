@@ -20,7 +20,7 @@ import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
 
 public class MainController
-        implements GameStateEventManager, GameStateEventManager.EventEmitter {
+    implements GameStateEventManager, GameStateEventManager.EventEmitter {
     private static final Logger LOGGER = Logger.getLogger(MainController.class.getName());
     private final List<GameStateEventManager> listeners = new ArrayList<>();
     private GameState currentState;
