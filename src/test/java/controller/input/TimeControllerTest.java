@@ -56,11 +56,19 @@ class TimeControllerTest {
         controller.onGameStateChanged(GameState.GAMEPLAY, GameState.GAMEPLAY);
         controller.onGameStateChanged(GameState.GAMEPLAY, GameState.GAMEPLAY);
 
-        // Call private method via reflection for test
         var method = TimeController.class.getDeclaredMethod("handleTimerComplete");
         method.setAccessible(true);
+
+        // Use a latch to wait for Platform.runLater
+        java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
+        doAnswer(invocation -> {
+            latch.countDown();
+            return null;
+        }).when(emitter).emitGameStateChange(GameState.ENDSCREEN_POSITIVE);
+
         method.invoke(controller);
 
+        assertTrue(latch.await(2, java.util.concurrent.TimeUnit.SECONDS), "FX event not emitted in time");
         verify(emitter, atLeastOnce()).emitGameStateChange(GameState.ENDSCREEN_POSITIVE);
     }
 
