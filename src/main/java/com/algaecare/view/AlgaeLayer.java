@@ -129,7 +129,6 @@ public class AlgaeLayer extends Layer {
             imageView.setScaleY(1);
             imageView.setRotate(0);
             setStateInternal(AnimationState.IDLE);
-            return;
         }
         if (currentState == AnimationState.HIDDEN || currentState == AnimationState.OUTRO) {
             setStateInternal(AnimationState.INTRO);
