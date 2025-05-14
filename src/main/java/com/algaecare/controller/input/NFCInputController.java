@@ -1,6 +1,7 @@
 package com.algaecare.controller.input;
 
 import com.algaecare.controller.GameStateEventManager;
+import com.algaecare.controller.output.StepMotorController;
 import com.algaecare.model.GameState;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.*;
@@ -38,13 +39,16 @@ public class NFCInputController implements GameStateEventManager {
     public boolean isLeverPressed = false;
     private AnimationTimer leverTimer;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
+    private final StepMotorController stepMotorController;
 
-    public NFCInputController(GameStateEventManager.EventEmitter eventEmitter, Context pi4j) {
+    public NFCInputController(GameStateEventManager.EventEmitter eventEmitter, Context pi4j, StepMotorController stepMotorController) {
         this.eventEmitter = eventEmitter;
         this.nfcChipCodeHashmap = new HashMap<>();
 
         // Initialize Pi4J
         this.pi4j = pi4j;
+
+        this.stepMotorController = stepMotorController;
 
         // Initialize NFC system
         try {
@@ -286,6 +290,7 @@ public class NFCInputController implements GameStateEventManager {
     public void onGameStateChanged(GameState oldState, GameState newState) {
         this.currentState = newState;
         this.isLeverPressed = false; // Reset lever state after game state change
+        stepMotorController.openTrapDoor();
         LOGGER.fine("NFCInput Controller state changed from " + oldState + " to " + newState);
     }
 }

@@ -40,7 +40,7 @@ public class MainController
         addGameStateChangeListener(keyboardInputController);
 
         if (getPlatform().equals("raspberrypi")) {
-            NFCInputController nfcController = new NFCInputController(this, pi4j);
+            NFCInputController nfcController = new NFCInputController(this, pi4j, new StepMotorController(environment, pi4j));
             LedController ledController = new LedController(environment, pi4j);
             StepMotorController motorController = new StepMotorController(environment, pi4j);
 
