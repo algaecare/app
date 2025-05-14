@@ -5,7 +5,6 @@ import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
-import javafx.application.Platform;
 import javafx.util.Duration;
 import java.util.logging.Logger;
 
