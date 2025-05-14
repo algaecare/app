@@ -1,11 +1,11 @@
-package com.algaecare.controller;
+package com.algaecare.controller.output;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
+import com.algaecare.controller.GameStateEventManager;
 import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
 import com.algaecare.view.*;
@@ -16,17 +16,22 @@ import javafx.stage.Stage;
 
 public class ScreenController implements GameStateEventManager {
     private static final Logger LOGGER = Logger.getLogger(ScreenController.class.getName());
-    private final List<Layer> layers = new ArrayList<>();
-    private final AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
-    private final Label debugText = createDebugText();
     private final GameStateEventManager.EventEmitter stateEmitter;
-    private Environment environment;
-    private final StaticLayer environmentLayer = new StaticLayer(0, 0, "/30-ENVIRONMENT.png");
-    private List<AlgaeLayer> allAlgaeLayers = new ArrayList<>();
-    private List<AlgaeLayer> hiddenAlgaeLayers = new ArrayList<>();
-    private List<AlgaeLayer> shownAlgaeLayers = new ArrayList<>();
 
-    private Label createDebugText() {
+    private final Environment environment;
+
+    private final boolean DEBUG_MODE = false;
+    private final Label gameStateDebugText = createGameStateDebugText();
+    private final Label environmentLevelDebugText = createEnvironmentLevelDebugText();
+
+    private final List<Layer> layers = new ArrayList<>();
+    private final List<AlgaeLayer> allAlgaeLayers = new ArrayList<>();
+    private final List<AlgaeLayer> hiddenAlgaeLayers = new ArrayList<>();
+    private final List<AlgaeLayer> shownAlgaeLayers = new ArrayList<>();
+    private final AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
+    private final StaticLayer environmentLayer = new StaticLayer(0, 0, "/30-ENVIRONMENT.png");
+
+    private Label createGameStateDebugText() {
         Label label = new Label();
         label.setStyle(
                 "-fx-font-size: 20px; -fx-text-fill: white; -fx-background-color: black; -fx-padding: 10px; -fx-opacity: 1;");
@@ -37,13 +42,25 @@ public class ScreenController implements GameStateEventManager {
         return label;
     }
 
+    private Label createEnvironmentLevelDebugText() {
+        Label label = new Label();
+        label.setStyle(
+                "-fx-font-size: 20px; -fx-text-fill: white; -fx-background-color: black; -fx-padding: 10px; -fx-opacity: 1;");
+        // Position the label at the bottom left corner
+        label.setTranslateX(-10); // 10px from the right
+        label.setTranslateY(-10); // 10px from the bottom (will be set using StackPane alignment)
+        StackPane.setAlignment(label, javafx.geometry.Pos.BOTTOM_RIGHT);
+        return label;
+    }
+
     public ScreenController(Stage stage, GameStateEventManager.EventEmitter stateEmitter, Environment environment) {
         this.stateEmitter = stateEmitter;
         this.environment = environment;
         MainScene scene = new MainScene(stage);
         initializeLayers();
         ((StackPane) scene.getScene().getRoot()).getChildren().addAll(layers);
-        ((StackPane) scene.getScene().getRoot()).getChildren().add(debugText);
+        ((StackPane) scene.getScene().getRoot()).getChildren().add(gameStateDebugText);
+        ((StackPane) scene.getScene().getRoot()).getChildren().add(environmentLevelDebugText);
         updateScreen(GameState.TITLE, GameState.TITLE);
     }
 
@@ -154,16 +171,17 @@ public class ScreenController implements GameStateEventManager {
     }
 
     public void updateScreen(GameState oldState, GameState newState) {
-        debugText.setText("Current Game State: " + newState);
-
-        // Hide all layers first, except for static layers and algae layers
-        for (Layer layer : layers) {
-            boolean isStaticLayer = layer instanceof StaticLayer;
-            boolean isAlgaeLayer = layer instanceof AlgaeLayer;
-            if (!isStaticLayer && !isAlgaeLayer) {
-                layer.hideLayer();
-            }
+        if (DEBUG_MODE) {
+            gameStateDebugText.setVisible(true);
+            environmentLevelDebugText.setVisible(true);
+        } else {
+            gameStateDebugText.setVisible(false);
+            environmentLevelDebugText.setVisible(false);
         }
+
+        gameStateDebugText.setText(String.valueOf(newState));
+
+        cleanupLayers();
 
         if (!newState.name().startsWith("OBJECT_") && newState != GameState.GAMEPLAY) {
             environmentLayer.hideLayer();
@@ -183,84 +201,54 @@ public class ScreenController implements GameStateEventManager {
             showAxolotlExpression(algaeLevel);
         }
 
-        // Show only the relevant layers based on the new state
+        environmentLevelDebugText.setText(environment.getAlgaeLevel() + "%");
+
         switch (newState) {
             case TITLE -> {
-                for (Layer layer : layers) {
-                    boolean isTitle = layer instanceof TextLayer textLayer && textLayer.getID() == GameState.TITLE;
-                    boolean isSubtitle = layer instanceof TextLayer textLayer
-                            && textLayer.getID() == GameState.SUBTITLE;
-                    if (isTitle || isSubtitle) {
-                        layer.showLayer();
-                    }
-                }
+                showTextLayer(GameState.TITLE);
+                showTextLayer(GameState.SUBTITLE);
+                showAlgaeLayersFromAlgaeLevel(100);
             }
 
             case NOT_AXOLOTL -> {
-                for (Layer layer : layers) {
-                    boolean isAxolotlError = layer instanceof TextLayer textLayer
-                            && textLayer.getID() == GameState.NOT_AXOLOTL;
-                    if (isAxolotlError) {
-                        layer.showLayer();
-                    }
-                }
+                showTextLayer(GameState.NOT_AXOLOTL);
             }
 
             case AXOLOTL_INTRODUCTION -> {
-                for (Layer layer : layers) {
-                    boolean isAxolotlIntroduction = layer instanceof TextLayer textLayer
-                            && textLayer.getID() == GameState.AXOLOTL_INTRODUCTION;
-                    if (isAxolotlIntroduction) {
-                        layer.showLayer();
-                    }
-                    if (layer instanceof AxolotlLayer axolotllayer) {
-                        axolotllayer.showLayer();
-                        axolotllayer.setExpression(AxolotlLayer.Expression.HAPPY);
-                    }
-                }
+                showTextLayer(GameState.AXOLOTL_INTRODUCTION);
+                showAxolotlLayer(AxolotlLayer.Expression.HAPPY);
             }
 
             case GAMEPLAY -> {
-                for (Layer layer : layers) {
-                    if (layer instanceof AxolotlLayer axolotllayer) {
-                        axolotllayer.showLayer();
-                    }
-                    if (layer instanceof TextLayer textLayer) {
-                        if (textLayer.getID() == oldState) {
-                            layer.showLayer();
-                        }
-                    }
-                }
+                showTextLayer(oldState);
+                showAxolotlLayer();
             }
 
             case OBJECT_GARBAGE_BAG, OBJECT_SHOPPING_BASKET_INTERNATIONAL, OBJECT_RECYCLING_BIN,
                     OBJECT_SHOPPING_BASKET_LOCAL -> {
-                for (Layer layer : layers) {
-                    if (layer instanceof ItemLayer itemLayer && itemLayer.getGameState() == newState) {
-                        itemLayer.showLayer();
-                        itemLayer.setOnAnimationComplete(() -> {
-                            emitStateChange(GameState.GAMEPLAY);
-                            itemLayer.hideLayer();
-                        });
-                    }
-
-                    int algaeLevel = environment.getAlgaeLevel();
-                    environmentLayer.setTargetOpacity(1 - algaeLevel / 100.0);
-                }
+                showItemLayer(newState);
             }
 
-            case OBJECT_CAR, OBJECT_AIRPLANE, OBJECT_TRAIN, OBJECT_BICYCLE -> {
-                for (Layer layer : layers) {
-                    if (layer instanceof ActionLayer actionLayer) {
-                        if (actionLayer.getGameState() == newState) {
-                            actionLayer.showLayer();
-                            actionLayer.setOnSequenceComplete(() -> {
-                                emitStateChange(GameState.GAMEPLAY);
-                                actionLayer.hideLayer();
-                            });
-                        }
-                    }
-                }
+            case OBJECT_CAR, OBJECT_AIRPLANE, OBJECT_TRAIN, OBJECT_BICYCLE, OBJECT_TRASH_GRABBER -> {
+                showActionLayer(newState);
+            }
+
+            case ENDSCREEN_NEGATIVE -> {
+                showTextLayer(GameState.ENDSCREEN_NEGATIVE);
+                showAxolotlLayer(AxolotlLayer.Expression.WORST);
+                onTimerComplete(newState);
+            }
+
+            case ENDSCREEN_POSITIVE -> {
+                showTextLayer(GameState.ENDSCREEN_POSITIVE);
+                showAxolotlLayer(AxolotlLayer.Expression.HAPPY);
+                onTimerComplete(GameState.GOODBYE);
+            }
+
+            case GOODBYE -> {
+                showTextLayer(GameState.GOODBYE);
+                showAxolotlLayer(AxolotlLayer.Expression.HAPPY);
+                onTimerComplete(GameState.TITLE);
             }
 
             default -> LOGGER.log(Level.INFO, () -> String.format("Updating screen to state %s", newState));
@@ -304,15 +292,82 @@ public class ScreenController implements GameStateEventManager {
         }
     }
 
+    private void onTimerComplete(GameState nextState) {
+        LOGGER.info("Game timer completed, transitioning to " + nextState);
+        javafx.animation.Timeline timeline = new javafx.animation.Timeline(
+                new javafx.animation.KeyFrame(javafx.util.Duration.seconds(5), event -> emitStateChange(nextState)));
+        timeline.setCycleCount(1);
+        timeline.play();
+    }
+
+    private void showTextLayer(GameState state) {
+        for (Layer layer : layers) {
+            if (layer instanceof TextLayer textLayer && textLayer.getID() == state) {
+                layer.showLayer();
+            }
+        }
+    }
+
+    private void showActionLayer(GameState state) {
+        for (Layer layer : layers) {
+            if (layer instanceof ActionLayer actionLayer) {
+                if (actionLayer.getGameState() == state) {
+                    actionLayer.showLayer();
+                    actionLayer.setOnSequenceComplete(() -> {
+                        emitStateChange(GameState.GAMEPLAY);
+                        actionLayer.hideLayer();
+                    });
+                }
+            }
+        }
+    }
+
+    private void showItemLayer(GameState state) {
+        for (Layer layer : layers) {
+            if (layer instanceof ItemLayer itemLayer && itemLayer.getGameState() == state) {
+                itemLayer.showLayer();
+                itemLayer.setOnAnimationComplete(() -> {
+                    emitStateChange(GameState.GAMEPLAY);
+                    itemLayer.hideLayer();
+                });
+            }
+        }
+    }
+
+    private void showAxolotlLayer() {
+        showAxolotlLayer(null);
+    }
+
+    private void showAxolotlLayer(AxolotlLayer.Expression expression) {
+        for (Layer layer : layers) {
+            if (layer instanceof AxolotlLayer axolotllayer) {
+                axolotllayer.showLayer();
+                if (expression != null) {
+                    axolotllayer.setExpression(expression);
+                }
+            }
+        }
+    }
+
     private void showAxolotlExpression(int algaeLevel) {
-        if (algaeLevel < 75) {
-            axolotlLayer.setExpression(AxolotlLayer.Expression.HAPPY);
-        } else if (algaeLevel < 50) {
-            axolotlLayer.setExpression(AxolotlLayer.Expression.BAD);
-        } else if (algaeLevel < 25) {
-            axolotlLayer.setExpression(AxolotlLayer.Expression.WORSE);
-        } else {
+        if (algaeLevel < 25) {
             axolotlLayer.setExpression(AxolotlLayer.Expression.WORST);
+        } else if (algaeLevel < 50) {
+            axolotlLayer.setExpression(AxolotlLayer.Expression.WORSE);
+        } else if (algaeLevel < 75) {
+            axolotlLayer.setExpression(AxolotlLayer.Expression.BAD);
+        } else {
+            axolotlLayer.setExpression(AxolotlLayer.Expression.HAPPY);
+        }
+    }
+
+    private void cleanupLayers() {
+        for (Layer layer : layers) {
+            boolean isStaticLayer = layer instanceof StaticLayer;
+            boolean isAlgaeLayer = layer instanceof AlgaeLayer;
+            if (!isStaticLayer && !isAlgaeLayer) {
+                layer.hideLayer();
+            }
         }
     }
 }

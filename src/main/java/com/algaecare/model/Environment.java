@@ -7,9 +7,7 @@ import java.util.logging.Logger;
 public class Environment {
     private static final Logger LOGGER = Logger.getLogger(Environment.class.getName());
     private int algaeLevel; // in percentage (0-100)
-    private int timer;
-    private boolean timerStarted = false;
-    private final int TIMER_DURATION = 130;
+
     private List<EnvironmentObject> environmentObjects = new ArrayList<>();
 
     public Environment(int algaeLevel) {
@@ -31,11 +29,6 @@ public class Environment {
     }
 
     public void updateEnvironment(GameState environmentObjectID) {
-        if (!timerStarted) {
-            timerStarted = true;
-            startTimer();
-        }
-
         EnvironmentObject environmentObject = environmentObjects.stream()
                 .filter(obj -> obj.getObjectID() == environmentObjectID)
                 .findFirst()
@@ -51,50 +44,14 @@ public class Environment {
                 newAlgaeLevel = 100;
             }
             this.algaeLevel = newAlgaeLevel;
-            LOGGER.info("Algenlevel: " + algaeLevel + "%");
         }
     }
 
     public void reset() {
-        this.algaeLevel = 0;
-        this.timer = 0;
-        this.timerStarted = false;
+        this.algaeLevel = 50;
     }
 
     public int getAlgaeLevel() {
         return algaeLevel;
-    }
-
-    public List<EnvironmentObject> getEnvironmentObjects() {
-        return environmentObjects;
-    }
-
-    public boolean isBelowZero() {
-        return algaeLevel <= 0;
-    }
-
-    public boolean finishGame() {
-        return (isBelowZero() && timer <= 130 || timer <= 130);
-    }
-
-    public void startTimer() {
-        timer = 0;
-        Thread timerThread = new Thread(() -> {
-            while (timer < TIMER_DURATION) {
-                LOGGER.info("Timer: " + timer + " Sekunden");
-                try {
-                    Thread.sleep(1000); // 1 Sekunde warten
-                } catch (InterruptedException e) {
-                    LOGGER.warning("Timer wurde unterbrochen.");
-                    Thread.currentThread().interrupt();
-                    return;
-                }
-                timer++;
-            }
-            LOGGER.info("Timer abgelaufen.");
-            timerStarted = false;
-        });
-        timerThread.setDaemon(true);
-        timerThread.start();
     }
 }
