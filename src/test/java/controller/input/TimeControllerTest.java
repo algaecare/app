@@ -4,6 +4,8 @@ import com.algaecare.controller.GameStateEventManager;
 import com.algaecare.controller.input.TimeController;
 import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
+import javafx.application.Platform;
+
 import javafx.embed.swing.JFXPanel;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
@@ -74,25 +76,36 @@ class TimeControllerTest {
 
     @Test
     void handleTimerCompleteEmitsNegativeEndscreenIfAlgaeLevelLow() throws Exception {
+        // Initialize test setup
         when(environment.getAlgaeLevel()).thenReturn(10);
         TimeController controller = new TimeController(emitter, environment);
-
         controller.onGameStateChanged(GameState.TITLE, GameState.GAMEPLAY);
 
+        // Create latch before accessing the method
+        java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
+
+        // Set up mock behavior
+        doAnswer(invocation -> {
+            Platform.runLater(latch::countDown);
+            return null;
+        }).when(emitter).emitGameStateChange(GameState.ENDSCREEN_NEGATIVE);
+
+        // Get and invoke private method
         var method = TimeController.class.getDeclaredMethod("handleTimerComplete");
         method.setAccessible(true);
 
-        // Use a latch to wait for Platform.runLater
-        java.util.concurrent.CountDownLatch latch = new java.util.concurrent.CountDownLatch(1);
-        doAnswer(invocation -> {
-            latch.countDown();
-            return null;
-        })
-                .when(emitter).emitGameStateChange(GameState.ENDSCREEN_NEGATIVE);
+        // Run on FX thread to ensure proper execution
+        Platform.runLater(() -> {
+            try {
+                method.invoke(controller);
+            } catch (Exception e) {
+                throw new RuntimeException(e);
+            }
+        });
 
-        method.invoke(controller);
-
-        assertTrue(latch.await(2, java.util.concurrent.TimeUnit.SECONDS), "FX event not emitted in time");
-        verify(emitter, atLeastOnce()).emitGameStateChange(GameState.ENDSCREEN_NEGATIVE);
+        // Wait for completion
+        assertTrue(latch.await(5, java.util.concurrent.TimeUnit.SECONDS),
+                "FX event not emitted in time");
+        verify(emitter, times(1)).emitGameStateChange(GameState.ENDSCREEN_NEGATIVE);
     }
 }
