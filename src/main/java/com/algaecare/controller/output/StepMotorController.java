@@ -58,7 +58,7 @@ public class StepMotorController implements GameStateEventManager {
                         .id("IN2-3").address(4).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
                         .provider("gpiod-digital-output")),
                 pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                        .id("IN2-4").address(17).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                        .id("IN2-4").address(7).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
                         .provider("gpiod-digital-output")));
 
         trapDoor = new StepMotor(
@@ -72,7 +72,7 @@ public class StepMotorController implements GameStateEventManager {
                         .id("IN3-3").address(10).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
                         .provider("gpiod-digital-output")),
                 pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                        .id("IN3-4").address(9).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                        .id("IN3-4").address(12).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
                         .provider("gpiod-digital-output")));
 
         // RESET POSITION
