@@ -45,9 +45,6 @@ public class ActionLayer extends Layer {
 
         // Load frame URLs
         frameUrls = loadFrameUrls(sequenceFolderPath);
-        if (frameUrls.isEmpty()) {
-            throw new IllegalArgumentException("No frames found in sequence folder: " + sequenceFolderPath);
-        }
 
         // Preload initial frames
         preloadFrames(0);
@@ -104,7 +101,7 @@ public class ActionLayer extends Layer {
                     .collect(Collectors.toList());
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to load frame URLs from: " + folderPath, e);
-            throw new RuntimeException("Failed to load frame URLs", e);
+            throw new IllegalArgumentException("No frames found in sequence folder: " + folderPath, e);
         }
     }
 
