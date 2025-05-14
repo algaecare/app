@@ -12,6 +12,7 @@ import java.util.logging.Logger;
 public class TimeController implements GameStateEventManager {
     private static final Logger LOGGER = Logger.getLogger(TimeController.class.getName());
     private static final int GAME_DURATION_SECONDS = 120; // 2 minutes
+    private static final int ALGAE_THRESHOLD = 50; // Extract constant
 
     private final Environment environment;
     private final Timeline timer;
@@ -28,28 +29,26 @@ public class TimeController implements GameStateEventManager {
         // Create a repeating timeline that fires every second
         timer = new Timeline(
                 new KeyFrame(Duration.seconds(1), event -> {
-                    secondsRemaining--;
-                    LOGGER.info("Time remaining: " + secondsRemaining + " seconds");
-
-                    if (secondsRemaining <= 0) {
-                        handleTimerComplete();
+                    if (secondsRemaining > 0) {
+                        secondsRemaining--;
+                        LOGGER.info("Time remaining: " + secondsRemaining + " seconds");
+                        if (secondsRemaining == 0) {
+                            handleTimerComplete();
+                        }
                     }
                 }));
         timer.setCycleCount(Timeline.INDEFINITE);
     }
 
     private void handleTimerComplete() {
-        LOGGER.info("Game timer completed");
-        timer.stop();
-        isRunning = false;
+        // Already on FX thread from Timeline, no need for Platform.runLater
+        GameState endState = environment.getAlgaeLevel() > ALGAE_THRESHOLD
+                ? GameState.ENDSCREEN_POSITIVE
+                : GameState.ENDSCREEN_NEGATIVE;
 
-        Platform.runLater(() -> {
-            if (environment.getAlgaeLevel() > 50) {
-                eventEmitter.emitGameStateChange(GameState.ENDSCREEN_POSITIVE);
-            } else {
-                eventEmitter.emitGameStateChange(GameState.ENDSCREEN_NEGATIVE);
-            }
-        });
+        LOGGER.info("Game ended with algae level: " + environment.getAlgaeLevel());
+        eventEmitter.emitGameStateChange(endState);
+        resetTimer();
     }
 
     @Override
