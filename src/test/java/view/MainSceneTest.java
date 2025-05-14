@@ -16,13 +16,6 @@ class MainSceneTest extends ApplicationTest {
 
     private static Stage testStage;
 
-    @BeforeAll
-    static void setupJavaFX() throws Exception {
-        // Initialize JavaFX toolkit
-        Platform.startup(() -> {
-        });
-    }
-
     @Override
     public void start(Stage stage) {
         testStage = stage;
