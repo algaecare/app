@@ -6,6 +6,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import com.algaecare.controller.GameStateEventManager;
+import com.algaecare.controller.input.TimeController;
 import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
 import com.algaecare.view.*;
@@ -17,12 +18,14 @@ import javafx.stage.Stage;
 public class ScreenController implements GameStateEventManager {
     private static final Logger LOGGER = Logger.getLogger(ScreenController.class.getName());
     private final GameStateEventManager.EventEmitter stateEmitter;
+    private final TimeController timeController;
 
     private final Environment environment;
 
-    private final boolean DEBUG_MODE = false;
+    private final boolean DEBUG_MODE = true;
     private final Label gameStateDebugText = createGameStateDebugText();
     private final Label environmentLevelDebugText = createEnvironmentLevelDebugText();
+    private final Label timerDebugText = createTimerDebugText();
 
     private final List<Layer> layers = new ArrayList<>();
     private final List<AlgaeLayer> allAlgaeLayers = new ArrayList<>();
@@ -53,14 +56,28 @@ public class ScreenController implements GameStateEventManager {
         return label;
     }
 
-    public ScreenController(Stage stage, GameStateEventManager.EventEmitter stateEmitter, Environment environment) {
+    private Label createTimerDebugText() {
+        Label label = new Label();
+        label.setStyle(
+                "-fx-font-size: 20px; -fx-text-fill: white; -fx-background-color: black; -fx-padding: 10px; -fx-opacity: 1;");
+        // Position the label at the top right corner
+        label.setTranslateX(-10); // 10px from the right
+        label.setTranslateY(10); // 10px from the top (will be set using StackPane alignment)
+        StackPane.setAlignment(label, javafx.geometry.Pos.TOP_RIGHT);
+        return label;
+    }
+
+    public ScreenController(Stage stage, GameStateEventManager.EventEmitter stateEmitter, Environment environment,
+            TimeController timeController) {
         this.stateEmitter = stateEmitter;
         this.environment = environment;
+        this.timeController = timeController;
         MainScene scene = new MainScene(stage);
         initializeLayers();
         ((StackPane) scene.getScene().getRoot()).getChildren().addAll(layers);
         ((StackPane) scene.getScene().getRoot()).getChildren().add(gameStateDebugText);
         ((StackPane) scene.getScene().getRoot()).getChildren().add(environmentLevelDebugText);
+        ((StackPane) scene.getScene().getRoot()).getChildren().add(timerDebugText);
         updateScreen(GameState.TITLE, GameState.TITLE);
     }
 
@@ -178,6 +195,15 @@ public class ScreenController implements GameStateEventManager {
             gameStateDebugText.setVisible(false);
             environmentLevelDebugText.setVisible(false);
         }
+
+        // create a ticker with javafx to update the timer
+        javafx.animation.Timeline timeline = new javafx.animation.Timeline(
+                new javafx.animation.KeyFrame(javafx.util.Duration.seconds(1), event -> {
+                    timerDebugText.setText("" + timeController.getSecondsRemaining());
+                }));
+        timeline.setCycleCount(javafx.animation.Animation.INDEFINITE);
+        timeline.play();
+        timerDebugText.setVisible(DEBUG_MODE);
 
         gameStateDebugText.setText(String.valueOf(newState));
 

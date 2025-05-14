@@ -1,6 +1,7 @@
 package controller.output;
 
 import com.algaecare.controller.GameStateEventManager;
+import com.algaecare.controller.input.TimeController;
 import com.algaecare.controller.output.ScreenController;
 import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
@@ -18,6 +19,7 @@ class ScreenControllerTest {
     private GameStateEventManager.EventEmitter emitter;
     private Environment environment;
     private Stage stage;
+    private TimeController timeController;
 
     @BeforeAll
     static void initJfx() {
@@ -30,18 +32,19 @@ class ScreenControllerTest {
         emitter = mock(GameStateEventManager.EventEmitter.class);
         environment = mock(Environment.class);
         stage = mock(Stage.class);
+        timeController = mock(TimeController.class);
     }
 
     @Test
     void constructorShouldNotThrow() {
         when(environment.getAlgaeLevel()).thenReturn(100);
-        assertDoesNotThrow(() -> new ScreenController(stage, emitter, environment));
+        assertDoesNotThrow(() -> new ScreenController(stage, emitter, environment, timeController));
     }
 
     @Test
     void onGameStateChangedShouldCallUpdateScreen() {
         when(environment.getAlgaeLevel()).thenReturn(100);
-        ScreenController controller = new ScreenController(stage, emitter, environment);
+        ScreenController controller = new ScreenController(stage, emitter, environment, timeController);
 
         // Should not throw and should update the screen
         assertDoesNotThrow(() -> controller.onGameStateChanged(GameState.TITLE, GameState.GAMEPLAY));
@@ -50,7 +53,7 @@ class ScreenControllerTest {
     @Test
     void getCurrentStateShouldThrowUnsupportedOperationException() {
         when(environment.getAlgaeLevel()).thenReturn(100);
-        ScreenController controller = new ScreenController(stage, emitter, environment);
+        ScreenController controller = new ScreenController(stage, emitter, environment, timeController);
 
         assertThrows(UnsupportedOperationException.class, controller::getCurrentState);
     }
@@ -58,7 +61,8 @@ class ScreenControllerTest {
     @Test
     void updateScreenShouldShowCorrectDebugText() {
         when(environment.getAlgaeLevel()).thenReturn(42);
-        ScreenController controller = new ScreenController(stage, emitter, environment);
+        when(timeController.getSecondsRemaining()).thenReturn(60);
+        ScreenController controller = new ScreenController(stage, emitter, environment, timeController);
 
         // This will update the debug text label (not visible in test, but should not
         // throw)
