@@ -56,13 +56,13 @@ public class LedController implements GameStateEventManager {
     public void onGameStateChanged(GameState oldState, GameState newState) {
         int level = environment.getAlgaeLevel();
 
-        int thresholdIndex = ((level * 6) / 100);
+        int thresholdIndex = (((100 - level) * 6) / 100);
 
         for (int i = 0; i < PIN_LEDS.length; i++) {
-            if (i >= thresholdIndex) {
-                updateLed(i, false);
-            } else {
+            if (i <= thresholdIndex) {
                 updateLed(i, true);
+            } else {
+                updateLed(i, false);
             }
         }
     }

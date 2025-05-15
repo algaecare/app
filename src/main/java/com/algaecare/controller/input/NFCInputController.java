@@ -289,7 +289,8 @@ public class NFCInputController implements GameStateEventManager {
 
     @Override
     public void onGameStateChanged(GameState oldState, GameState newState) {
-        if((oldState == GameState.GAMEPLAY || oldState == GameState.TITLE || oldState == GameState.AXOLOTL_INTRODUCTION) && newState != oldState) {
+        if((oldState == GameState.GAMEPLAY || oldState == GameState.TITLE ||
+            oldState == GameState.AXOLOTL_INTRODUCTION) && newState != oldState) {
             new Thread(() ->{
                 stepMotorController.openTrapDoor();
             }).start();

@@ -117,6 +117,9 @@ public class StepMotorController implements GameStateEventManager {
     @Override
     public void onGameStateChanged(GameState oldState, GameState newState) {
         int level = environment.getAlgaeLevel();
+        if (level < 0) {
+            level = 1;
+        }
         int stepsGood = Math.round(2000 - ((float) level / 100 * 4000));
 
         int co2StepsToDo = stepsGood - stepCounterCO2;
