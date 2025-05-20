@@ -1,0 +1,1 @@
+scp -r /Users/timbuser/Documents/PRIMEOENERGIE/algae-care.zip pi@100.107.22.123:/home/pi/algaecare/app
