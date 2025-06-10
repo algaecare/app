@@ -12,83 +12,39 @@ import static java.lang.Thread.sleep;
 public class StepMotorController implements GameStateEventManager {
 
     private final Environment environment;
-    private final StepMotor o2Display;
-    private final StepMotor co2Display;
     private final StepMotor trapDoor;
-    public int stepCounterO2 = 0;
-    public int stepCounterCO2 = 0;
-    private int stepCounterTrapDoor = 0;
 
     private final int[][] stepSequence = {
-        {1, 0, 0, 1},
-        {1, 0, 0, 0},
-        {1, 1, 0, 0},
-        {0, 1, 0, 0},
-        {0, 1, 1, 0},
-        {0, 0, 1, 0},
-        {0, 0, 1, 1},
-        {0, 0, 0, 1}
+            { 1, 0, 0, 1 },
+            { 1, 0, 0, 0 },
+            { 1, 1, 0, 0 },
+            { 0, 1, 0, 0 },
+            { 0, 1, 1, 0 },
+            { 0, 0, 1, 0 },
+            { 0, 0, 1, 1 },
+            { 0, 0, 0, 1 }
     };
 
     public StepMotorController(Environment environment, Context pi4j) {
         this.environment = environment;
 
-        //co2Display
-        co2Display = new StepMotor(
-            pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                .id("IN1-1").address(5).shutdown(DigitalState.LOW)
-                .initial(DigitalState.LOW)
-                .provider("gpiod-digital-output")),
-            pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                .id("IN1-2").address(6).shutdown(DigitalState.LOW)
-                .initial(DigitalState.LOW)
-                .provider("gpiod-digital-output")),
-            pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                .id("IN1-3").address(13).shutdown(DigitalState.LOW)
-                .initial(DigitalState.LOW)
-                .provider("gpiod-digital-output")),
-            pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                .id("IN1-4").address(19).shutdown(DigitalState.LOW)
-                .initial(DigitalState.LOW)
-                .provider("gpiod-digital-output")));
-
-        //o2Display
+        // trapDoor
         trapDoor = new StepMotor(
-            pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                .id("IN2-1").address(2).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                .provider("gpiod-digital-output")),
-            pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                .id("IN2-2").address(3).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                .provider("gpiod-digital-output")),
-            pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                .id("IN2-3").address(4).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                .provider("gpiod-digital-output")),
-            pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                .id("IN2-4").address(7).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                .provider("gpiod-digital-output")));
-
-        //trapDoor
-        o2Display = new StepMotor(
-            pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                .id("IN3-1").address(27).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                .provider("gpiod-digital-output")),
-            pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                .id("IN3-2").address(22).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                .provider("gpiod-digital-output")),
-            pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                .id("IN3-3").address(10).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                .provider("gpiod-digital-output")),
-            pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
-                .id("IN3-4").address(12).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
-                .provider("gpiod-digital-output")));
+                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                        .id("IN2-1").address(2).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                        .provider("gpiod-digital-output")),
+                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                        .id("IN2-2").address(3).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                        .provider("gpiod-digital-output")),
+                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                        .id("IN2-3").address(4).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                        .provider("gpiod-digital-output")),
+                pi4j.create(DigitalOutputConfigBuilder.newInstance(pi4j)
+                        .id("IN2-4").address(7).shutdown(DigitalState.LOW).initial(DigitalState.LOW)
+                        .provider("gpiod-digital-output")));
 
         // RESET POSITION
-        rotateMotor(co2Display, 4100);
-        rotateMotor(o2Display, 4100);
-        rotateMotor(trapDoor, 4100);
-
-        rotateMotor(co2Display, -2050);
-        rotateMotor(o2Display, -2050);
+        rotateMotor(trapDoor, -4100);
     }
 
     public void rotateMotor(StepMotor motor, int steps) {
@@ -114,27 +70,6 @@ public class StepMotorController implements GameStateEventManager {
         }
     }
 
-    @Override
-    public void onGameStateChanged(GameState oldState, GameState newState) {
-        int level = environment.getAlgaeLevel();
-        if (level < 0) {
-            level = 1;
-        }
-        int stepsGood = Math.round(2000 - ((float) level / 100 * 4000));
-
-        int co2StepsToDo = stepsGood - stepCounterCO2;
-        int o2StepsToDo = stepsGood - stepCounterO2;
-
-        if (co2StepsToDo != 0) {
-            rotateMotor(co2Display, co2StepsToDo);
-            stepCounterCO2 += co2StepsToDo;
-        }
-        if (o2StepsToDo != 0) {
-            rotateMotor(o2Display, o2StepsToDo);
-            stepCounterO2 += o2StepsToDo;
-        }
-    }
-
     public void openTrapDoor() {
         rotateMotor(trapDoor, -2000);
         rotateMotor(trapDoor, 3000);
@@ -143,5 +78,12 @@ public class StepMotorController implements GameStateEventManager {
     @Override
     public GameState getCurrentState() {
         return null;
+    }
+
+    @Override
+    public void onGameStateChanged(GameState oldState, GameState newState) {
+        // TODO Auto-generated method stub
+        // throw new UnsupportedOperationException("Unimplemented method
+        // 'onGameStateChanged'");
     }
 }
