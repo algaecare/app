@@ -137,7 +137,7 @@ public class StepMotorController implements GameStateEventManager {
 
     public void openTrapDoor() {
         rotateMotor(trapDoor, -2000);
-        rotateMotor(trapDoor, -3000);
+        rotateMotor(trapDoor, 3000);
     }
 
     @Override

@@ -11,6 +11,7 @@ import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
 import com.algaecare.view.*;
 
+import javafx.scene.Cursor;
 import javafx.scene.control.Label;
 import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
@@ -79,6 +80,7 @@ public class ScreenController implements GameStateEventManager {
         ((StackPane) scene.getScene().getRoot()).getChildren().add(environmentLevelDebugText);
         ((StackPane) scene.getScene().getRoot()).getChildren().add(timerDebugText);
         updateScreen(GameState.TITLE, GameState.TITLE);
+        scene.getScene().setCursor(Cursor.NONE);
     }
 
     private void initializeLayers() {
