@@ -3,7 +3,7 @@ Description=AlgaeCare
 After=graphical.target
 
 [Service]
-ExecStart=/home/algaecare/app/startup-script.sh
+ExecStart=/home/algaecare/app/start.sh
 WorkingDirectory=/home/algaecare/app
 StandardOutput=inherit
 StandardError=inherit
