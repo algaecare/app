@@ -1,0 +1,15 @@
+[Unit]
+Description=AlgaeCare
+After=graphical.target
+
+[Service]
+ExecStart=/home/algaecare/app/startup-script.sh
+WorkingDirectory=/home/algaecare/app
+StandardOutput=inherit
+StandardError=inherit
+Restart=on-failure
+User=algaecare
+Group=algaecare
+
+[Install]
+WantedBy=graphical.target
