@@ -7,9 +7,16 @@ import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
 import java.io.File;
+import java.net.URI;
+import java.net.URL;
+import java.nio.file.FileSystem;
+import java.nio.file.FileSystems;
+import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -17,6 +24,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.algaecare.model.GameState;
 
@@ -90,15 +98,96 @@ public class ActionLayer extends Layer {
 
     private List<String> loadFrameUrls(String folderPath) {
         try {
-            Path path = Paths.get(Objects.requireNonNull(
-                    getClass().getResource(folderPath)).toURI());
-            File folder = path.toFile();
+            List<String> frameUrls = new ArrayList<>();
 
-            return Arrays.stream(Objects.requireNonNull(folder.listFiles()))
-                    .filter(file -> file.getName().toLowerCase().matches(".*\\.(png|jpg|jpeg)$"))
-                    .sorted()
-                    .map(file -> file.toURI().toString())
-                    .collect(Collectors.toList());
+            // Get the resource URL
+            URL resourceUrl = getClass().getResource(folderPath);
+            if (resourceUrl == null) {
+                throw new IllegalArgumentException("Resource folder not found: " + folderPath);
+            }
+
+            URI uri = resourceUrl.toURI();
+
+            if ("jar".equals(uri.getScheme())) {
+                // We're running from a JAR - need to handle differently
+                // Since we can't easily "list" files in a JAR directory,
+                // we'll try a common naming convention approach
+
+                // Try common frame naming patterns
+                String[] patterns = {
+                        "frame_%03d.png", // frame_001.png, frame_002.png, etc.
+                        "frame_%d.png", // frame_1.png, frame_2.png, etc.
+                        "image_%03d.png", // image_001.png, image_002.png, etc.
+                        "image_%d.png", // image_1.png, image_2.png, etc.
+                        "%03d.png", // 001.png, 002.png, etc.
+                        "%d.png" // 1.png, 2.png, etc.
+                };
+
+                // Try to find frames using naming patterns
+                for (String pattern : patterns) {
+                    for (int i = 1; i <= 1000; i++) { // Try up to 1000 frames
+                        String frameName = String.format(pattern, i);
+                        URL frameUrl = getClass().getResource(folderPath + "/" + frameName);
+                        if (frameUrl != null) {
+                            frameUrls.add(frameUrl.toExternalForm());
+                        } else if (i > 10 && frameUrls.isEmpty()) {
+                            // If we haven't found anything after 10 tries, try next pattern
+                            break;
+                        } else if (frameUrls.size() > 0 && frameUrl == null) {
+                            // We found some frames but this one is missing - assume we're done
+                            break;
+                        }
+                    }
+                    if (!frameUrls.isEmpty()) {
+                        break; // Found frames with this pattern
+                    }
+                }
+
+                if (frameUrls.isEmpty()) {
+                    // Fallback: try to read from a file system if we're in development
+                    try (FileSystem fileSystem = FileSystems.newFileSystem(uri, Collections.emptyMap())) {
+                        Path folderPathInJar = fileSystem.getPath(folderPath);
+                        if (Files.exists(folderPathInJar)) {
+                            try (Stream<Path> files = Files.walk(folderPathInJar)) {
+                                frameUrls = files
+                                        .filter(Files::isRegularFile)
+                                        .filter(path -> {
+                                            String fileName = path.getFileName().toString().toLowerCase();
+                                            return fileName.matches(".*\\.(png|jpg|jpeg)$");
+                                        })
+                                        .sorted()
+                                        .map(path -> getClass().getResource(path.toString()).toExternalForm())
+                                        .collect(Collectors.toList());
+                            }
+                        }
+                    }
+                }
+
+            } else {
+                // We're running from the file system (development mode)
+                Path path = Paths.get(uri);
+                if (Files.exists(path) && Files.isDirectory(path)) {
+                    try (Stream<Path> files = Files.walk(path)) {
+                        frameUrls = files
+                                .filter(Files::isRegularFile)
+                                .filter(p -> {
+                                    String fileName = p.getFileName().toString().toLowerCase();
+                                    return fileName.matches(".*\\.(png|jpg|jpeg)$");
+                                })
+                                .sorted()
+                                .map(p -> p.toUri().toString())
+                                .collect(Collectors.toList());
+                    }
+                }
+            }
+
+            if (frameUrls.isEmpty()) {
+                throw new IllegalArgumentException("No image frames found in sequence folder: " + folderPath);
+            }
+
+            LOGGER.info("Loaded " + frameUrls.size() + " frames from: " + folderPath);
+            return frameUrls;
+
         } catch (Exception e) {
             LOGGER.log(Level.SEVERE, "Failed to load frame URLs from: " + folderPath, e);
             throw new IllegalArgumentException("No frames found in sequence folder: " + folderPath, e);
