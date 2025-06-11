@@ -6,7 +6,7 @@ import com.algaecare.model.GameState;
 import com.pi4j.context.Context;
 
 public class LedController implements GameStateEventManager {
-    private static final int[] PIN_LEDS = {14, 15, 18, 23, 24, 25};
+    private static final int[] PIN_LEDS = { 14, 15, 18, 26, 24, 25 };
     private static final int PIN_LEDS_LEVER = 11;
     private Environment environment;
     private Context pi4j;
@@ -30,7 +30,8 @@ public class LedController implements GameStateEventManager {
             updateLed(i, true);
             try {
                 Thread.sleep(500);
-            } catch (InterruptedException ignored) { }
+            } catch (InterruptedException ignored) {
+            }
             updateLed(i, false);
         }
     }
