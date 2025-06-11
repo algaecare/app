@@ -44,7 +44,7 @@ public class StepMotorController implements GameStateEventManager {
                         .provider("gpiod-digital-output")));
 
         // RESET POSITION
-        rotateMotor(trapDoor, -4100);
+        rotateMotor(trapDoor, 4100);
     }
 
     public void rotateMotor(StepMotor motor, int steps) {
