@@ -87,20 +87,35 @@ public class NFCInputController implements GameStateEventManager {
     private void startLeverListener() {
         leverTimer = new AnimationTimer() {
             private long lastUpdate = 0;
+            private boolean wasHigh = false;
+            private boolean isProcessing = false;
 
             @Override
             public void handle(long now) {
                 if (now - lastUpdate < DEBOUNCE_TIME * 1_000_000)
                     return;
-                lastUpdate = now;
 
-                if (leverButton.isHigh()) {
-                    if (!isLeverPressed) {
-                        isLeverPressed = true;
-                        LOGGER.info("Lever pressed - scheduling NFC read");
-                        executor.submit(this::readAndEmitNfc);
-                    }
+                boolean isHigh = leverButton.isHigh();
+
+                // Only trigger on rising edge and when not already processing
+                if (isHigh && !wasHigh && !isLeverPressed && !isProcessing) {
+                    isLeverPressed = true;
+                    isProcessing = true;
+                    LOGGER.info("Lever pressed - scheduling NFC read");
+                    executor.submit(() -> {
+                        try {
+                            readAndEmitNfc();
+                        } finally {
+                            isProcessing = false;
+                        }
+                    });
+                } else if (!isHigh && wasHigh) {
+                    // Reset on falling edge
+                    isLeverPressed = false;
                 }
+
+                wasHigh = isHigh;
+                lastUpdate = now;
             }
 
             private void readAndEmitNfc() {
@@ -122,7 +137,6 @@ public class NFCInputController implements GameStateEventManager {
             }
         };
         leverTimer.start();
-        LOGGER.info("Started JavaFX lever listener (non-blocking)");
     }
 
     public void shutdown() {
