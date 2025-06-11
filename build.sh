@@ -1,5 +1,9 @@
 #!/bin/bash
 
+INSTALL_DIR="/home/algaecare/app/dist"
+
+echo "Installing application to persistent directory..."
+
 # Build script for Algae Care Application
 LOG_FILE="build.log"
 
@@ -67,5 +71,32 @@ else
     echo "$(date): Make sure resources are in src/main/resources/ before building" | tee -a "$LOG_FILE"
 fi
 
-echo "To deploy to Pi: Use the deployment scripts"
 echo "$(date): Build script finished." | tee -a "$LOG_FILE"
+
+if [ $? -ne 0 ]; then
+    echo "Build failed. Cannot install."
+    exit 1
+fi
+
+# Create install directory
+mkdir -p "$INSTALL_DIR"
+
+# Copy JAR files
+if [ -f "target/algaecare-shaded.jar" ]; then
+    cp "target/algaecare-shaded.jar" "$INSTALL_DIR/"
+    echo "Shaded JAR installed to $INSTALL_DIR/"
+fi
+
+if [ -f "target/algaecare.jar" ]; then
+    cp "target/algaecare.jar" "$INSTALL_DIR/"
+    echo "Regular JAR installed to $INSTALL_DIR/"
+fi
+
+# Copy dependencies
+if [ -d "target/libs" ]; then
+    cp -r "target/libs" "$INSTALL_DIR/"
+    echo "Dependencies installed to $INSTALL_DIR/libs/"
+fi
+
+echo "Installation complete!"
+echo "JAR files are now persistent in: $INSTALL_DIR"
