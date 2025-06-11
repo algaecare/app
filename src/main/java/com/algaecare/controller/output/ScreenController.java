@@ -23,7 +23,7 @@ public class ScreenController implements GameStateEventManager {
 
     private final Environment environment;
 
-    private final boolean DEBUG_MODE = false;
+    private final boolean DEBUG_MODE = true;
     private final Label gameStateDebugText = createGameStateDebugText();
     private final Label environmentLevelDebugText = createEnvironmentLevelDebugText();
     private final Label timerDebugText = createTimerDebugText();
