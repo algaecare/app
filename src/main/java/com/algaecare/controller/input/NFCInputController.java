@@ -35,7 +35,7 @@ public class NFCInputController implements GameStateEventManager {
     private GameState currentState;
     private DigitalInput leverButton;
     private static final int LEVER_PIN = 16;
-    private static final int DEBOUNCE_TIME = 100; // milliseconds
+    private static final int DEBOUNCE_TIME = 3000; // milliseconds
     public boolean isLeverPressed = false;
     private AnimationTimer leverTimer;
     private final ExecutorService executor = Executors.newSingleThreadExecutor();
