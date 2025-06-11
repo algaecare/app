@@ -3,7 +3,6 @@ package controller.input;
 import com.algaecare.controller.GameStateEventManager;
 import com.algaecare.controller.input.NFCInputController;
 import com.algaecare.controller.output.StepMotorController;
-import com.algaecare.model.Environment;
 import com.algaecare.model.GameState;
 import com.pi4j.context.Context;
 import com.pi4j.io.gpio.digital.DigitalInput;
@@ -39,7 +38,7 @@ class NFCInputControllerTest {
         DigitalInput digitalInput = mock(DigitalInput.class);
         when(pi4j.create(any(com.pi4j.io.gpio.digital.DigitalInputConfig.class))).thenReturn(digitalInput);
         StepMotorController stepMotorController = mock(StepMotorController.class);
-        assertDoesNotThrow(() -> new NFCInputController(emitter, pi4j,stepMotorController));
+        assertDoesNotThrow(() -> new NFCInputController(emitter, pi4j, stepMotorController));
     }
 
     @Test
