@@ -68,4 +68,8 @@ public class TimeController implements GameStateEventManager {
     public int getSecondsRemaining() {
         return secondsRemaining;
     }
+
+    public int getGameDurationSeconds() {
+        return GAME_DURATION_SECONDS;
+    }
 }

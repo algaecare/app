@@ -23,7 +23,7 @@ public class ScreenController implements GameStateEventManager {
 
     private final Environment environment;
 
-    private final boolean DEBUG_MODE = true;
+    private final boolean DEBUG_MODE = false;
     private final Label gameStateDebugText = createGameStateDebugText();
     private final Label environmentLevelDebugText = createEnvironmentLevelDebugText();
     private final Label timerDebugText = createTimerDebugText();
@@ -34,6 +34,7 @@ public class ScreenController implements GameStateEventManager {
     private final List<AlgaeLayer> shownAlgaeLayers = new ArrayList<>();
     private final AxolotlLayer axolotlLayer = new AxolotlLayer(1425, 610, 550, 505);
     private final StaticLayer environmentLayer = new StaticLayer(0, 0, "/30-ENVIRONMENT.png");
+    private final TimeLineLayer timeLineLayer;
 
     private Label createGameStateDebugText() {
         Label label = new Label();
@@ -73,6 +74,7 @@ public class ScreenController implements GameStateEventManager {
         this.stateEmitter = stateEmitter;
         this.environment = environment;
         this.timeController = timeController;
+        this.timeLineLayer = new TimeLineLayer(timeController);
         MainScene scene = new MainScene(stage);
         initializeLayers();
         ((StackPane) scene.getScene().getRoot()).getChildren().addAll(layers);
@@ -167,6 +169,9 @@ public class ScreenController implements GameStateEventManager {
             }
         }
 
+        // TIME LINE LAYER
+        layers.add(timeLineLayer);
+
         updateScreen(GameState.TITLE, GameState.TITLE);
     }
 
@@ -251,6 +256,7 @@ public class ScreenController implements GameStateEventManager {
             case GAMEPLAY -> {
                 showTextLayer(oldState);
                 showAxolotlLayer();
+                timeLineLayer.showLayer();
             }
 
             case OBJECT_GARBAGE_BAG, OBJECT_SHOPPING_BASKET_INTERNATIONAL, OBJECT_RECYCLING_BIN,
@@ -263,12 +269,14 @@ public class ScreenController implements GameStateEventManager {
             }
 
             case ENDSCREEN_NEGATIVE -> {
+                timeLineLayer.hideLayer();
                 showTextLayer(GameState.ENDSCREEN_NEGATIVE);
                 showAxolotlLayer(AxolotlLayer.Expression.WORST);
                 onTimerComplete(GameState.GOODBYE);
             }
 
             case ENDSCREEN_POSITIVE -> {
+                timeLineLayer.hideLayer();
                 showTextLayer(GameState.ENDSCREEN_POSITIVE);
                 showAxolotlLayer(AxolotlLayer.Expression.HAPPY);
                 onTimerComplete(GameState.GOODBYE);
@@ -339,6 +347,7 @@ public class ScreenController implements GameStateEventManager {
     }
 
     private void showActionLayer(GameState state) {
+        timeLineLayer.showLayer();
         for (Layer layer : layers) {
             if (layer instanceof ActionLayer actionLayer) {
                 if (actionLayer.getGameState() == state) {
@@ -353,6 +362,7 @@ public class ScreenController implements GameStateEventManager {
     }
 
     private void showItemLayer(GameState state) {
+        timeLineLayer.showLayer();
         for (Layer layer : layers) {
             if (layer instanceof ItemLayer itemLayer && itemLayer.getGameState() == state) {
                 itemLayer.showLayer();
