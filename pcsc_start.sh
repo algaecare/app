@@ -5,7 +5,9 @@ show_message() {
     clear
     echo -e "\n\n"
     echo "=============================================="
+    echo ""
     echo "$1"
+    echo ""
     echo "=============================================="
 }
 
@@ -17,19 +19,22 @@ countdown() {
         sleep 1
         ((seconds--))
     done
-    echo -e "\rStarting scan now...                    "
+    echo -e "\rStarting scan now..."
 }
 
 # Main script
-show_message "Please connect your PCSC Scanner now!"
-echo -e "\nWaiting for 15 seconds before starting the scan..."
+show_message "~ BITTE STECKE DAS WEISSE USB KABEL HINTER DEM KASTEN AUS UND WIEDER EIN ~"
+echo -e "\nWaiting for 10 seconds before starting the scan..."
 echo -e "You can press Ctrl+C to cancel if needed.\n"
 
 # Countdown
-countdown 15
+countdown 10
 
 # Clear screen before starting pcsc_scan
 clear
+
+# start the start.sh script in the background
+exec /home/algaecare/app/start.sh &
 
 # Start the actual pcsc_scan in the same terminal
 exec /usr/bin/pcsc_scan
