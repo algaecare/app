@@ -12,14 +12,10 @@ if systemctl is-active --quiet algaecare.service; then
     sudo systemctl stop algaecare.service
 fi
 
-# Reset git repository to ensure a clean state
-cd "$APP_DIR" || { echo "$(date): Failed to change directory to $APP_DIR. Check $LOG_FILE for details." | tee -a "$LOG_FILE"; exit 1; }
-echo "$(date): Resetting git repository..." | tee -a "$LOG_FILE"
+# Discard any local changes for a clean update
+echo "$(date): Resetting local changes for a clean update..." | tee -a "$LOG_FILE"
 git reset --hard HEAD 2>&1 | tee -a "$LOG_FILE"
-if [ ${PIPESTATUS[0]} -ne 0 ]; then
-    echo "$(date): Git reset failed. Check $LOG_FILE for details." | tee -a "$LOG_FILE"
-    exit 1
-fi
+git clean -fd 2>&1 | tee -a "$LOG_FILE"
 
 # Pull the latest version from GitHub
 echo "$(date): Pulling latest version from GitHub..." | tee -a "$LOG_FILE"
