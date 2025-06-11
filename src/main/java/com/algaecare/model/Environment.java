@@ -42,6 +42,8 @@ public class Environment {
             LOGGER.warning("Umweltobjekt nicht gefunden: " + environmentObjectID);
             return;
         } else {
+            LOGGER.info("CALLED updateEnvironment with object: " + environmentObject.getObjectID()
+                    + " and algae change: " + environmentObject.getAlgaeChange());
             int newAlgaeLevel = algaeLevel + environmentObject.getAlgaeChange();
             if (newAlgaeLevel < 0) {
                 newAlgaeLevel = 0;
