@@ -289,14 +289,28 @@ public class NFCInputController implements GameStateEventManager {
 
     @Override
     public void onGameStateChanged(GameState oldState, GameState newState) {
-        if ((oldState == GameState.GAMEPLAY || oldState == GameState.TITLE ||
-                oldState == GameState.AXOLOTL_INTRODUCTION) && newState != oldState) {
+        // Handle transition from TITLE state
+        if (oldState == GameState.TITLE) {
+            if (newState == GameState.AXOLOTL_INTRODUCTION) {
+                // Valid transition - open trap door
+                new Thread(() -> {
+                    stepMotorController.openTrapDoor();
+                }).start();
+            } else {
+                eventEmitter.emitGameStateChange(GameState.NOT_AXOLOTL);
+                return; // Don't update current state for invalid transitions
+            }
+        }
+
+        // Handle other state transitions that should open trap door
+        if ((oldState == GameState.GAMEPLAY || oldState == GameState.AXOLOTL_INTRODUCTION)
+                && newState != oldState) {
             new Thread(() -> {
                 stepMotorController.openTrapDoor();
             }).start();
         }
+
         this.currentState = newState;
         this.isLeverPressed = false; // Reset lever state after game state change
-        LOGGER.fine("NFCInput Controller state changed from " + oldState + " to " + newState);
     }
 }
