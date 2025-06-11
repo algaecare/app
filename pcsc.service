@@ -1,0 +1,17 @@
+[Unit]
+Description=PCSC Scanner Terminal Application with User Prompt
+After=graphical.target
+
+[Service]
+Type=simple
+User=algaecare
+Group=algaecare
+WorkingDirectory=/home/algaecare/app
+Environment=DISPLAY=:0
+Environment=XAUTHORITY=/home/algaecare/.Xauthority
+ExecStart=/usr/bin/xterm -fa 'Monospace' -fs 12 -bg black -fg green -title "PCSC Scanner" -hold -e pcsc-start.sh
+Restart=always
+RestartSec=10
+
+[Install]
+WantedBy=graphical.target
