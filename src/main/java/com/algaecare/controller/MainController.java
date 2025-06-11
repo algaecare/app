@@ -25,13 +25,16 @@ public class MainController
     private final List<GameStateEventManager> listeners = new ArrayList<>();
     private GameState currentState;
     private Context pi4j;
+    // Instances
+    private final Environment environment;
+    private final TimeController timeController;
 
     public MainController(Stage stage) {
         // Initialize model
-        Environment environment = new Environment(50);
+        this.environment = new Environment(this);
 
         // Initialize controllers
-        TimeController timeController = new TimeController(this, environment);
+        this.timeController = new TimeController(this);
         KeyboardInputController keyboardInputController = new KeyboardInputController(stage, this);
         ScreenController screenController = new ScreenController(stage, this, environment, timeController);
 
@@ -92,5 +95,20 @@ public class MainController
             LOGGER.warning("Not running on ARM platform - GPIO control disabled");
             return "none";
         }
+    }
+
+    public void finishGame() {
+        LOGGER.info("Game finished, resetting environment");
+
+        GameState endState = environment.getAlgaeLevel() > environment.getAlgaeThreshold()
+                ? GameState.ENDSCREEN_POSITIVE
+                : GameState.ENDSCREEN_NEGATIVE;
+
+        // Reset environment and timer
+        environment.reset();
+        timeController.resetTimer();
+
+        // Notfy listeners of game state change
+        notifyGameStateChanged(currentState, endState);
     }
 }

@@ -4,14 +4,19 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 
+import com.algaecare.controller.MainController;
+
 public class Environment {
     private static final Logger LOGGER = Logger.getLogger(Environment.class.getName());
+    private final MainController mainController;
+    private static final int ALGAE_THRESHOLD = 50;
     private int algaeLevel; // in percentage (0-100)
 
     private List<EnvironmentObject> environmentObjects = new ArrayList<>();
 
-    public Environment(int algaeLevel) {
-        this.algaeLevel = algaeLevel;
+    public Environment(MainController mainController) {
+        this.mainController = mainController;
+        this.algaeLevel = ALGAE_THRESHOLD; // Default algae level
         this.environmentObjects = initializeEnvironmentObjects();
     }
 
@@ -40,6 +45,7 @@ public class Environment {
             int newAlgaeLevel = algaeLevel + environmentObject.getAlgaeChange();
             if (newAlgaeLevel < 0) {
                 newAlgaeLevel = 0;
+                mainController.finishGame();
             } else if (newAlgaeLevel > 100) {
                 newAlgaeLevel = 100;
             }
@@ -48,10 +54,14 @@ public class Environment {
     }
 
     public void reset() {
-        this.algaeLevel = 50;
+        this.algaeLevel = ALGAE_THRESHOLD;
     }
 
     public int getAlgaeLevel() {
         return algaeLevel;
+    }
+
+    public int getAlgaeThreshold() {
+        return ALGAE_THRESHOLD;
     }
 }

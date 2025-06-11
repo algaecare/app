@@ -214,19 +214,16 @@ public class ScreenController implements GameStateEventManager {
         if (!newState.name().startsWith("OBJECT_") && newState != GameState.GAMEPLAY) {
             environmentLayer.hideLayer();
         } else {
-            if (newState == GameState.TITLE || newState == GameState.GOODBYE) {
-                environment.reset();
-            }
             if (newState.name().startsWith("OBJECT_")) {
                 environment.updateEnvironment(newState);
             }
             environmentLayer.showLayer();
 
-            // LOGIC FOR ALGAE LAYER
             int algaeLevel = environment.getAlgaeLevel();
             if (algaeLevel == 0) {
-                emitStateChange(GameState.ENDSCREEN_NEGATIVE);
+                return; // No algae, no need to update layers
             }
+
             environmentLayer.setTargetOpacity(1 - algaeLevel / 100.0);
             showAlgaeLayersFromAlgaeLevel(algaeLevel);
             showAxolotlExpression(algaeLevel);
@@ -239,6 +236,7 @@ public class ScreenController implements GameStateEventManager {
                 showTextLayer(GameState.TITLE);
                 showTextLayer(GameState.SUBTITLE);
                 showAlgaeLayersFromAlgaeLevel(100);
+                environment.reset();
             }
 
             case NOT_AXOLOTL -> {
@@ -267,7 +265,7 @@ public class ScreenController implements GameStateEventManager {
             case ENDSCREEN_NEGATIVE -> {
                 showTextLayer(GameState.ENDSCREEN_NEGATIVE);
                 showAxolotlLayer(AxolotlLayer.Expression.WORST);
-                onTimerComplete(newState);
+                onTimerComplete(GameState.GOODBYE);
             }
 
             case ENDSCREEN_POSITIVE -> {
@@ -277,6 +275,7 @@ public class ScreenController implements GameStateEventManager {
             }
 
             case GOODBYE -> {
+                showAlgaeLayersFromAlgaeLevel(100);
                 showTextLayer(GameState.GOODBYE);
                 showAxolotlLayer(AxolotlLayer.Expression.HAPPY);
                 onTimerComplete(GameState.TITLE);
@@ -326,7 +325,7 @@ public class ScreenController implements GameStateEventManager {
     private void onTimerComplete(GameState nextState) {
         LOGGER.info("Game timer completed, transitioning to " + nextState);
         javafx.animation.Timeline timeline = new javafx.animation.Timeline(
-                new javafx.animation.KeyFrame(javafx.util.Duration.seconds(5), event -> emitStateChange(nextState)));
+                new javafx.animation.KeyFrame(javafx.util.Duration.seconds(15), event -> emitStateChange(nextState)));
         timeline.setCycleCount(1);
         timeline.play();
     }
