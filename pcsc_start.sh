@@ -22,16 +22,22 @@ countdown() {
     echo -e "\rStarting scan now..."
 }
 
+# Start pcsc_scan in background and redirect output to temp file
+temp_file=$(mktemp)
+/usr/bin/pcsc_scan > "$temp_file" &
+pcsc_pid=$!
+
 # Main script
 show_message "~ BITTE STECKE DAS WEISSE USB KABEL HINTER DEM KASTEN AUS UND WIEDER EIN ~"
-echo -e "\nWaiting for 10 seconds before starting the scan..."
+echo -e "\nWaiting for 20 seconds before showing the scan results..."
 echo -e "You can press Ctrl+C to cancel if needed.\n"
 
 # Countdown
-countdown 10
+countdown 20
 
-# Clear screen before starting pcsc_scan
+# Clear screen and show the output
 clear
+tail -f "$temp_file"
 
-# Start the actual pcsc_scan in the same terminal
-exec /usr/bin/pcsc_scan
+# Cleanup on script exit
+trap "kill $pcsc_pid; rm $temp_file" EXIT
