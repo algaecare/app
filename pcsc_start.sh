@@ -33,8 +33,5 @@ countdown 10
 # Clear screen before starting pcsc_scan
 clear
 
-# start the start.sh script in the background
-exec /home/algaecare/app/start.sh &
-
 # Start the actual pcsc_scan in the same terminal
 exec /usr/bin/pcsc_scan
