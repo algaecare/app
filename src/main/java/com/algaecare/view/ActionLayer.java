@@ -6,7 +6,6 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
 
-import java.io.File;
 import java.net.URI;
 import java.net.URL;
 import java.nio.file.FileSystem;
@@ -15,11 +14,9 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -185,7 +182,6 @@ public class ActionLayer extends Layer {
                 throw new IllegalArgumentException("No image frames found in sequence folder: " + folderPath);
             }
 
-            LOGGER.info("Loaded " + frameUrls.size() + " frames from: " + folderPath);
             return frameUrls;
 
         } catch (Exception e) {
