@@ -88,3 +88,6 @@ dist/
 .idea/
 
 src/main/resources/dynamic/*
+
+# Reduced dependecy
+dependency-reduced-pom.xml
