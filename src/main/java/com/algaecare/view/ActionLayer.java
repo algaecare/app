@@ -2,6 +2,7 @@ package com.algaecare.view;
 
 import javafx.animation.KeyFrame;
 import javafx.animation.Timeline;
+import javafx.application.Platform;
 import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.util.Duration;
@@ -18,6 +19,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.stream.Collectors;
@@ -37,10 +41,13 @@ public class ActionLayer extends Layer {
     private int currentFrame = 0;
     private Runnable onSequenceComplete;
     private final GameState gameState;
+    private final ExecutorService backgroundExecutor;
+    private Future<?> currentAnimationTask;
 
     public ActionLayer(GameState gameState, String sequenceFolderPath) {
         this.gameState = gameState;
         this.frameCache = new ConcurrentHashMap<>();
+        this.backgroundExecutor = Executors.newFixedThreadPool(2); // One for animation, one for preloading
 
         // Initialize ImageView
         imageView = new ImageView();
@@ -61,10 +68,13 @@ public class ActionLayer extends Layer {
         animation = new Timeline();
         animation.setCycleCount(frameUrls.size());
         animation.getKeyFrames().add(
-                new KeyFrame(FRAME_DURATION, event -> playNextFrame()));
+                new KeyFrame(FRAME_DURATION, event -> {
+                    // Submit frame loading to background thread
+                    backgroundExecutor.submit(this::playNextFrame);
+                }));
         animation.setOnFinished(event -> {
             if (onSequenceComplete != null) {
-                onSequenceComplete.run();
+                Platform.runLater(onSequenceComplete);
             }
         });
 
@@ -73,24 +83,27 @@ public class ActionLayer extends Layer {
     }
 
     private void preloadFrames(int startIndex) {
-        // Clear old cached frames that we won't need soon
-        frameCache.keySet().removeIf(index -> index < startIndex || index >= startIndex + PRELOAD_FRAMES);
+        // Submit preloading to background thread
+        backgroundExecutor.submit(() -> {
+            // Clear old cached frames that we won't need soon
+            frameCache.keySet().removeIf(index -> index < startIndex || index >= startIndex + PRELOAD_FRAMES);
 
-        // Preload next few frames
-        for (int i = 0; i < PRELOAD_FRAMES && startIndex + i < frameUrls.size(); i++) {
-            final int frameIndex = startIndex + i;
-            if (!frameCache.containsKey(frameIndex)) {
-                Image img = new Image(
-                        frameUrls.get(frameIndex),
-                        1920, // max width
-                        1080, // max height
-                        true, // preserve ratio
-                        true, // smooth
-                        true // background loading
-                );
-                frameCache.put(frameIndex, img);
+            // Preload next few frames
+            for (int i = 0; i < PRELOAD_FRAMES && startIndex + i < frameUrls.size(); i++) {
+                final int frameIndex = startIndex + i;
+                if (!frameCache.containsKey(frameIndex)) {
+                    Image img = new Image(
+                            frameUrls.get(frameIndex),
+                            1920, // max width
+                            1080, // max height
+                            true, // preserve ratio
+                            true, // smooth
+                            true // background loading
+                    );
+                    frameCache.put(frameIndex, img);
+                }
             }
-        }
+        });
     }
 
     private List<String> loadFrameUrls(String folderPath) {
@@ -198,7 +211,10 @@ public class ActionLayer extends Layer {
                     1920, 1080, true, true, true);
             frameCache.put(frameIndex, img);
         }
-        imageView.setImage(img);
+
+        // Update UI on JavaFX Application Thread
+        final Image finalImg = img;
+        Platform.runLater(() -> imageView.setImage(finalImg));
 
         // Preload next frames
         preloadFrames(frameIndex + 1);
@@ -215,20 +231,46 @@ public class ActionLayer extends Layer {
 
     @Override
     public void showLayer() {
+        // Cancel any existing animation task
+        if (currentAnimationTask != null && !currentAnimationTask.isDone()) {
+            currentAnimationTask.cancel(true);
+        }
+
         currentFrame = 0;
-        loadFrame(currentFrame); // Load first frame instead of accessing frames list
-        setVisible(true);
-        animation.playFromStart();
+
+        // Start animation on background thread
+        currentAnimationTask = backgroundExecutor.submit(() -> {
+            loadFrame(currentFrame);
+            Platform.runLater(() -> {
+                setVisible(true);
+                animation.playFromStart();
+            });
+        });
     }
 
     @Override
     public void hideLayer() {
-        setVisible(false);
-        animation.stop();
-        frameCache.clear(); // Clear cache when hiding
+        Platform.runLater(() -> {
+            setVisible(false);
+            animation.stop();
+        });
+
+        // Cancel current animation task
+        if (currentAnimationTask != null && !currentAnimationTask.isDone()) {
+            currentAnimationTask.cancel(true);
+        }
+
+        // Clear cache on background thread
+        backgroundExecutor.submit(() -> frameCache.clear());
     }
 
     public GameState getGameState() {
         return gameState;
+    }
+
+    // Add cleanup method for proper resource management
+    public void cleanup() {
+        hideLayer();
+        backgroundExecutor.shutdown();
     }
 }
